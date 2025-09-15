@@ -1,0 +1,23 @@
+:root {
+  /* Default theme colors (will be overridden by ThemeProvider) */
+  --color-background: rgb(15, 23, 42);
+  --color-surface: rgb(30, 41, 59);
+  --color-surface-secondary: rgb(51, 65, 85);
+  --color-border: rgb(71, 85, 105);
+  --color-text: rgb(248, 250, 252);
+  --color-text-secondary: rgb(148, 163, 184);
+  --color-accent: rgb(59, 130, 246);
+  --color-accent-secondary: rgb(37, 99, 235);
+  --color-success: rgb(34, 197, 94);
+  --color-warning: rgb(245, 158, 11);
+  --color-error: rgb(239, 68, 68);
+}
+
+html, body, #root {
+  height: 100vh;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+  width: 100vw;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
