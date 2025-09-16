@@ -1,10 +1,20 @@
 import { Calendar, Settings } from 'lucide-react'
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import useConfigStore from '../state/state-management'
 
 export default function Layout() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { config } = useConfigStore()
+
+  const handleSettingsClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (location.pathname === '/settings') {
+      navigate('/')
+    } else {
+      navigate('/settings')
+    }
+  }
 
   return (
     <div 
@@ -46,8 +56,8 @@ export default function Layout() {
             >
               <Calendar />
             </Link>
-            <Link 
-              to="/settings" 
+            <button 
+              onClick={handleSettingsClick}
               className='px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105'
               style={{
                 backgroundColor: location.pathname === '/settings' 
@@ -62,7 +72,7 @@ export default function Layout() {
               }}
             >
               <Settings />
-            </Link>
+            </button>
           </nav>
         </div>
       </header>
