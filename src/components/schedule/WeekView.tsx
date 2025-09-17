@@ -145,10 +145,20 @@ const WeekView = memo(({ currentDate, setViewMode }: WeekViewProps) => {
                   )}
 
                   {timeSlots.map((time, timeIndex) => (
-                    <div key={time} className="flex border-b" style={{
+                    <div key={time} className="flex border-b relative" style={{
                       borderColor: 'var(--color-border-alpha-30)',
                       minHeight: `${WEEK_HOUR_HEIGHT}px`
                     }}>
+                      {/* Half-hour dashed line */}
+                      <div 
+                        className="absolute left-0 right-0 border-t border-dashed opacity-75" 
+                        style={{
+                          borderColor: 'var(--color-border-alpha-30)',
+                          top: `${WEEK_HOUR_HEIGHT / 2}px`,
+                          zIndex: 5
+                        }}
+                      />
+                      
                       <div className="w-12 flex-shrink-0 p-2 text-xs font-medium border-r" style={{
                         borderColor: 'var(--color-border-alpha-30)',
                         color: 'var(--color-text-secondary)'
