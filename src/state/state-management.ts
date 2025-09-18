@@ -23,6 +23,11 @@ interface Theme {
     success: string;
     warning: string;
     error: string;
+    // Header-specific colors
+    headerAccent: string;
+    headerAccentSecondary: string;
+    headerText: string;
+    headerBackground: string;
   };
 }
 
@@ -43,6 +48,34 @@ const getThemes = (): Theme[] => [
       success: "rgb(34, 197, 94)", // green-500
       warning: "rgb(245, 158, 11)", // amber-500
       error: "rgb(239, 68, 68)", // red-500
+      // Header colors (same as regular accent for dark theme)
+      headerAccent: "rgb(59, 130, 246)", // blue-500
+      headerAccentSecondary: "rgb(37, 99, 235)", // blue-600
+      headerText: "rgb(148, 163, 184)", // slate-400
+      headerBackground: "rgb(30, 41, 59)", // slate-800 - matches surface-alpha-40 background from day/week switcher
+    }
+  },
+  {
+    id: "light",
+    name: "Light One",
+    description: "light mode (thumbs up)",
+    colors: {
+      background: "rgb(226, 232, 240)", // slate-200 - darker than previous slate-100
+      surface: "rgb(241, 245, 249)", // slate-100 - slightly lighter surface
+      surfaceSecondary: "rgb(203, 213, 225)", // slate-300
+      border: "rgb(148, 163, 184)", // slate-400 - more prominent borders
+      text: "rgb(15, 23, 42)", // slate-900
+      textSecondary: "rgb(71, 85, 105)", // slate-600
+      accent: "rgb(56, 189, 248)", // sky-400
+      accentSecondary: "rgb(14, 165, 233)", // sky-500
+      success: "rgb(34, 197, 94)", // green-500
+      warning: "rgb(245, 158, 11)", // amber-500
+      error: "rgb(239, 68, 68)", // red-500
+      // Header colors - strong blue even in light mode
+      headerAccent: "rgb(37, 99, 235)", // blue-600 - deeper blue for good contrast
+      headerAccentSecondary: "rgb(29, 78, 216)", // blue-700
+      headerText: "rgb(37, 99, 235)", // blue-600 - blue text for header elements
+      headerBackground: "rgb(219, 234, 254)", // blue-100 - light blue background
     }
   },
   {
@@ -61,6 +94,11 @@ const getThemes = (): Theme[] => [
       success: "rgb(34, 197, 94)", // green-500
       warning: "rgb(245, 158, 11)", // amber-500
       error: "rgb(239, 68, 68)", // red-500
+      // Header colors (keep original pink accent)
+      headerAccent: "rgb(220, 38, 127)", // pink-600
+      headerAccentSecondary: "rgb(190, 24, 93)", // pink-700
+      headerText: "rgb(161, 161, 170)", // zinc-400
+      headerBackground: "rgb(38, 38, 38)", // neutral-800 - matches surface-alpha-40 background for consistency
     }
   },
   {
@@ -80,6 +118,11 @@ const getThemes = (): Theme[] => [
       success: "rgb(120, 255, 137)", // bright success green
       warning: "rgb(255, 235, 59)", // bright yellow (like frog eyes)
       error: "rgb(255, 87, 87)", // bright red (danger in the swamp)
+      // Header colors (keep frog theme)
+      headerAccent: "rgb(72, 214, 89)", // vibrant frog green
+      headerAccentSecondary: "rgb(56, 183, 71)", // slightly darker frog green
+      headerText: "rgb(134, 239, 144)", // light green
+      headerBackground: "rgb(22, 78, 29)", // dark swamp green - matches surface-alpha-40 for consistency
     }
   },
 ];
@@ -90,6 +133,42 @@ const getListedThemes = (): Theme[] => getThemes().filter(theme => !theme.delist
 // Get all themes including delisted ones
 const getAllThemes = (): Theme[] => getThemes();
 
+// Helper function to determine if a theme is light or dark
+const isLightTheme = (theme: Theme): boolean => {
+  // Parse RGB values from background color
+  const match = theme.colors.background.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+  if (match) {
+    const [, r, g, b] = match.map(Number);
+    // Calculate luminance using the relative luminance formula
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.5; // If luminance > 0.5, it's considered light
+  }
+  return false;
+};
+
+// Helper function to get the best opposing theme (light <-> dark)
+const getOpposingTheme = (currentThemeId: string): string => {
+  const themes = getListedThemes();
+  const currentTheme = themes.find(t => t.id === currentThemeId);
+  
+  if (!currentTheme) return 'default';
+  
+  const isCurrentLight = isLightTheme(currentTheme);
+  
+  // Find the best opposing theme (light vs dark)
+  const opposingThemes = themes.filter(theme => 
+    theme.id !== currentThemeId && isLightTheme(theme) !== isCurrentLight
+  );
+  
+  // Return the first opposing theme, or fallback to default themes
+  if (opposingThemes.length > 0) {
+    return opposingThemes[0].id;
+  }
+  
+  // Fallback logic
+  return isCurrentLight ? 'default' : 'ocean-breeze';
+};
+
 interface Config {
   font: Font;
   theme: string;
@@ -99,12 +178,15 @@ interface Config {
 
 interface ConfigState {
   config: Config;
+  previousTheme: string; // Track the previous theme for toggling
   getThemes: () => Theme[];
   getListedThemes: () => Theme[];
   getAllThemes: () => Theme[];
   setConfig: (partial: Partial<Config>) => void;
   resetConfig: () => void;
   getCurrentTheme: () => Theme;
+  isCurrentThemeLight: () => boolean;
+  toggleLightDarkMode: () => void;
 }
 
 const defaultConfig: Config = {
@@ -118,6 +200,7 @@ const useConfigStore = create<ConfigState>()(
   persist(
     (set, get) => ({
       config: defaultConfig,
+      previousTheme: "default", // Initialize with default
       getThemes,
       getListedThemes,
       getAllThemes,
@@ -125,16 +208,39 @@ const useConfigStore = create<ConfigState>()(
         set((state) => ({
           config: { ...state.config, ...partial },
         })),
-      resetConfig: () => set({ config: defaultConfig }),
+      resetConfig: () => set({ config: defaultConfig, previousTheme: "default" }),
       getCurrentTheme: () => {
         const { config } = get();
         const themes = getAllThemes();
         return themes.find(theme => theme.id === config.theme) || themes[0];
       },
+      isCurrentThemeLight: () => {
+        const currentTheme = get().getCurrentTheme();
+        return isLightTheme(currentTheme);
+      },
+      toggleLightDarkMode: () => {
+        const { config, previousTheme } = get();
+        const currentThemeId = config.theme;
+        
+        // If we have a previous theme and it's different from current, switch back to it
+        if (previousTheme && previousTheme !== currentThemeId) {
+          set((state) => ({
+            config: { ...state.config, theme: previousTheme },
+            previousTheme: currentThemeId
+          }));
+        } else {
+          // Otherwise, find the best opposing theme
+          const newTheme = getOpposingTheme(currentThemeId);
+          set((state) => ({
+            config: { ...state.config, theme: newTheme },
+            previousTheme: currentThemeId
+          }));
+        }
+      },
     }),
     {
       name: "app-config", 
-      partialize: (state) => ({ config: state.config }),
+      partialize: (state) => ({ config: state.config, previousTheme: state.previousTheme }),
     }
   )
 );

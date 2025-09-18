@@ -34,6 +34,12 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     root.style.setProperty('--color-warning', theme.colors.warning);
     root.style.setProperty('--color-error', theme.colors.error);
     
+    // Header-specific colors
+    root.style.setProperty('--color-header-accent', theme.colors.headerAccent);
+    root.style.setProperty('--color-header-accent-secondary', theme.colors.headerAccentSecondary);
+    root.style.setProperty('--color-header-text', theme.colors.headerText);
+    root.style.setProperty('--color-header-background', theme.colors.headerBackground);
+    
     // Alpha variants
     root.style.setProperty('--color-surface-alpha-40', toRgba(theme.colors.surface, 0.4));
     root.style.setProperty('--color-surface-alpha-60', toRgba(theme.colors.surface, 0.6));
@@ -46,6 +52,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     root.style.setProperty('--color-error-alpha-20', toRgba(theme.colors.error, 0.2));
     root.style.setProperty('--color-error-alpha-30', toRgba(theme.colors.error, 0.3));
     root.style.setProperty('--color-background-alpha-60', toRgba(theme.colors.background, 0.6));
+    
+    // Header alpha variants
+    root.style.setProperty('--color-header-accent-alpha-20', toRgba(theme.colors.headerAccent, 0.2));
+    root.style.setProperty('--color-header-accent-alpha-30', toRgba(theme.colors.headerAccent, 0.3));
 
     // Also set the body background
     document.body.style.backgroundColor = theme.colors.background;

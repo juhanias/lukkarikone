@@ -1,11 +1,11 @@
-import { Calendar, Settings } from 'lucide-react'
+import { Calendar, Settings, Sun, Moon } from 'lucide-react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import useConfigStore from '../state/state-management'
 
 export default function Layout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { config } = useConfigStore()
+  const { config, isCurrentThemeLight, toggleLightDarkMode } = useConfigStore()
 
   const handleSettingsClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -29,26 +29,41 @@ export default function Layout() {
     >
       {/* Header */}
       <header className='p-4 flex gap-4 justify-between items-center flex-shrink-0' style={{
-        backgroundColor: 'var(--color-surface-alpha-40)',
+        backgroundColor: isCurrentThemeLight() 
+          ? 'var(--color-header-background)' 
+          : 'var(--color-surface-alpha-40)', // Match day/week switcher background for dark themes
         borderBottom: '1px solid var(--color-border-alpha-30)'
       }}>
         <div className='w-full max-w-7xl mx-auto flex gap-4 justify-between items-center'>
           <Link to="/" className='text-xl font-medium transition-colors hover:opacity-80' style={{
-            color: 'var(--color-accent)'
+            color: 'var(--color-header-accent)'
           }}>
             juh.fi/lukkari
           </Link>
           <nav className='flex gap-4 items-center'>
+            {/* Theme Toggle Button */}
+            <button 
+              onClick={toggleLightDarkMode}
+              className='px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105 cursor-pointer'
+              style={{
+                backgroundColor: 'transparent',
+                color: 'var(--color-header-text)',
+                border: '1px solid var(--color-border-alpha-30)'
+              }}
+              title={isCurrentThemeLight() ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              {isCurrentThemeLight() ? <Moon /> : <Sun />}
+            </button>
             <Link 
               to="/" 
-              className='px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105'
+              className='px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105 cursor-pointer'
               style={{
                 backgroundColor: location.pathname === '/' 
-                  ? 'var(--color-accent)' 
+                  ? 'var(--color-header-accent)' 
                   : 'transparent',
                 color: location.pathname === '/' 
                   ? 'white'
-                  : 'var(--color-text-secondary)',
+                  : 'var(--color-header-text)',
                 border: location.pathname === '/' 
                   ? 'none'
                   : '1px solid var(--color-border-alpha-30)'
@@ -58,14 +73,14 @@ export default function Layout() {
             </Link>
             <button 
               onClick={handleSettingsClick}
-              className='px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105'
+              className='px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105 cursor-pointer'
               style={{
                 backgroundColor: location.pathname === '/settings' 
-                  ? 'var(--color-accent)' 
+                  ? 'var(--color-header-accent)' 
                   : 'transparent',
                 color: location.pathname === '/settings' 
                   ? 'white'
-                  : 'var(--color-text-secondary)',
+                  : 'var(--color-header-text)',
                 border: location.pathname === '/settings' 
                   ? 'none'
                   : '1px solid var(--color-border-alpha-30)'
