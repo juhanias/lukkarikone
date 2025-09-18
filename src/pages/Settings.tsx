@@ -117,10 +117,10 @@ export default function Settings() {
                 subtitle="Määritä kalenterisi URL-osoite"
               >
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex-1 min-w-0">
                       <div className="font-medium">Kalenterin URL</div>
-                      <div className="text-sm opacity-70">
+                      <div className="text-sm opacity-70 break-words">
                         {config.calendarUrl 
                           ? `Määritetty: ${config.calendarUrl.length > 50 
                               ? config.calendarUrl.substring(0, 47) + '...' 
@@ -132,6 +132,7 @@ export default function Settings() {
                     <CalendarUrlModal>
                       <Button 
                         variant="outline"
+                        className="flex-shrink-0 w-full sm:w-auto"
                         style={{
                           borderColor: 'var(--color-border)',
                           color: 'var(--color-text)',

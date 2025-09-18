@@ -205,7 +205,7 @@ export default function Schedule() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="w-full max-w-4xl mx-auto px-4"
+            className="w-full max-w-7xl mx-auto px-4"
           >
             <div className="rounded-lg p-4 border" style={{
               backgroundColor: 'var(--color-error-alpha-20)',
@@ -240,7 +240,7 @@ export default function Schedule() {
         borderColor: 'var(--color-border-alpha-30)'
       }}>
         {/* View Tabs */}
-        <div className="w-full max-w-4xl mx-auto px-4 pt-4">
+        <div className="w-full max-w-7xl mx-auto px-4 pt-4">
           <div className="flex rounded-lg p-1" style={{ backgroundColor: 'var(--color-surface-secondary-alpha-30)' }}>
             <button
               onClick={() => setViewMode('day')}
@@ -275,7 +275,7 @@ export default function Schedule() {
 
         {/* Navigation Controls */}
         <div className="flex justify-between items-center p-4">
-          <div className="w-full max-w-4xl mx-auto flex justify-between items-center">
+          <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
             <motion.button 
               onClick={() => handleSwipe('right')}
               disabled={isTransitioning}

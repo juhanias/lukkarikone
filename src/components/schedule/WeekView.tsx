@@ -88,7 +88,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
       <div className="w-full flex-shrink-0" style={{
         background: `linear-gradient(to bottom, var(--color-surface-alpha-40), transparent)`
       }}>
-        <div className="max-w-4xl mx-auto px-4 py-6 text-center">
+        <div className="max-w-7xl mx-auto px-4 py-6 text-center">
           <div className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>
             Viikko {DateFormatUtils.getWeekNumber(currentDate)}
           </div>
@@ -99,7 +99,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
       </div>
 
       {/* Week Container */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
+      <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full">
         <div className="flex-1 flex flex-col px-4">
           {totalEventsThisWeek === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center min-h-96" style={{ color: 'var(--color-text-secondary)' }}>

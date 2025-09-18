@@ -32,7 +32,7 @@ export default function Layout() {
         backgroundColor: 'var(--color-surface-alpha-40)',
         borderBottom: '1px solid var(--color-border-alpha-30)'
       }}>
-        <div className='w-full max-w-4xl mx-auto flex gap-4 justify-between items-center'>
+        <div className='w-full max-w-7xl mx-auto flex gap-4 justify-between items-center'>
           <Link to="/" className='text-xl font-medium transition-colors hover:opacity-80' style={{
             color: 'var(--color-accent)'
           }}>
