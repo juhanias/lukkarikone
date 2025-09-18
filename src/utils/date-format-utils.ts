@@ -1,26 +1,87 @@
+import i18n from '../i18n'
+
 export class DateFormatUtils {
-  private static readonly DAYS_FI = ['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai']
-  private static readonly MONTHS_FI = ['tammikuu', 'helmikuu', 'maaliskuu', 'huhtikuu', 'toukokuu', 'kesäkuu',
-    'heinäkuu', 'elokuu', 'syyskuu', 'lokakuu', 'marraskuu', 'joulukuu']
-  
-  private static readonly DAY_NAMES_SHORT = ['Ma', 'Ti', 'Ke', 'To', 'Pe', 'La', 'Su']
+  /**
+   * Get localized day names from i18n
+   */
+  private static getLocalizedDays(): string[] {
+    const t = i18n.getFixedT(i18n.language, 'schedule')
+    return [
+      t('dateFormat.days.monday'),
+      t('dateFormat.days.tuesday'),
+      t('dateFormat.days.wednesday'),
+      t('dateFormat.days.thursday'),
+      t('dateFormat.days.friday'),
+      t('dateFormat.days.saturday'),
+      t('dateFormat.days.sunday')
+    ]
+  }
+
+  /**
+   * Get localized short day names from i18n
+   */
+  private static getLocalizedDaysShort(): string[] {
+    const t = i18n.getFixedT(i18n.language, 'schedule')
+    return [
+      t('dateFormat.daysShort.monday'),
+      t('dateFormat.daysShort.tuesday'),
+      t('dateFormat.daysShort.wednesday'),
+      t('dateFormat.daysShort.thursday'),
+      t('dateFormat.daysShort.friday'),
+      t('dateFormat.daysShort.saturday'),
+      t('dateFormat.daysShort.sunday')
+    ]
+  }
+
+  /**
+   * Get localized month names from i18n
+   */
+  private static getLocalizedMonths(): string[] {
+    const t = i18n.getFixedT(i18n.language, 'schedule')
+    return [
+      t('dateFormat.months.january'),
+      t('dateFormat.months.february'),
+      t('dateFormat.months.march'),
+      t('dateFormat.months.april'),
+      t('dateFormat.months.may'),
+      t('dateFormat.months.june'),
+      t('dateFormat.months.july'),
+      t('dateFormat.months.august'),
+      t('dateFormat.months.september'),
+      t('dateFormat.months.october'),
+      t('dateFormat.months.november'),
+      t('dateFormat.months.december')
+    ]
+  }
+
+  /**
+   * Get current locale for date formatting
+   */
+  private static getCurrentLocale(): string {
+    return i18n.language
+  }
 
   /**
    * Formats a date for the day view header
    */
   static formatDayViewDate(date: Date): { dayWeek: string; fullDate: string } {
+    const t = i18n.getFixedT(i18n.language, 'schedule')
+    
     // Convert Sunday (0) to be day 6, Monday (1) to be day 0, etc.
     const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1
-    const dayName = this.DAYS_FI[dayIndex]
+    const dayNames = this.getLocalizedDays()
+    const monthNames = this.getLocalizedMonths()
+    
+    const dayName = dayNames[dayIndex]
     const dayCapitalized = dayName.charAt(0).toUpperCase() + dayName.slice(1)
     const day = date.getDate()
-    const month = this.MONTHS_FI[date.getMonth()]
+    const month = monthNames[date.getMonth()]
     const year = date.getFullYear()
 
     const week = this.getWeekNumber(date)
 
     return {
-      dayWeek: `${dayCapitalized} - vk ${week}`,
+      dayWeek: `${dayCapitalized} - ${t('weekView.weekShort')} ${week}`,
       fullDate: `${day}. ${month} ${year}`
     }
   }
@@ -29,8 +90,9 @@ export class DateFormatUtils {
    * Formats the week header for week view
    */
   static formatWeekHeader(startDate: Date, endDate: Date): string {
-    const startMonth = startDate.toLocaleString('fi', { month: 'short' })
-    const endMonth = endDate.toLocaleString('fi', { month: 'short' })
+    const locale = this.getCurrentLocale()
+    const startMonth = startDate.toLocaleString(locale, { month: 'short' })
+    const endMonth = endDate.toLocaleString(locale, { month: 'short' })
     
     if (startMonth === endMonth) {
       return `${startDate.getDate()}. - ${endDate.getDate()}. ${startMonth}`
@@ -61,9 +123,10 @@ export class DateFormatUtils {
    * Gets short day names for week view, optionally filtered to exclude weekends
    */
   static getDayNamesShort(includeWeekends: boolean = true): string[] {
+    const dayNamesShort = this.getLocalizedDaysShort()
     return includeWeekends 
-      ? this.DAY_NAMES_SHORT 
-      : this.DAY_NAMES_SHORT.filter((_, index) => index !== 5 && index !== 6) // Exclude Saturday (5) and Sunday (6)
+      ? dayNamesShort 
+      : dayNamesShort.filter((_, index: number) => index !== 5 && index !== 6) // Exclude Saturday (5) and Sunday (6)
   }
 
   /**
@@ -83,10 +146,15 @@ export class DateFormatUtils {
   }
 
   /**
-   * Formats current time as HH:MM
+   * Formats current time as HH:MM in 24-hour format
    */
   static getCurrentTimeString(): string {
     const now = new Date()
-    return now.toLocaleTimeString('fi', { hour: '2-digit', minute: '2-digit' })
+    const locale = this.getCurrentLocale()
+    return now.toLocaleTimeString(locale, { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false  // Force 24-hour format
+    })
   }
 }

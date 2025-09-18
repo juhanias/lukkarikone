@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import type { ScheduleEvent, GapPeriod } from '../../types/schedule'
 import { ScheduleUtils } from '../../utils/schedule-utils'
 import { ScheduleLayoutUtils, type PositionedEvent } from '../../utils/schedule-layout-utils'
@@ -17,6 +18,8 @@ interface ScheduleDayProps {
 }
 
 const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
+  const { t } = useTranslation('schedule')
+  
   // Realization dialog hook
   const { 
     isOpen: realizationDialogOpen,
@@ -84,14 +87,14 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
           {events.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center min-h-96" style={{ color: 'var(--color-text-secondary)' }}>
               <Calendar size={48} className="mb-4 opacity-50" />
-              <p className="text-lg font-medium">Ei tapahtumia</p>
-              <p className="text-sm opacity-75 mt-1 text-center">Tällä päivällä ei ole merkittyjä tapahtumia / luentoja!</p>
+              <p className="text-lg font-medium">{t('dayView.noEvents')}</p>
+              <p className="text-sm opacity-75 mt-1 text-center">{t('dayView.noEventsDescription')}</p>
               
               {/* decorative elements for empty state */}
               <div className="mt-8 text-center">
                 <div className="inline-flex items-center space-x-2 text-xs opacity-60">
                   <span>←</span>
-                  <span>Pyyhkäise vaihtaaksesi päivää</span>
+                  <span>{t('dayView.swipeToNavigate')}</span>
                   <span>→</span>
                 </div>
               </div>
@@ -164,7 +167,7 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
                       backgroundColor: 'var(--color-surface-alpha-40)',
                       borderColor: 'var(--color-border-alpha-30)'
                     }}>
-                      {gap.duration.toFixed(1)}h tauko
+                      {gap.duration.toFixed(1)}h {t('dayView.breakDuration')}
                     </div>
                   </div>
                 ))}

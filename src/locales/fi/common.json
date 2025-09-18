@@ -1,0 +1,28 @@
+{
+  "navigation": {
+    "schedule": "Lukujärjestys",
+    "settings": "Asetukset"
+  },
+  "actions": {
+    "save": "Tallenna",
+    "cancel": "Peruuta",
+    "close": "Sulje",
+    "edit": "Muokkaa",
+    "delete": "Poista",
+    "add": "Lisää",
+    "copy": "Kopioi",
+    "or": "tai"
+  },
+  "labels": {
+    "language": "Kieli",
+    "theme": "Teema",
+    "loading": "Lataa...",
+    "error": "Virhe",
+    "success": "Onnistui"
+  },
+  "messages": {
+    "noData": "Ei tietoja saatavilla",
+    "errorLoading": "Tietojen lataaminen epäonnistui",
+    "changes_saved": "Muutokset tallennettu onnistuneesti"
+  }
+}

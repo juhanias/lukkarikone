@@ -1,0 +1,74 @@
+{
+  "realizationDialog": {
+    "title": "Course Implementation Details",
+    "loading": "Loading implementation details...",
+    "error": {
+      "title": "Error",
+      "message": "Failed to load implementation details"
+    },
+    "basicInfo": {
+      "title": "Basic Information",
+      "courseId": "Course ID",
+      "courseCode": "Code",
+      "teachingLanguage": "Teaching Language",
+      "credits": "Credits",
+      "period": "Period",
+      "location": "Location",
+      "evaluationScale": "Evaluation Scale",
+      "campus": "Campus"
+    },
+    "schedule": {
+      "title": "Implementation Period",
+      "description": "Implementation period and schedule",
+      "starts": "Starts",
+      "ends": "Ends"
+    },
+    "enrollment": {
+      "title": "Enrollment",
+      "starts": "Starts",
+      "ends": "Ends"
+    },
+    "duration": {
+      "title": "Duration",
+      "description": "Course duration"
+    },
+    "instructor": {
+      "title": "Teachers",
+      "description": "Course instructor(s)"
+    },
+    "groups": {
+      "title": "Student Groups", 
+      "description": "Target groups"
+    },
+    "learningMaterial": {
+      "title": "Learning Materials"
+    },
+    "furtherInformation": {
+      "title": "Further Information"
+    },
+    "events": {
+      "title": "Upcoming Events",
+      "moreEvents": "and {{count}} more events"
+    },
+    "description": {
+      "title": "Description",
+      "description": "Course description"
+    }
+  },
+  "lectureDetailsDialog": {
+    "title": "Lecture Details",
+    "description": "Detailed information about the selected lecture",
+    "basicInfo": "Basic Information",
+    "schedule": "Schedule",
+    "location": "Location",
+    "instructor": "Instructor", 
+    "groups": "Groups",
+    "date": "Date",
+    "time": "Time",
+    "duration": "Duration",
+    "teachers": "Teachers",
+    "studentGroups": "Student Groups",
+    "showRealizationDetails": "Show Implementation Details",
+    "noRealizationData": "Detailed implementation information is not available for this event."
+  }
+}

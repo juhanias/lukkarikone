@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion'
-import { Settings as SettingsIcon, Type, RotateCcw, Code, Palette, Calendar, Link } from 'lucide-react'
+import { Settings as SettingsIcon, Type, RotateCcw, Code, Palette, Calendar, Link, Languages } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import useConfigStore from '../state/state-management'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { FrogIcon } from '../components/FrogIcon'
+import LanguageSelector from '../components/LanguageSelector'
 import { SettingsSection, Toggle, RadioCard, ActionButton } from '../components/ui'
 import { CalendarUrlModal } from '../components/CalendarUrlModal'
 import { Button } from '@/components/ui/button'
@@ -36,6 +38,7 @@ const motionProps = prefersReducedMotion
   : { initial: 'hidden', animate: 'visible' }
 
 export default function Settings() {
+  const { t } = useTranslation('settings')
   const { config, setConfig, resetConfig, getListedThemes } = useConfigStore()
   const listedThemes = getListedThemes() // Get only the normal themes
   const isFrogMode = config.theme === 'frog'
@@ -52,8 +55,8 @@ export default function Settings() {
           }}>
             <SettingsIcon className="w-8 h-8" style={{ color: 'var(--color-accent)' }} aria-hidden="true" />
           </div>
-          <h1 className="text-3xl font-light mb-2" style={{ color: 'var(--color-text)' }}>Asetukset</h1>
-          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Mukauta sovelluksen ulkoasua ja toimintoja</p>
+          <h1 className="text-3xl font-light mb-2" style={{ color: 'var(--color-text)' }}>{t('title')}</h1>
+          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{t('subtitle')}</p>
         </div>
       </div>
 
@@ -69,11 +72,11 @@ export default function Settings() {
             <motion.div variants={itemVariants}>
               <SettingsSection
                 icon={Type}
-                title="Fonttiasetukset"
-                subtitle="Valitse sovelluksen fontti"
+                title={t('sections.font.title')}
+                subtitle={t('sections.font.subtitle')}
               >
                 <fieldset className="space-y-4">
-                  <legend className="sr-only">Valitse fontti</legend>
+                  <legend className="sr-only">{t('sections.font.subtitle')}</legend>
                   {FONT_OPTIONS.map((option) => (
                     <RadioCard
                       key={option.value}
@@ -81,8 +84,8 @@ export default function Settings() {
                       value={option.value}
                       checked={config.font === option.value}
                       onChange={(value) => setConfig({ font: value as Font })}
-                      label={option.label}
-                      subtitle={option.subtitle}
+                      label={t(`sections.font.options.${option.value}.label`)}
+                      subtitle={t(`sections.font.options.${option.value}.subtitle`)}
                     />
                   ))}
                 </fieldset>
@@ -95,15 +98,28 @@ export default function Settings() {
                 icon={Calendar}
                 iconColor="#3b82f6"
                 iconBgColor="#3b82f633"
-                title="Näkymäasetukset"
-                subtitle="Mukauta kalenterinäkymää"
+                title={t('sections.view.title')}
+                subtitle={t('sections.view.subtitle')}
               >
                 <Toggle
                   checked={config.showWeekends}
                   onChange={(checked) => setConfig({ showWeekends: checked })}
-                  label="Näytä viikonloput"
-                  subtitle="Näytä lauantai ja sunnuntai viikkonäkymässä"
+                  label={t('sections.view.showWeekends.label')}
+                  subtitle={t('sections.view.showWeekends.subtitle')}
                 />
+              </SettingsSection>
+            </motion.div>
+
+            {/* Language Settings */}
+            <motion.div variants={itemVariants}>
+              <SettingsSection
+                icon={Languages}
+                iconColor="#f59e0b"
+                iconBgColor="#f59e0b33"
+                title={t('sections.language.title')}
+                subtitle={t('sections.language.subtitle')}
+              >
+                <LanguageSelector />
               </SettingsSection>
             </motion.div>
 
@@ -113,19 +129,21 @@ export default function Settings() {
                 icon={Link}
                 iconColor="#10b981"
                 iconBgColor="#10b98133"
-                title="Kalenteriasetukset"
-                subtitle="Määritä kalenterisi URL-osoite"
+                title={t('sections.calendar.title')}
+                subtitle={t('sections.calendar.subtitle')}
               >
                 <div className="space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium">Kalenterin URL</div>
+                      <div className="font-medium">{t('sections.calendar.urlLabel')}</div>
                       <div className="text-sm opacity-70 break-words">
                         {config.calendarUrl 
-                          ? `Määritetty: ${config.calendarUrl.length > 50 
-                              ? config.calendarUrl.substring(0, 47) + '...' 
-                              : config.calendarUrl}`
-                          : 'Ei määritetty - kalenteri ei toimi ilman URL:ää'
+                          ? t('sections.calendar.configured', { 
+                              url: config.calendarUrl.length > 50 
+                                ? config.calendarUrl.substring(0, 47) + '...' 
+                                : config.calendarUrl
+                            })
+                          : t('sections.calendar.notConfigured')
                         }
                       </div>
                     </div>
@@ -140,7 +158,7 @@ export default function Settings() {
                           fontFamily: `var(--font-${config.font})`
                         }}
                       >
-                        {config.calendarUrl ? 'Muokkaa linkkiä' : 'Linkkaa kalenteri'}
+                        {config.calendarUrl ? t('sections.calendar.editLink') : t('sections.calendar.linkCalendar')}
                       </Button>
                     </CalendarUrlModal>
                   </div>
@@ -155,8 +173,8 @@ export default function Settings() {
                   icon={Palette}
                   iconColor="#9333ea"
                   iconBgColor="#9333ea33"
-                  title="Teema-asetukset"
-                  subtitle="Valitse sovelluksen värimaailma"
+                  title={t('sections.theme.title')}
+                  subtitle={t('sections.theme.subtitle')}
                 >
                   <ThemeSelector
                     themes={listedThemes}
@@ -172,8 +190,8 @@ export default function Settings() {
               <SettingsSection
                 icon={FrogIcon}
                 variant="default"
-                title="🐸 mode"
-                subtitle={isFrogMode ? '🐸🐸🐸' : 'aktivoi 🐸-moodi elääksesi villisti'}
+                title={t('sections.frog.title')}
+                subtitle={isFrogMode ? t('sections.frog.subtitleActive') : t('sections.frog.subtitle')}
               >
                 <motion.button
                   className="w-full flex items-center p-4 rounded-lg cursor-pointer transition-all"
@@ -191,12 +209,12 @@ export default function Settings() {
                 >
                   <div className="flex-1 text-left">
                     <span className="font-medium" style={{ color: 'var(--color-text)' }}>
-                      {isFrogMode ? 'Poistu sammakkotilasta' : 'Aktivoi 🐸-tila'}
+                      {isFrogMode ? t('sections.frog.deactivate') : t('sections.frog.activate')}
                     </span>
                     <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                       {isFrogMode 
-                        ? 'Palaa takaisin normaaliin teemaan'
-                        : 'aktivoi 🐸-moodi elääksesi villisti. voit kyllä palata takaisin jos kaduttaa'
+                        ? t('sections.frog.deactivateSubtitle')
+                        : t('sections.frog.activateSubtitle')
                       }
                     </p>
                   </div>
@@ -217,11 +235,11 @@ export default function Settings() {
               <SettingsSection
                 icon={RotateCcw}
                 variant="danger"
-                title="Toiminnot"
-                subtitle="Palauta oletusasetukset"
+                title={t('sections.actions.title')}
+                subtitle={t('sections.actions.subtitle')}
               >
                 <ActionButton onClick={resetConfig} variant="danger">
-                  Palauta oletusasetukset
+                  {t('sections.actions.resetButton')}
                 </ActionButton>
               </SettingsSection>
             </motion.div>
@@ -233,8 +251,8 @@ export default function Settings() {
                   icon={Code}
                   iconColor="var(--color-success)"
                   iconBgColor="var(--color-success-alpha-20)"
-                  title="Konfiguraatio"
-                  subtitle="Nykyiset asetukset (kehittäjille)"
+                  title={t('sections.debug.title')}
+                  subtitle={t('sections.debug.subtitle')}
                 >
                   <div className="rounded-lg p-4" style={{
                     backgroundColor: 'var(--color-background-alpha-60)',

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { 
   Dialog, 
   DialogContent, 
@@ -24,6 +25,8 @@ const LectureDetailsDialog = ({
   event,
   onOpenRealizationDialog
 }: LectureDetailsDialogProps) => {
+  const { t } = useTranslation('dialogs')
+  
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('fi-FI', {
       hour: '2-digit',
@@ -67,10 +70,10 @@ const LectureDetailsDialog = ({
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
             <BookOpen className="h-6 w-6" />
-            Luennon tiedot
+            {t('lectureDetailsDialog.title')}
           </DialogTitle>
           <DialogDescription style={{ color: 'var(--color-text-secondary)' }}>
-            Yksityiskohtaiset tiedot valitusta luennosta
+            {t('lectureDetailsDialog.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -104,7 +107,7 @@ const LectureDetailsDialog = ({
               }}>
                 <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                   <Calendar className="h-4 w-4" />
-                  Päivämäärä
+                  {t('lectureDetailsDialog.date')}
                 </h4>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   {formatDate(event.startTime)}
@@ -117,13 +120,13 @@ const LectureDetailsDialog = ({
               }}>
                 <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                   <Clock className="h-4 w-4" />
-                  Aika
+                  {t('lectureDetailsDialog.time')}
                 </h4>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   {formatTime(event.startTime)} - {formatTime(event.endTime)}
                   <br />
                   <span className="text-xs opacity-75">
-                    Kesto: {getDurationString(event.duration)}
+                    {t('lectureDetailsDialog.duration')}: {getDurationString(event.duration)}
                   </span>
                 </p>
               </div>
@@ -137,7 +140,7 @@ const LectureDetailsDialog = ({
               }}>
                 <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                   <MapPin className="h-4 w-4" />
-                  Sijainti
+                  {t('lectureDetailsDialog.location')}
                 </h4>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   {event.location}
@@ -153,7 +156,7 @@ const LectureDetailsDialog = ({
               }}>
                 <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                   <GraduationCap className="h-4 w-4" />
-                  Opettajat
+                  {t('lectureDetailsDialog.teachers')}
                 </h4>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   {event.teachers.join(', ')}
@@ -169,7 +172,7 @@ const LectureDetailsDialog = ({
               }}>
                 <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                   <Users className="h-4 w-4" />
-                  Opiskelijaryhmät
+                  {t('lectureDetailsDialog.studentGroups')}
                 </h4>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   {event.groups.join(', ')}
@@ -186,7 +189,7 @@ const LectureDetailsDialog = ({
                 >
                   <div className="flex items-center justify-center gap-2">
                     <ExternalLink className="h-4 w-4" />
-                    Näytä toteutustiedot
+                    {t('lectureDetailsDialog.showRealizationDetails')}
                   </div>
                 </ActionButton>
               </div>
@@ -201,7 +204,7 @@ const LectureDetailsDialog = ({
                 <div className="flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
                   <Info className="h-4 w-4" />
                   <span className="text-sm">
-                    Tälle tapahtumalle ei ole saatavilla yksityiskohtaisia toteutustietoja.
+                    {t('lectureDetailsDialog.noRealizationData')}
                   </span>
                 </div>
               </div>

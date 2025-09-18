@@ -1,0 +1,63 @@
+{
+  "title": "Settings",
+  "subtitle": "Customize the application appearance and functionality",
+  "sections": {
+    "font": {
+      "title": "Font Settings",
+      "subtitle": "Choose application font",
+      "options": {
+        "system": {
+          "label": "System Font",
+          "subtitle": "Uses device default font"
+        },
+        "lexend": {
+          "label": "Lexend Font", 
+          "subtitle": "Optimized for readability"
+        }
+      }
+    },
+    "view": {
+      "title": "View Settings",
+      "subtitle": "Customize calendar view",
+      "showWeekends": {
+        "label": "Show weekends",
+        "subtitle": "Display Saturday and Sunday in week view"
+      }
+    },
+    "language": {
+      "title": "Language Settings",
+      "subtitle": "Choose your preferred language"
+    },
+    "calendar": {
+      "title": "Calendar Settings",
+      "subtitle": "Configure your calendar URL",
+      "urlLabel": "Calendar URL",
+      "notConfigured": "Not configured - calendar won't work without URL",
+      "configured": "Configured: {{url}}",
+      "editLink": "Edit link",
+      "linkCalendar": "Link calendar"
+    },
+    "theme": {
+      "title": "Theme Settings",
+      "subtitle": "Choose application color scheme"
+    },
+    "frog": {
+      "title": "🐸 mode",
+      "subtitle": "activate 🐸-mode to live wildly",
+      "subtitleActive": "🐸🐸🐸",
+      "activate": "Activate 🐸-mode",
+      "deactivate": "Exit frog mode",
+      "activateSubtitle": "activate 🐸-mode to live wildly. you can return if you regret it",
+      "deactivateSubtitle": "Return to normal theme"
+    },
+    "actions": {
+      "title": "Actions",
+      "subtitle": "Restore default settings",
+      "resetButton": "Restore default settings"
+    },
+    "debug": {
+      "title": "Configuration",
+      "subtitle": "Current settings (for developers)"
+    }
+  }
+}

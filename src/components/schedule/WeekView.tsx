@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useScheduleRange, useScheduleStore, default as useConfigStore } from '../../state/state-management'
 import { ScheduleLayoutUtils } from '../../utils/schedule-layout-utils'
 import { ScheduleUtils } from '../../utils/schedule-utils'
@@ -16,6 +17,7 @@ interface WeekViewProps {
 }
 
 const WeekView = memo(({ currentDate }: WeekViewProps) => {
+  const { t } = useTranslation('schedule')
   const { getWeekStart, getWeekDates } = useScheduleRange()
   const { getEventsForWeek } = useScheduleStore()
   const { config } = useConfigStore()
@@ -90,7 +92,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
       }}>
         <div className="max-w-7xl mx-auto px-4 py-6 text-center">
           <div className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Viikko {DateFormatUtils.getWeekNumber(currentDate)}
+            {t('weekView.week')} {DateFormatUtils.getWeekNumber(currentDate)}
           </div>
           <h2 className="text-2xl font-medium" style={{ color: 'var(--color-text)' }}>
             {formatWeekHeader()}
@@ -104,8 +106,8 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
           {totalEventsThisWeek === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center min-h-96" style={{ color: 'var(--color-text-secondary)' }}>
               <Calendar size={48} className="mb-4 opacity-50" />
-              <p className="text-lg font-medium">Ei tapahtumia</p>
-              <p className="text-sm opacity-75 mt-1 text-center">Tällä viikolla ei ole merkittyjä tapahtumia!</p>
+              <p className="text-lg font-medium">{t('weekView.noEvents')}</p>
+              <p className="text-sm opacity-75 mt-1 text-center">{t('weekView.noEventsDescription')}</p>
             </div>
           ) : (
             <div className="flex-1 relative overflow-x-auto">

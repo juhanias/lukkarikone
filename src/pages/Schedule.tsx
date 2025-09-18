@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { useScheduleRange, useScheduleStore } from '../state/state-management'
 import useConfigStore from '../state/state-management'
 import { ChevronLeft, ChevronRight, CircleX, Calendar } from 'lucide-react'
@@ -8,6 +9,7 @@ import { CalendarUrlModal } from '../components/CalendarUrlModal'
 import { Button } from '@/components/ui/button'
 
 export default function Schedule() {
+  const { t } = useTranslation('schedule')
   const { 
     currentDate, 
     viewMode,
@@ -57,7 +59,7 @@ export default function Schedule() {
 
     setTimeout(() => {
       setIsTransitioning(false)
-    }, 300)
+    }, 2)
   }, [isTransitioning, viewMode, goToNextDay, goToPreviousDay, goToNextWeek, goToPreviousWeek])
 
   const handlePanEnd = (_event: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
@@ -151,13 +153,13 @@ export default function Schedule() {
                 color: 'var(--color-text)',
                 fontFamily: `var(--font-${config.font})`
               }}>
-                Kalenterin URL puuttuu
+                {t('calendar.urlMissing')}
               </h2>
               <p className="mb-6" style={{ 
                 color: 'var(--color-text-secondary)',
                 fontFamily: `var(--font-${config.font})`
               }}>
-                Määritä Turku AMK:n kalenterijärjestelmän URL-osoite nähdäksesi lukujärjestyksesi.
+                {t('calendar.urlMissingDescription')}
               </p>
               <div className="flex gap-3 justify-center">
                 <CalendarUrlModal>
@@ -171,7 +173,7 @@ export default function Schedule() {
                     }}
                   >
                     <Calendar className="h-4 w-4" />
-                    Linkkaa kalenteri
+                    {t('calendar.linkCalendar')}
                   </Button>
                 </CalendarUrlModal>
               </div>
@@ -195,7 +197,7 @@ export default function Schedule() {
                 borderColor: 'var(--color-accent)',
                 borderTopColor: 'transparent'
               }}></div>
-              <p className="mt-4" style={{ color: 'var(--color-text-secondary)' }}>Ladataan lukkaria...</p>
+              <p className="mt-4" style={{ color: 'var(--color-text-secondary)' }}>{t('loading.schedule')}</p>
             </div>
           </motion.div>
         )}
@@ -218,14 +220,14 @@ export default function Schedule() {
                 />                  
                 
                 <div className="flex-1">
-                  <p className="font-medium" style={{ color: 'var(--color-error)' }}>Lukujärjestyksen lataus epäonnistui</p>
+                  <p className="font-medium" style={{ color: 'var(--color-error)' }}>{t('errors.loadingFailed')}</p>
                   <p className="text-sm mt-1 leading-relaxed" style={{ color: 'var(--color-error)' }}>{error}</p>
                   <button 
                     onClick={clearError}
                     className="text-sm underline mt-2 hover:opacity-80"
                     style={{ color: 'var(--color-accent)' }}
                   >
-                    Sulje
+                    {t('errors.close')}
                   </button>
                 </div>
               </div>
@@ -254,7 +256,7 @@ export default function Schedule() {
                 color: viewMode === 'day' ? 'white' : 'var(--color-text-secondary)'
               }}
             >
-              Päivä
+              {t('navigation.day')}
             </button>
             <button
               onClick={() => setViewMode('week')}
@@ -268,7 +270,7 @@ export default function Schedule() {
                 color: viewMode === 'week' ? 'white' : 'var(--color-text-secondary)'
               }}
             >
-              Viikko
+              {t('navigation.week')}
             </button>
           </div>
         </div>
@@ -299,7 +301,7 @@ export default function Schedule() {
                   setTimeout(() => {
                     useScheduleRange.getState().goToToday()
                     setIsTransitioning(false)
-                  }, 150)
+                  }, 2)
                 }
               }}
               className="px-4 py-2 rounded-full text-sm font-medium transition-colors"
@@ -310,7 +312,7 @@ export default function Schedule() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              Tänään
+              {t('navigation.today')}
             </motion.button>
             
             <motion.button 

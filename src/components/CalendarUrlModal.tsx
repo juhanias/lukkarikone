@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Calendar, Link, AlertCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import useConfigStore, { useScheduleStore } from '@/state/state-management'
 
 interface CalendarUrlModalProps {
@@ -10,6 +11,8 @@ interface CalendarUrlModalProps {
 }
 
 export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
+  const { t } = useTranslation('schedule')
+  const { t: tCommon } = useTranslation('common')
   const { config, setConfig } = useConfigStore()
   const { refreshSchedule, clearError } = useScheduleStore()
   const [inputUrl, setInputUrl] = useState(config.calendarUrl)
@@ -18,18 +21,18 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
 
   const validateUrl = (url: string) => {
     if (!url.trim()) {
-      return "Kalenterin URL on pakollinen"
+      return t('calendarModal.validation.required')
     }
 
     try {
       new URL(url)
     } catch {
-      return "Anna kelvollinen URL-osoite"
+      return t('calendarModal.validation.invalid')
     }
 
     // Validate that it looks like a Turku AMK iCal URL
     if (!url.toLowerCase().includes('turkuamk.fi')) {
-      return "URL:n tulee olla Turku AMK:n kalenterijärjestelmästä"
+      return t('calendarModal.validation.mustBeTurkuAmk')
     }
 
     return ""
@@ -99,7 +102,7 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
             }}
           >
             <Calendar className="h-5 w-5" style={{ color: 'var(--color-accent)' }} />
-            Määritä kalenterin URL
+            {t('calendarModal.title')}
           </DialogTitle>
           <DialogDescription 
             style={{ 
@@ -107,7 +110,7 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
               fontFamily: `var(--font-${config.font})`
             }}
           >
-            Valitse PTIVIS25B pikasetup tai anna oma kalenterisi URL-osoite.
+            {t('calendarModal.description')}
           </DialogDescription>
         </DialogHeader>
         
@@ -127,13 +130,13 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                   color: 'var(--color-text)',
                   fontFamily: `var(--font-${config.font})`
                 }}>
-                  PTIVIS25B
+                  {t('calendarModal.quickSetup.title')}
                 </h4>
                 <p className="text-sm" style={{ 
                   color: 'var(--color-text-secondary)',
                   fontFamily: `var(--font-${config.font})`
                 }}>
-                  Pikasetup ryhmän kalenterille
+                  {t('calendarModal.quickSetup.description')}
                 </p>
               </div>
               <Button 
@@ -145,7 +148,7 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                   fontFamily: `var(--font-${config.font})`
                 }}
               >
-                Käytä
+                {t('calendarModal.quickSetup.useButton')}
               </Button>
             </div>
           </div>
@@ -160,7 +163,7 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
               color: 'var(--color-text-secondary)',
               fontFamily: `var(--font-${config.font})`
             }}>
-              tai
+              {tCommon('actions.or')}
             </span>
             <hr style={{ 
               flexGrow: 1, 
@@ -177,13 +180,13 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                 fontFamily: `var(--font-${config.font})`
               }}
             >
-              Kalenterin URL
+              {t('calendarModal.customUrl.label')}
             </label>
             <div className="relative">
               <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: 'var(--color-text-secondary)' }} />
               <Input
                 id="calendar-url"
-                placeholder="http://lukkari.turkuamk.fi/ical.php?hash=SINUN_HASH"
+                placeholder={t('calendarModal.customUrl.placeholder')}
                 value={inputUrl}
                 onChange={(e) => {
                   setInputUrl(e.target.value)
@@ -265,7 +268,7 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
               fontFamily: `var(--font-${config.font})`
             }}
           >
-            Peruuta
+            {t('calendarModal.actions.cancel')}
           </Button>
           <Button 
             onClick={handleSave}
@@ -276,7 +279,7 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
               fontFamily: `var(--font-${config.font})`
             }}
           >
-            Linkkaa kalenteri
+            {t('calendarModal.actions.save')}
           </Button>
         </div>
       </DialogContent>

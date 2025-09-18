@@ -1,0 +1,74 @@
+{
+  "realizationDialog": {
+    "title": "Toteutustiedot",
+    "loading": "Ladataan toteutustietoja...",
+    "error": {
+      "title": "Virhe",
+      "message": "Toteutustietojen lataaminen epäonnistui"
+    },
+    "basicInfo": {
+      "title": "Perustiedot",
+      "courseId": "Kurssikoodi",
+      "courseCode": "Koodi",
+      "teachingLanguage": "Opetuskieli",
+      "credits": "Laajuus",
+      "period": "Jakso",
+      "location": "Sijainti",
+      "evaluationScale": "Arviointiasteikko",
+      "campus": "Kampus"
+    },
+    "schedule": {
+      "title": "Toteutusaika",
+      "description": "Toteutusjakso ja aikataulu",
+      "starts": "Alkaa",
+      "ends": "Päättyy"
+    },
+    "enrollment": {
+      "title": "Ilmoittautuminen",
+      "starts": "Alkaa",
+      "ends": "Päättyy"
+    },
+    "duration": {
+      "title": "Kesto",
+      "description": "Kurssin kesto"
+    },
+    "instructor": {
+      "title": "Opettajat",
+      "description": "Kurssin opettaja(t)"
+    },
+    "groups": {
+      "title": "Opiskelijaryhmät", 
+      "description": "Kohderyhmät"
+    },
+    "learningMaterial": {
+      "title": "Oppimateriaali"
+    },
+    "furtherInformation": {
+      "title": "Lisätietoja"
+    },
+    "events": {
+      "title": "Tulevat tapahtumat",
+      "moreEvents": "ja {{count}} muuta tapahtumaa"
+    },
+    "description": {
+      "title": "Kuvaus",
+      "description": "Kurssin kuvaus"
+    }
+  },
+  "lectureDetailsDialog": {
+    "title": "Luennon tiedot",
+    "description": "Yksityiskohtaiset tiedot valitusta luennosta",
+    "basicInfo": "Perustiedot",
+    "schedule": "Aikataulu",
+    "location": "Sijainti",
+    "instructor": "Opettaja", 
+    "groups": "Ryhmät",
+    "date": "Päivämäärä",
+    "time": "Aika",
+    "duration": "Kesto",
+    "teachers": "Opettajat",
+    "studentGroups": "Opiskelijaryhmät",
+    "showRealizationDetails": "Näytä toteutustiedot",
+    "noRealizationData": "Tälle tapahtumalle ei ole saatavilla yksityiskohtaisia toteutustietoja."
+  }
+}

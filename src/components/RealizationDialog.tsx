@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { 
   Dialog, 
   DialogContent, 
@@ -54,6 +55,8 @@ const RealizationDialog = ({
   isLoading,
   error
 }: RealizationDialogProps) => {
+  const { t } = useTranslation('dialogs')
+  
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('fi-FI', {
@@ -91,17 +94,17 @@ const RealizationDialog = ({
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
             <GraduationCap className="h-6 w-6" />
-            Toteutustiedot
+            {t('realizationDialog.title')}
           </DialogTitle>
           <DialogDescription style={{ color: 'var(--color-text-secondary)' }}>
-            Yksityiskohtaiset tiedot opintojakson toteutuksesta
+            {realizationData?.name || t('realizationDialog.title')}
           </DialogDescription>
         </DialogHeader>
 
         {isLoading && (
           <div className="flex items-center justify-center py-8" style={{ color: 'var(--color-text)' }}>
             <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: 'var(--color-accent)' }}></div>
-            <span className="ml-3">Ladataan toteutustietoja...</span>
+            <span className="ml-3">{t('realizationDialog.loading')}</span>
           </div>
         )}
 
@@ -112,7 +115,7 @@ const RealizationDialog = ({
           }}>
             <div className="flex items-center gap-2" style={{ color: 'var(--color-error)' }}>
               <Info className="h-5 w-5" />
-              <span className="font-medium">Virhe</span>
+              <span className="font-medium">{t('realizationDialog.error.title')}</span>
             </div>
             <p className="mt-2" style={{ color: 'var(--color-error)' }}>{error}</p>
           </div>
@@ -136,20 +139,20 @@ const RealizationDialog = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
                   <BookOpen className="h-4 w-4" style={{ color: 'var(--color-accent)' }} />
-                  <span><strong>Koodi:</strong> {realizationData.code}</span>
+                  <span><strong>{t('realizationDialog.basicInfo.courseCode')}:</strong> {realizationData.code}</span>
                 </div>
                 <div className="flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
-                  <span><strong>Opetuskieli:</strong> {realizationData.teaching_language}</span>
+                  <span><strong>{t('realizationDialog.basicInfo.teachingLanguage')}:</strong> {realizationData.teaching_language}</span>
                 </div>
                 <div className="flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
-                  <span><strong>Laajuus:</strong> {realizationData.scope_amount} op</span>
+                  <span><strong>{t('realizationDialog.basicInfo.credits')}:</strong> {realizationData.scope_amount} op</span>
                 </div>
                 <div className="flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
-                  <span><strong>Arviointiasteikko:</strong> {realizationData.evaluation_scale}</span>
+                  <span><strong>{t('realizationDialog.basicInfo.evaluationScale')}:</strong> {realizationData.evaluation_scale}</span>
                 </div>
                 <div className="flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
                   <MapPin className="h-4 w-4" style={{ color: 'var(--color-accent)' }} />
-                  <span><strong>Kampus:</strong> {realizationData.office}</span>
+                  <span><strong>{t('realizationDialog.basicInfo.campus')}:</strong> {realizationData.office}</span>
                 </div>
               </div>
             </div>
@@ -162,11 +165,11 @@ const RealizationDialog = ({
               }}>
                 <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                   <Calendar className="h-4 w-4" />
-                  Toteutusaika
+                  {t('realizationDialog.schedule.title')}
                 </h4>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                  <strong>Alkaa:</strong> {formatDate(realizationData.start_date)}<br />
-                  <strong>Päättyy:</strong> {formatDate(realizationData.end_date)}
+                  <strong>{t('realizationDialog.schedule.starts')}:</strong> {formatDate(realizationData.start_date)}<br />
+                  <strong>{t('realizationDialog.schedule.ends')}:</strong> {formatDate(realizationData.end_date)}
                 </p>
               </div>
               
@@ -176,11 +179,11 @@ const RealizationDialog = ({
               }}>
                 <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                   <Clock className="h-4 w-4" />
-                  Ilmoittautuminen
+                  {t('realizationDialog.enrollment.title')}
                 </h4>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                  <strong>Alkaa:</strong> {formatDate(realizationData.enrollment_start_date)}<br />
-                  <strong>Päättyy:</strong> {formatDate(realizationData.enrollment_end_date)}
+                  <strong>{t('realizationDialog.enrollment.starts')}:</strong> {formatDate(realizationData.enrollment_start_date)}<br />
+                  <strong>{t('realizationDialog.enrollment.ends')}:</strong> {formatDate(realizationData.enrollment_end_date)}
                 </p>
               </div>
             </div>
@@ -193,7 +196,7 @@ const RealizationDialog = ({
               }}>
                 <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                   <GraduationCap className="h-4 w-4" />
-                  Opettajat
+                  {t('realizationDialog.instructor.title')}
                 </h4>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   {realizationData.teacher.split(';').map(teacher => teacher.trim()).join(', ')}
@@ -206,7 +209,7 @@ const RealizationDialog = ({
               }}>
                 <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                   <Users className="h-4 w-4" />
-                  Opiskelijaryhmät
+                  {t('realizationDialog.groups.title')}
                 </h4>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   {realizationData.tgroup.split(';').map(group => group.trim()).join(', ')}
@@ -222,7 +225,7 @@ const RealizationDialog = ({
               }}>
                 <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                   <BookOpen className="h-4 w-4" />
-                  Oppimateriaali
+                  {t('realizationDialog.learningMaterial.title')}
                 </h4>
                 <p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--color-text-secondary)' }}>
                   {realizationData.learning_material}
@@ -238,7 +241,7 @@ const RealizationDialog = ({
               }}>
                 <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                   <Info className="h-4 w-4" />
-                  Lisätietoja
+                  {t('realizationDialog.furtherInformation.title')}
                 </h4>
                 <p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--color-text-secondary)' }}>
                   {realizationData.further_information}
@@ -254,7 +257,7 @@ const RealizationDialog = ({
               }}>
                 <h4 className="font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
                   <Calendar className="h-4 w-4" />
-                  Tulevat tapahtumat ({realizationData.events.length})
+                  {t('realizationDialog.events.title')} ({realizationData.events.length})
                 </h4>
                 <div className="space-y-2 max-h-40 overflow-y-auto">
                   {realizationData.events.slice(0, 5).map((event) => (
@@ -276,7 +279,7 @@ const RealizationDialog = ({
                   ))}
                   {realizationData.events.length > 5 && (
                     <div className="text-xs text-center py-1" style={{ color: 'var(--color-text-secondary)' }}>
-                      ... ja {realizationData.events.length - 5} muuta tapahtumaa
+                      ... {t('realizationDialog.events.moreEvents', { count: realizationData.events.length - 5 })}
                     </div>
                   )}
                 </div>

@@ -1,0 +1,104 @@
+{
+  "weekView": {
+    "noEvents": "No events",
+    "noEventsDescription": "No events scheduled for this week!",
+    "currentTime": "Now",
+    "week": "Week",
+    "weekShort": "Week"
+  },
+  "dayView": {
+    "noEvents": "No events",
+    "noEventsDescription": "No events or lectures scheduled for this day!",
+    "swipeToNavigate": "← Swipe to change day →",
+    "breakDuration": "break"
+  },
+  "navigation": {
+    "day": "Day",
+    "week": "Week", 
+    "today": "Today"
+  },
+  "calendar": {
+    "urlMissing": "Calendar URL missing",
+    "urlMissingDescription": "Configure the URL from Turku AMK calendar system to see your schedule.",
+    "linkCalendar": "Link calendar"
+  },
+  "loading": {
+    "schedule": "Loading schedule..."
+  },
+  "errors": {
+    "loadingFailed": "Schedule loading failed",
+    "close": "Close"
+  },
+  "dateFormat": {
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday", 
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "daysShort": {
+      "monday": "Mon",
+      "tuesday": "Tue",
+      "wednesday": "Wed", 
+      "thursday": "Thu",
+      "friday": "Fri",
+      "saturday": "Sat",
+      "sunday": "Sun"
+    },
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    },
+    "monthsShort": {
+      "january": "Jan",
+      "february": "Feb", 
+      "march": "Mar",
+      "april": "Apr",
+      "may": "May",
+      "june": "Jun",
+      "july": "Jul",
+      "august": "Aug",
+      "september": "Sep",
+      "october": "Oct",
+      "november": "Nov",
+      "december": "Dec"
+    }
+  },
+  "calendarModal": {
+    "title": "Set Calendar URL",
+    "description": "Choose PTIVIS25B quick setup or enter your own calendar URL.",
+    "quickSetup": {
+      "title": "PTIVIS25B",
+      "description": "Quick setup for group calendar",
+      "useButton": "Use"
+    },
+    "customUrl": {
+      "title": "Custom URL",
+      "description": "Enter your calendar URL from Turku AMK calendar system",
+      "placeholder": "https://lukkari.turkuamk.fi/ical.php?hash=...",
+      "label": "Calendar URL"
+    },
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "validation": {
+      "required": "Calendar URL is required",
+      "invalid": "Please enter a valid URL",
+      "mustBeTurkuAmk": "URL must be from Turku AMK calendar system"
+    }
+  }
+}
