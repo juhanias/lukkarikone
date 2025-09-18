@@ -15,8 +15,7 @@ interface WeekViewProps {
   setViewMode: (mode: 'day' | 'week') => void
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const WeekView = memo(({ currentDate, setViewMode }: WeekViewProps) => {
+const WeekView = memo(({ currentDate }: WeekViewProps) => {
   const { getWeekStart, getWeekDates } = useScheduleRange()
   const { getEventsForWeek } = useScheduleStore()
   const { config } = useConfigStore()
