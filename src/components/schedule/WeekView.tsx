@@ -5,16 +5,39 @@ import { ScheduleUtils } from '../../utils/schedule-utils'
 import { DateFormatUtils } from '../../utils/date-format-utils'
 import { WEEK_HOUR_HEIGHT, SCHEDULE_LAYOUT, START_HOUR } from '../../constants/schedule-layout-constants'
 import { Calendar, Clock } from 'lucide-react'
+import { useRealizationDialog } from '../../hooks/useRealizationDialog'
+import { useLectureDetailsDialog } from '../../hooks/useLectureDetailsDialog'
+import RealizationDialog from '../RealizationDialog'
+import LectureDetailsDialog from '../LectureDetailsDialog'
 
 interface WeekViewProps {
   currentDate: Date
   setViewMode: (mode: 'day' | 'week') => void
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const WeekView = memo(({ currentDate, setViewMode }: WeekViewProps) => {
   const { getWeekStart, getWeekDates } = useScheduleRange()
   const { getEventsForWeek } = useScheduleStore()
   const { config } = useConfigStore()
+  
+  // Realization dialog hook
+  const { 
+    isOpen: realizationDialogOpen,
+    isLoading: realizationLoading,
+    error: realizationError,
+    realizationData,
+    openDialog: openRealizationDialog,
+    closeDialog: closeRealizationDialog
+  } = useRealizationDialog()
+  
+  // Lecture details dialog hook
+  const {
+    isOpen: lectureDetailsDialogOpen,
+    selectedEvent,
+    openDialog: openLectureDetailsDialog,
+    closeDialog: closeLectureDetailsDialog
+  } = useLectureDetailsDialog()
   
   const weekStart = getWeekStart(currentDate)
   const weekDates = getWeekDates(currentDate)
@@ -195,17 +218,8 @@ const WeekView = memo(({ currentDate, setViewMode }: WeekViewProps) => {
                                     e.preventDefault()
                                     e.stopPropagation()
                                     
-                                    // Use requestAnimationFrame to defer state changes
-                                    requestAnimationFrame(() => {
-                                      // Only set date if it's different to avoid unnecessary key change
-                                      if (date.toDateString() !== currentDate.toDateString()) {
-                                        useScheduleRange.getState().setCurrentDate(date)
-                                      }
-                                      // Switch view mode after a minimal delay to preserve scroll
-                                      setTimeout(() => {
-                                        setViewMode('day')
-                                      }, 10)
-                                    })
+                                    // Open lecture details dialog for this event
+                                    openLectureDetailsDialog(event)
                                   }}
                                 >
                                   <div className="font-semibold line-clamp-1 leading-tight">
@@ -234,6 +248,23 @@ const WeekView = memo(({ currentDate, setViewMode }: WeekViewProps) => {
           )}
         </div>
       </div>
+
+      {/* Realization Dialog */}
+      <RealizationDialog
+        open={realizationDialogOpen}
+        onOpenChange={closeRealizationDialog}
+        realizationData={realizationData}
+        isLoading={realizationLoading}
+        error={realizationError}
+      />
+
+      {/* Lecture Details Dialog */}
+      <LectureDetailsDialog
+        open={lectureDetailsDialogOpen}
+        onOpenChange={closeLectureDetailsDialog}
+        event={selectedEvent}
+        onOpenRealizationDialog={openRealizationDialog}
+      />
     </div>
   )
 })

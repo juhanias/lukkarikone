@@ -16,6 +16,72 @@ app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+app.get('/api/realization/:id', async (req: Request, res: Response) => {
+  try {
+    const realizationId = req.params.id as string;
+    
+    if (!realizationId) {
+      return res.status(400).json({ 
+        error: 'Realization ID is required',
+        message: 'Please provide a realization ID as a URL parameter'
+      });
+    }
+
+    // Validate realization ID format (basic validation)
+    if (!/^[a-zA-Z0-9\-_]+$/.test(realizationId)) {
+      return res.status(400).json({ 
+        error: 'Invalid realization ID format',
+        message: 'Realization ID contains invalid characters'
+      });
+    }
+
+    const cacheKey = `realization_${realizationId}`;
+    const cachedData = cache.get(cacheKey);
+    
+    if (cachedData) {
+      console.log(`Cache hit for realization ID: ${realizationId}`);
+      return res.json({
+        data: cachedData,
+        cached: true,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    console.log(`Fetching realization data for ID: ${realizationId}`);
+
+    const realizationUrl = `https://lukkari.turkuamk.fi/rest/realization/${realizationId}`;
+    const response = await fetch(realizationUrl);
+    
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: `Failed to fetch realization data`,
+        message: `HTTP ${response.status}: ${response.statusText}`,
+        realizationId: realizationId
+      });
+    }
+
+    const realizationData = await response.json();
+
+    // Cache the realization data
+    cache.set(cacheKey, realizationData);
+    
+    console.log(`Successfully cached realization data for ID: ${realizationId}`);
+    
+    res.json({
+      data: realizationData,
+      cached: false,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Realization fetch error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: error instanceof Error ? error.message : 'Unknown error occurred'
+    });
+  }
+});
+
 app.get('/api/calendar', async (req: Request, res: Response) => {
   try {
     const calendarUrl = req.query.url as string;

@@ -6,6 +6,10 @@ import { ScheduleLayoutUtils, type PositionedEvent } from '../../utils/schedule-
 import { DateFormatUtils } from '../../utils/date-format-utils'
 import { START_HOUR, DAY_HOUR_HEIGHT } from '../../constants/schedule-layout-constants'
 import { Calendar, Clock } from 'lucide-react'
+import { useRealizationDialog } from '../../hooks/useRealizationDialog'
+import { useLectureDetailsDialog } from '../../hooks/useLectureDetailsDialog'
+import RealizationDialog from '../RealizationDialog'
+import LectureDetailsDialog from '../LectureDetailsDialog'
 
 interface ScheduleDayProps {
   date: Date
@@ -13,6 +17,24 @@ interface ScheduleDayProps {
 }
 
 const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
+  // Realization dialog hook
+  const { 
+    isOpen: realizationDialogOpen,
+    isLoading: realizationLoading,
+    error: realizationError,
+    realizationData,
+    openDialog: openRealizationDialog,
+    closeDialog: closeRealizationDialog
+  } = useRealizationDialog()
+
+  // Lecture details dialog hook
+  const {
+    isOpen: lectureDetailsDialogOpen,
+    selectedEvent,
+    openDialog: openLectureDetailsDialog,
+    closeDialog: closeLectureDetailsDialog
+  } = useLectureDetailsDialog()
+
   // Function to calculate gap periods between events
   const calculateGapPeriods = (events: ScheduleEvent[]): GapPeriod[] => {
     return ScheduleLayoutUtils.calculateGapPeriods(events)
@@ -167,14 +189,8 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
-                        console.log('Event clicked:', {
-                          title: event.title,
-                          location: event.location,
-                          time: ScheduleUtils.formatTimeRange(event.startTime, event.endTime),
-                          teachers: event.teachers,
-                          groups: event.groups,
-                          description: event.description
-                        })
+                        // Open lecture details dialog for this event
+                        openLectureDetailsDialog(event)
                       }}
                     >
                       {/* Event Time Badge */}
@@ -212,6 +228,23 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
           )}
         </div>
       </div>
+
+      {/* Realization Dialog */}
+      <RealizationDialog
+        open={realizationDialogOpen}
+        onOpenChange={closeRealizationDialog}
+        realizationData={realizationData}
+        isLoading={realizationLoading}
+        error={realizationError}
+      />
+
+      {/* Lecture Details Dialog */}
+      <LectureDetailsDialog
+        open={lectureDetailsDialogOpen}
+        onOpenChange={closeLectureDetailsDialog}
+        event={selectedEvent}
+        onOpenRealizationDialog={openRealizationDialog}
+      />
     </div>
   )
 })
