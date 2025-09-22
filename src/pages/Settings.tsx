@@ -44,9 +44,9 @@ export default function Settings() {
   const isFrogMode = config.theme === 'frog'
 
   return (
-    <div className="h-full flex flex-col" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div className="h-full overflow-y-auto" style={{ backgroundColor: 'var(--color-background)' }}>
       {/* Header - Full Width Gradient */}
-      <div className="w-full flex-shrink-0" style={{ 
+      <div className="w-full" style={{ 
         background: `linear-gradient(to bottom, var(--color-surface-alpha-40), transparent)` 
       }}>
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
@@ -60,14 +60,13 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Settings Container - Constrained Width */}
-      <div className="flex-1 overflow-y-auto">
-        <motion.div 
-          className="max-w-4xl mx-auto px-4 py-6"
-          variants={containerVariants}
-          {...motionProps}
-        >
-          <div className="space-y-6">
+      <motion.div 
+        className="max-w-4xl mx-auto px-4"
+        variants={containerVariants}
+        {...motionProps}
+      >
+        {/* Settings Container */}
+        <div className="pb-6 space-y-6">
             {/* Font Settings */}
             <motion.div variants={itemVariants}>
               <SettingsSection
@@ -265,9 +264,8 @@ export default function Settings() {
                 </SettingsSection>
               </motion.div>
             )}
-          </div>
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     </div>
   )
 }

@@ -147,7 +147,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                       }}
                     >
                       {/* Time label */}
-                      <div className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1 z-30">
+                      <div className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1 z-30" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)' }}>
                         <Clock size={10} />
                         {currentTimeString}
                       </div>
@@ -204,16 +204,20 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                             if (eventStartHour >= slotHour && eventStartHour < nextSlotHour) {
                               const topOffset = ((eventStartHour - slotHour) * WEEK_HOUR_HEIGHT) // WEEK_HOUR_HEIGHT px per hour
                               const height = event.duration * WEEK_HOUR_HEIGHT // WEEK_HOUR_HEIGHT px per hour
+                              const colorPair = ScheduleUtils.getColorPair(event.title)
                               
                               return (
                                 <div
                                   key={event.id}
-                                  className={`absolute left-0.5 right-0.5 rounded text-white text-xs p-1 cursor-pointer overflow-hidden ${event.color} hover:z-50 hover:scale-105 transition-transform duration-200`}
+                                  className={`absolute left-0.5 right-0.5 rounded text-white text-xs p-1 cursor-pointer overflow-hidden hover:z-50 hover:scale-101 transition-all duration-500 schedule-event-gradient`}
                                   style={{
                                     top: `${topOffset}px`,
                                     height: `${Math.max(height, SCHEDULE_LAYOUT.EVENT.MIN_HEIGHT)}px`, // Minimum height
-                                    zIndex: 10
-                                  }}
+                                    zIndex: 10,
+                                    background: colorPair.normal,
+                                    '--normal-gradient': colorPair.normal,
+                                    '--hover-gradient': colorPair.flipped,
+                                  } as React.CSSProperties & { '--normal-gradient': string; '--hover-gradient': string }}
                                   onClick={(e) => {
                                     // Prevent the click from causing scroll reset
                                     e.preventDefault()
@@ -223,7 +227,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                                     openLectureDetailsDialog(event)
                                   }}
                                 >
-                                  <div className="font-semibold line-clamp-1 leading-tight">
+                                  <div className="font-semibold line-clamp-2 leading-tight">
                                     {event.title}
                                   </div>
                                   {event.location && height > 40 && (
@@ -231,7 +235,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                                       📍 {event.location}
                                     </div>
                                   )}
-                                  <div className="text-xs opacity-75 line-clamp-1">
+                                  <div className="text-xs opacity-75 line-clamp-2">
                                     {ScheduleUtils.formatTimeRange(event.startTime, event.endTime)}
                                   </div>
                                 </div>

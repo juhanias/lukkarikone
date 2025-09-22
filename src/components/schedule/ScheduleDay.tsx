@@ -138,7 +138,7 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
                     }}
                   >
                     {/* Time label */}
-                    <div className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1">
+                    <div className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)' }}>
                       <Clock size={12} />
                       {currentTimeString}
                     </div>
@@ -175,11 +175,12 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
                 {/* Events */}
                 {positionedEvents.map((event) => {
                   const eventDurationInHours = (event.endTime.getTime() - event.startTime.getTime()) / (1000 * 60 * 60)
+                  const colorPair = ScheduleUtils.getColorPair(event.title)
                   
                   return (
                     <motion.div
                       key={event.id}
-                      className={`absolute rounded-lg ${event.color} text-white shadow-lg cursor-pointer overflow-hidden hover:scale-105 transition-transform duration-200`}
+                      className={`absolute rounded-lg text-white shadow-lg cursor-pointer overflow-hidden hover:scale-101 transition-all duration-500 schedule-event-gradient`}
                       style={{
                         top: `${(event.startHour - START_HOUR) * DAY_HOUR_HEIGHT}px`,
                         height: `${event.duration * DAY_HOUR_HEIGHT}px`,
@@ -188,9 +189,12 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
                         zIndex: event.zIndex,
                         marginLeft: '2px',
                         marginRight: '2px',
-                      }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                        background: colorPair.normal,
+                        '--normal-gradient': colorPair.normal,
+                        '--hover-gradient': colorPair.flipped,
+                      } as React.CSSProperties & { '--normal-gradient': string; '--hover-gradient': string }}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.995 }}
                       onClick={() => {
                         // Open lecture details dialog for this event
                         openLectureDetailsDialog(event)
@@ -213,13 +217,13 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
                           <p className={`text-xs opacity-90 leading-tight ${
                             eventDurationInHours >= 3 ? 'line-clamp-3' : 'line-clamp-2'
                           }`}>
-                            📍 {event.location}
+                            {event.location}
                           </p>
                         )}
                         
                         {event.teachers && event.teachers.length > 0 && eventDurationInHours >= 2 && (
-                          <p className="text-xs opacity-75 line-clamp-1">
-                            👨‍🏫 {event.teachers.join(', ')}
+                          <p className="text-xs opacity-75 line-clamp-2">
+                            {event.teachers.join(', ')}
                           </p>
                         )}
                       </div>

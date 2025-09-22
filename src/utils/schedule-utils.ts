@@ -1,28 +1,44 @@
 import ICAL from 'ical.js';
 import { format, isSameDay } from 'date-fns';
 import type { TurkuAmkScheduleEntry, ScheduleEvent } from '../types/schedule';
+import { RealizationApiService } from '../services/realizationApi';
 
 export class ScheduleUtils {
   private static readonly BACKEND_API_BASE = 'https://lukkari-api.juh.fi/api';
 
   private static readonly EVENT_COLORS = [
-    'bg-blue-800',
-    'bg-purple-800', 
-    'bg-green-800',
-    'bg-orange-800',
-    'bg-teal-800',
-    'bg-indigo-800',
-    'bg-red-800',
-    'bg-amber-800',
-    'bg-slate-600',
-    'bg-gray-600',
-    'bg-emerald-800',
-    'bg-rose-800',
-    'bg-cyan-800',
-    'bg-violet-800',
-    'bg-lime-800',
-    'bg-sky-800',
+    'rgb(30, 64, 175)', // blue
+    'rgb(88, 28, 135)', // purple
+    'rgb(22, 101, 52)', // green
+    'rgb(194, 65, 12)', // orange
+    'rgb(13, 148, 136)', // teal
+    'rgb(67, 56, 202)', // indigo
+    'rgb(185, 28, 28)', // red
+    'rgb(180, 83, 9)', // amber
+    'rgb(71, 85, 105)', // slate
+    'rgb(75, 85, 99)', // gray
+    'rgb(5, 150, 105)', // emerald
+    'rgb(190, 18, 60)', // rose
+    'rgb(8, 145, 178)', // cyan
+    'rgb(124, 58, 237)', // violet
+    'rgb(101, 163, 13)', // lime
+    'rgb(7, 89, 133)', // sky
   ];
+
+  // Utility function to lighten an RGB color by a given factor (0-1)
+  private static lightenRgbColor(rgbString: string, factor: number = 0.1): string {
+    const rgbMatch = rgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (!rgbMatch) return rgbString;
+    
+    const [, r, g, b] = rgbMatch.map(Number);
+    
+    // Lighten by mixing with white
+    const lightenedR = Math.round(r + (255 - r) * factor);
+    const lightenedG = Math.round(g + (255 - g) * factor);
+    const lightenedB = Math.round(b + (255 - b) * factor);
+    
+    return `rgb(${lightenedR}, ${lightenedG}, ${lightenedB})`;
+  }
 
   // Simple hash function to generate consistent colors based on event title
   private static hashString(str: string): number {
@@ -35,10 +51,40 @@ export class ScheduleUtils {
     return Math.abs(hash);
   }
 
+  // Get the key to use for color generation - prioritize course ID if available
+  private static getColorKey(eventTitle: string): string {
+    const courseId = RealizationApiService.extractRealizationCode(eventTitle);
+    return courseId || eventTitle;
+  }
+
   static getSeededColor(eventTitle: string): string {
-    const hash = this.hashString(eventTitle);
+    const colorKey = this.getColorKey(eventTitle);
+    const hash = this.hashString(colorKey);
     const colorIndex = hash % this.EVENT_COLORS.length;
-    return this.EVENT_COLORS[colorIndex];
+    const primaryColor = this.EVENT_COLORS[colorIndex];
+    const secondaryColor = this.lightenRgbColor(primaryColor);
+    return `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+  }
+
+  static getSeededColorFlipped(eventTitle: string): string {
+    const colorKey = this.getColorKey(eventTitle);
+    const hash = this.hashString(colorKey);
+    const colorIndex = hash % this.EVENT_COLORS.length;
+    const primaryColor = this.EVENT_COLORS[colorIndex];
+    const secondaryColor = this.lightenRgbColor(primaryColor);
+    return `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`;
+  }
+
+  static getColorPair(eventTitle: string): { normal: string; flipped: string } {
+    const colorKey = this.getColorKey(eventTitle);
+    const hash = this.hashString(colorKey);
+    const colorIndex = hash % this.EVENT_COLORS.length;
+    const primaryColor = this.EVENT_COLORS[colorIndex];
+    const secondaryColor = this.lightenRgbColor(primaryColor);
+    return {
+      normal: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
+      flipped: `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`
+    };
   }
 
   static async retrieveScheduleFromUrl(calendarUrl?: string): Promise<InstanceType<typeof ICAL.Component>> {
