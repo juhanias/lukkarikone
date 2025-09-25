@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import type { ReactNode } from 'react'
 import { Button } from './button'
 import type { VariantProps } from "class-variance-authority"
