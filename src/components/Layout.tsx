@@ -1,6 +1,7 @@
 import { Calendar, Settings, Sun, Moon } from 'lucide-react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import useConfigStore from '../state/state-management'
+import { Button } from './ui/button'
 
 export default function Layout() {
   const location = useLocation()
@@ -42,9 +43,11 @@ export default function Layout() {
           </Link>
           <nav className='flex gap-4 items-center'>
             {/* Theme Toggle Button */}
-            <button 
+            <Button 
               onClick={toggleLightDarkMode}
-              className='px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105 cursor-pointer'
+              variant="ghost"
+              size="sm"
+              className="px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105"
               style={{
                 backgroundColor: 'transparent',
                 color: 'var(--color-header-text)',
@@ -52,28 +55,33 @@ export default function Layout() {
               }}
               title={isCurrentThemeLight() ? 'Switch to dark mode' : 'Switch to light mode'}
             >
-              {isCurrentThemeLight() ? <Moon /> : <Sun />}
-            </button>
-            <Link 
-              to="/" 
-              className='px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105 cursor-pointer'
-              style={{
-                backgroundColor: location.pathname === '/' 
-                  ? 'var(--color-header-accent)' 
-                  : 'transparent',
-                color: location.pathname === '/' 
-                  ? 'white'
-                  : 'var(--color-header-text)',
-                border: location.pathname === '/' 
-                  ? 'none'
-                  : '1px solid var(--color-border-alpha-30)'
-              }}
-            >
-              <Calendar />
+              {isCurrentThemeLight() ? <Moon size={18} /> : <Sun size={18} />}
+            </Button>
+            <Link to="/">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105"
+                style={{
+                  backgroundColor: location.pathname === '/' 
+                    ? 'var(--color-header-accent)' 
+                    : 'transparent',
+                  color: location.pathname === '/' 
+                    ? 'white'
+                    : 'var(--color-header-text)',
+                  border: location.pathname === '/' 
+                    ? 'none'
+                    : '1px solid var(--color-border-alpha-30)'
+                }}
+              >
+                <Calendar size={18} />
+              </Button>
             </Link>
-            <button 
+            <Button 
               onClick={handleSettingsClick}
-              className='px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105 cursor-pointer'
+              variant="ghost"
+              size="sm"
+              className="px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105"
               style={{
                 backgroundColor: location.pathname === '/settings' 
                   ? 'var(--color-header-accent)' 
@@ -86,8 +94,8 @@ export default function Layout() {
                   : '1px solid var(--color-border-alpha-30)'
               }}
             >
-              <Settings />
-            </button>
+              <Settings size={18} />
+            </Button>
           </nav>
         </div>
       </header>

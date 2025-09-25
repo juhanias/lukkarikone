@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useRealizationColorStore } from '../state/state-management';
 import { RealizationColorUtils } from '../utils/realization-color-utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import { Button } from './ui/button';
 
 interface RealizationColorCustomizerProps {
   open: boolean;
@@ -125,32 +126,20 @@ export const RealizationColorCustomizer = ({
 
           {/* Color Input Type Toggle */}
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={() => setColorInputType('hex')}
-              className={`px-3 py-1 text-sm rounded ${
-                colorInputType === 'hex' ? 'font-medium' : ''
-              }`}
-              style={{
-                backgroundColor: colorInputType === 'hex' ? 'var(--color-accent)' : 'var(--color-surface-secondary)',
-                color: colorInputType === 'hex' ? 'white' : 'var(--color-text-secondary)',
-                border: '1px solid var(--color-border)'
-              }}
+              variant={colorInputType === 'hex' ? 'default' : 'outline'}
+              size="sm"
             >
               {t('dialog.buttons.hex')}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setColorInputType('rgb')}
-              className={`px-3 py-1 text-sm rounded ${
-                colorInputType === 'rgb' ? 'font-medium' : ''
-              }`}
-              style={{
-                backgroundColor: colorInputType === 'rgb' ? 'var(--color-accent)' : 'var(--color-surface-secondary)',
-                color: colorInputType === 'rgb' ? 'white' : 'var(--color-text-secondary)',
-                border: '1px solid var(--color-border)'
-              }}
+              variant={colorInputType === 'rgb' ? 'default' : 'outline'}
+              size="sm"
             >
               {t('dialog.buttons.rgb')}
-            </button>
+            </Button>
           </div>
 
           {/* Color Input */}
@@ -193,45 +182,35 @@ export const RealizationColorCustomizer = ({
 
           {/* Action Buttons */}
           <div className="flex gap-2 pt-2">
-            <button
+            <Button
               onClick={handleApply}
               disabled={!tempColor}
-              className="flex items-center gap-1 px-4 py-2 rounded text-sm font-medium disabled:opacity-50"
-              style={{
-                backgroundColor: tempColor ? 'var(--color-accent)' : 'var(--color-surface-secondary)',
-                color: tempColor ? 'white' : 'var(--color-text-secondary)'
-              }}
+              size="sm"
             >
               <Check className="h-4 w-4" />
               {t('dialog.buttons.apply')}
-            </button>
+            </Button>
             
             {isCustomized && (
-              <button
+              <Button
                 onClick={handleReset}
-                className="flex items-center gap-1 px-4 py-2 rounded text-sm font-medium"
-                style={{
-                  backgroundColor: 'var(--color-error)',
-                  color: 'white'
-                }}
+                variant="destructive"
+                size="sm"
               >
                 <RotateCcw className="h-4 w-4" />
                 {t('dialog.buttons.resetToDefault')}
-              </button>
+              </Button>
             )}
 
-            <button
+            <Button
               onClick={handleCancel}
-              className="flex items-center gap-1 px-4 py-2 rounded text-sm font-medium ml-auto"
-              style={{
-                backgroundColor: 'var(--color-surface-secondary)',
-                color: 'var(--color-text-secondary)',
-                border: '1px solid var(--color-border)'
-              }}
+              variant="outline"
+              size="sm"
+              className="ml-auto"
             >
               <X className="h-4 w-4" />
               {t('dialog.buttons.cancel')}
-            </button>
+            </Button>
           </div>
         </div>
       </DialogContent>

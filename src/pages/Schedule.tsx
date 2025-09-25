@@ -222,13 +222,15 @@ export default function Schedule() {
                 <div className="flex-1">
                   <p className="font-medium" style={{ color: 'var(--color-error)' }}>{t('errors.loadingFailed')}</p>
                   <p className="text-sm mt-1 leading-relaxed" style={{ color: 'var(--color-error)' }}>{error}</p>
-                  <button 
+                  <Button 
                     onClick={clearError}
-                    className="text-sm underline mt-2 hover:opacity-80"
+                    variant="link"
+                    size="sm"
+                    className="text-sm underline mt-2 hover:opacity-80 p-0 h-auto"
                     style={{ color: 'var(--color-accent)' }}
                   >
                     {t('errors.close')}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -244,90 +246,92 @@ export default function Schedule() {
         {/* View Tabs */}
         <div className="w-full max-w-7xl mx-auto px-4 pt-4">
           <div className="flex rounded-lg p-1" style={{ backgroundColor: 'var(--color-surface-secondary-alpha-30)' }}>
-            <button
+            <Button
               onClick={() => setViewMode('day')}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                viewMode === 'day' 
-                  ? 'shadow-sm' 
-                  : ''
-              }`}
-              style={{
-                backgroundColor: viewMode === 'day' ? 'var(--color-accent)' : 'transparent',
-                color: viewMode === 'day' ? 'white' : 'var(--color-text-secondary)'
-              }}
+              variant={viewMode === 'day' ? 'default' : 'ghost'}
+              size="sm"
+              className="flex-1"
             >
               {t('navigation.day')}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setViewMode('week')}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                viewMode === 'week' 
-                  ? 'shadow-sm' 
-                  : ''
-              }`}
-              style={{
-                backgroundColor: viewMode === 'week' ? 'var(--color-accent)' : 'transparent',
-                color: viewMode === 'week' ? 'white' : 'var(--color-text-secondary)'
-              }}
+              variant={viewMode === 'week' ? 'default' : 'ghost'}
+              size="sm"
+              className="flex-1"
             >
               {t('navigation.week')}
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Navigation Controls */}
         <div className="flex justify-between items-center p-4">
           <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
-            <motion.button 
-              onClick={() => handleSwipe('right')}
-              disabled={isTransitioning}
-              className="p-3 rounded-full transition-colors disabled:opacity-50"
-              style={{
-                backgroundColor: 'var(--color-surface-secondary-alpha-30)',
-                color: 'var(--color-text-secondary)'
-              }}
+            <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <ChevronLeft size={20} />
-            </motion.button>
+              <Button 
+                onClick={() => handleSwipe('right')}
+                disabled={isTransitioning}
+                variant="ghost"
+                size="icon"
+                className="p-3 rounded-full disabled:opacity-50"
+                style={{
+                  backgroundColor: 'var(--color-surface-secondary-alpha-30)',
+                  color: 'var(--color-text-secondary)'
+                }}
+              >
+                <ChevronLeft size={20} />
+              </Button>
+            </motion.div>
             
-            <motion.button
-              onClick={() => {
-                const today = new Date()
-                today.setHours(0, 0, 0, 0)
-                if (currentDate.getTime() !== today.getTime()) {
-                  setIsTransitioning(true)
-                  setTimeout(() => {
-                    useScheduleRange.getState().goToToday()
-                    setIsTransitioning(false)
-                  }, 2)
-                }
-              }}
-              className="px-4 py-2 rounded-full text-sm font-medium transition-colors"
-              style={{
-                backgroundColor: 'var(--color-accent-alpha-20)',
-                color: 'var(--color-accent)'
-              }}
+            <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              {t('navigation.today')}
-            </motion.button>
+              <Button
+                onClick={() => {
+                  const today = new Date()
+                  today.setHours(0, 0, 0, 0)
+                  if (currentDate.getTime() !== today.getTime()) {
+                    setIsTransitioning(true)
+                    setTimeout(() => {
+                      useScheduleRange.getState().goToToday()
+                      setIsTransitioning(false)
+                    }, 2)
+                  }
+                }}
+                size="sm"
+                className="px-4 py-2 rounded-full text-sm font-medium"
+                style={{
+                  backgroundColor: 'var(--color-accent-alpha-20)',
+                  color: 'var(--color-accent)'
+                }}
+              >
+                {t('navigation.today')}
+              </Button>
+            </motion.div>
             
-            <motion.button 
-              onClick={() => handleSwipe('left')}
-              disabled={isTransitioning}
-              className="p-3 rounded-full transition-colors disabled:opacity-50"
-              style={{
-                backgroundColor: 'var(--color-surface-secondary-alpha-30)',
-                color: 'var(--color-text-secondary)'
-              }}
+            <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <ChevronRight size={20} />
-            </motion.button>
+              <Button 
+                onClick={() => handleSwipe('left')}
+                disabled={isTransitioning}
+                variant="ghost"
+                size="icon"
+                className="p-3 rounded-full disabled:opacity-50"
+                style={{
+                  backgroundColor: 'var(--color-surface-secondary-alpha-30)',
+                  color: 'var(--color-text-secondary)'
+                }}
+              >
+                <ChevronRight size={20} />
+              </Button>
+            </motion.div>
           </div>
         </div>
       </div>

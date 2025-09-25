@@ -193,40 +193,44 @@ export default function Settings() {
                 title={t('sections.frog.title')}
                 subtitle={isFrogMode ? t('sections.frog.subtitleActive') : t('sections.frog.subtitle')}
               >
-                <motion.button
-                  className="w-full flex items-center p-4 rounded-lg cursor-pointer transition-all"
-                  style={{
-                    backgroundColor: isFrogMode
-                      ? 'rgba(72, 214, 89, 0.15)'
-                      : 'var(--color-surface-secondary-alpha-30)',
-                    border: isFrogMode
-                      ? '1px solid rgba(72, 214, 89, 0.4)'
-                      : '1px solid var(--color-border-alpha-30)'
-                  }}
+                <motion.div
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setConfig({ theme: isFrogMode ? 'default' : 'frog' })}
                 >
-                  <div className="flex-1 text-left">
-                    <span className="font-medium" style={{ color: 'var(--color-text)' }}>
-                      {isFrogMode ? t('sections.frog.deactivate') : t('sections.frog.activate')}
-                    </span>
-                    <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-                      {isFrogMode 
-                        ? t('sections.frog.deactivateSubtitle')
-                        : t('sections.frog.activateSubtitle')
-                      }
-                    </p>
-                  </div>
-                  {isFrogMode && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="w-2 h-2 rounded-full ml-4"
-                      style={{ backgroundColor: '#48d659' }}
-                    />
-                  )}
-                </motion.button>
+                  <Button
+                    variant="ghost"
+                    className="w-full flex items-center p-4 rounded-lg cursor-pointer transition-all justify-start h-auto"
+                    style={{
+                      backgroundColor: isFrogMode
+                        ? 'rgba(72, 214, 89, 0.15)'
+                        : 'var(--color-surface-secondary-alpha-30)',
+                      border: isFrogMode
+                        ? '1px solid rgba(72, 214, 89, 0.4)'
+                        : '1px solid var(--color-border-alpha-30)'
+                    }}
+                    onClick={() => setConfig({ theme: isFrogMode ? 'default' : 'frog' })}
+                  >
+                    <div className="flex-1 text-left">
+                      <span className="font-medium" style={{ color: 'var(--color-text)' }}>
+                        {isFrogMode ? t('sections.frog.deactivate') : t('sections.frog.activate')}
+                      </span>
+                      <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                        {isFrogMode 
+                          ? t('sections.frog.deactivateSubtitle')
+                          : t('sections.frog.activateSubtitle')
+                        }
+                      </p>
+                    </div>
+                    {isFrogMode && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-2 h-2 rounded-full ml-4"
+                        style={{ backgroundColor: '#48d659' }}
+                      />
+                    )}
+                  </Button>
+                </motion.div>
               </SettingsSection>
             </motion.div>
 

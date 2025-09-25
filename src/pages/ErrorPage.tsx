@@ -1,4 +1,5 @@
 import { useRouteError, Link } from 'react-router-dom'
+import { Button } from '../components/ui/button'
 
 interface RouteError {
   statusText?: string
@@ -32,12 +33,13 @@ export default function ErrorPage() {
             Go Back Home
           </Link>
           <div>
-            <button 
+            <Button 
               onClick={() => window.location.reload()}
-              className='text-gray-400 hover:text-white underline transition-colors'
+              variant="link"
+              className="text-gray-400 hover:text-white underline p-0 h-auto"
             >
               Try Again
-            </button>
+            </Button>
           </div>
         </div>
       </div>
