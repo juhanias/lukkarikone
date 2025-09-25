@@ -20,8 +20,8 @@
       "title": "View Settings",
       "subtitle": "Customize calendar view",
       "showWeekends": {
-        "label": "Show weekends",
-        "subtitle": "Display Saturday and Sunday in week view"
+        "label": "Always show weekends",
+        "subtitle": "Weekends are automatically shown if they contain events"
       }
     },
     "language": {

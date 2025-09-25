@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Settings as SettingsIcon, Type, RotateCcw, Code, Palette, Calendar, Link, Languages } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import useConfigStore from '../state/state-management'
+import useConfigStore, { useRealizationColorStore } from '../state/state-management'
 import { ThemeSelector } from '../components/ThemeSelector'
 import { FrogIcon } from '../components/FrogIcon'
 import LanguageSelector from '../components/LanguageSelector'
@@ -40,6 +40,7 @@ const motionProps = prefersReducedMotion
 export default function Settings() {
   const { t } = useTranslation('settings')
   const { config, setConfig, resetConfig, getListedThemes } = useConfigStore()
+  const { customColors, clearAllCustomColors } = useRealizationColorStore()
   const listedThemes = getListedThemes() // Get only the normal themes
   const isFrogMode = config.theme === 'frog'
 
@@ -253,13 +254,48 @@ export default function Settings() {
                   title={t('sections.debug.title')}
                   subtitle={t('sections.debug.subtitle')}
                 >
-                  <div className="rounded-lg p-4" style={{
-                    backgroundColor: 'var(--color-background-alpha-60)',
-                    border: '1px solid var(--color-border-alpha-30)'
-                  }}>
-                    <pre className="text-sm font-mono overflow-auto" style={{ color: 'var(--color-success)' }}>
-                      {JSON.stringify(config, null, 2)}
-                    </pre>
+                  <div className="space-y-4">
+                    {/* App Configuration */}
+                    <div>
+                      <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
+                        App Configuration
+                      </h4>
+                      <div className="rounded-lg p-4" style={{
+                        backgroundColor: 'var(--color-background-alpha-60)',
+                        border: '1px solid var(--color-border-alpha-30)'
+                      }}>
+                        <pre className="text-sm font-mono overflow-auto" style={{ color: 'var(--color-success)' }}>
+                          {JSON.stringify(config, null, 2)}
+                        </pre>
+                      </div>
+                    </div>
+
+                    {/* Custom Realization Colors */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
+                          Custom Realization Colors ({Object.keys(customColors).length})
+                        </h4>
+                        {Object.keys(customColors).length > 0 && (
+                          <ActionButton 
+                            onClick={clearAllCustomColors} 
+                            variant="danger"
+                          >
+                            Clear All
+                          </ActionButton>
+                        )}
+                      </div>
+                      <div className="rounded-lg p-4" style={{
+                        backgroundColor: 'var(--color-background-alpha-60)',
+                        border: '1px solid var(--color-border-alpha-30)'
+                      }}>
+                        <pre className="text-sm font-mono overflow-auto" style={{ color: 'var(--color-accent)' }}>
+                          {Object.keys(customColors).length === 0 
+                            ? '{}' 
+                            : JSON.stringify(customColors, null, 2)}
+                        </pre>
+                      </div>
+                    </div>
                   </div>
                 </SettingsSection>
               </motion.div>

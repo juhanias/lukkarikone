@@ -26,7 +26,7 @@ export class ScheduleUtils {
   ];
 
   // Utility function to lighten an RGB color by a given factor (0-1)
-  private static lightenRgbColor(rgbString: string, factor: number = 0.1): string {
+  static lightenRgbColor(rgbString: string, factor: number = 0.1): string {
     const rgbMatch = rgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
     if (!rgbMatch) return rgbString;
     
@@ -57,27 +57,21 @@ export class ScheduleUtils {
     return courseId || eventTitle;
   }
 
-  static getSeededColor(eventTitle: string): string {
-    const colorKey = this.getColorKey(eventTitle);
-    const hash = this.hashString(colorKey);
+  /**
+   * Gets the default color for a realization code (without custom overrides)
+   * This method generates the same color that would be used in the original system
+   */
+  static getDefaultRealizationColor(realizationKey: string): string {
+    const hash = this.hashString(realizationKey);
     const colorIndex = hash % this.EVENT_COLORS.length;
-    const primaryColor = this.EVENT_COLORS[colorIndex];
-    const secondaryColor = this.lightenRgbColor(primaryColor);
-    return `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+    return this.EVENT_COLORS[colorIndex];
   }
 
-  static getSeededColorFlipped(eventTitle: string): string {
-    const colorKey = this.getColorKey(eventTitle);
-    const hash = this.hashString(colorKey);
-    const colorIndex = hash % this.EVENT_COLORS.length;
-    const primaryColor = this.EVENT_COLORS[colorIndex];
-    const secondaryColor = this.lightenRgbColor(primaryColor);
-    return `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`;
-  }
-
-  static getColorPair(eventTitle: string): { normal: string; flipped: string } {
-    const colorKey = this.getColorKey(eventTitle);
-    const hash = this.hashString(colorKey);
+  /**
+   * Gets the default color pair for a realization (without custom overrides)
+   */
+  static getDefaultColorPair(realizationKey: string): { normal: string; flipped: string } {
+    const hash = this.hashString(realizationKey);
     const colorIndex = hash % this.EVENT_COLORS.length;
     const primaryColor = this.EVENT_COLORS[colorIndex];
     const secondaryColor = this.lightenRgbColor(primaryColor);
@@ -85,6 +79,77 @@ export class ScheduleUtils {
       normal: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
       flipped: `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`
     };
+  }
+
+  /**
+   * Gets a color pair for an event title, with support for custom colors
+   * @param eventTitle The event title to generate colors for
+   * @param customColors Optional record of custom colors by realization code
+   */
+  static getColorPair(eventTitle: string, customColors?: Record<string, string>): { normal: string; flipped: string } {
+    const colorKey = this.getColorKey(eventTitle);
+    const realizationCode = RealizationApiService.extractRealizationCode(eventTitle);
+    
+    // Check if we have a custom color for this realization
+    if (realizationCode && customColors && customColors[realizationCode]) {
+      const primaryColor = customColors[realizationCode];
+      const secondaryColor = this.lightenRgbColor(primaryColor);
+      return {
+        normal: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
+        flipped: `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`
+      };
+    }
+    
+    // Fall back to default color generation
+    return this.getDefaultColorPair(colorKey);
+  }
+
+  /**
+   * Gets a seeded color for an event title, with support for custom colors
+   * @param eventTitle The event title to generate color for
+   * @param customColors Optional record of custom colors by realization code
+   */
+  static getSeededColor(eventTitle: string, customColors?: Record<string, string>): string {
+    const colorKey = this.getColorKey(eventTitle);
+    const realizationCode = RealizationApiService.extractRealizationCode(eventTitle);
+    
+    // Check if we have a custom color for this realization
+    if (realizationCode && customColors && customColors[realizationCode]) {
+      const primaryColor = customColors[realizationCode];
+      const secondaryColor = this.lightenRgbColor(primaryColor);
+      return `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+    }
+    
+    // Fall back to default color generation
+    const hash = this.hashString(colorKey);
+    const colorIndex = hash % this.EVENT_COLORS.length;
+    const primaryColor = this.EVENT_COLORS[colorIndex];
+    const secondaryColor = this.lightenRgbColor(primaryColor);
+    return `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+  }
+
+  /**
+   * Gets a flipped seeded color for an event title, with support for custom colors
+   * @param eventTitle The event title to generate color for
+   * @param customColors Optional record of custom colors by realization code
+   */
+  static getSeededColorFlipped(eventTitle: string, customColors?: Record<string, string>): string {
+    const colorKey = this.getColorKey(eventTitle);
+    const realizationCode = RealizationApiService.extractRealizationCode(eventTitle);
+    
+    // Check if we have a custom color for this realization
+    if (realizationCode && customColors && customColors[realizationCode]) {
+      const primaryColor = customColors[realizationCode];
+      const secondaryColor = this.lightenRgbColor(primaryColor);
+      return `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`;
+    }
+    
+    // Fall back to default color generation
+    const hash = this.hashString(colorKey);
+    const colorIndex = hash % this.EVENT_COLORS.length;
+    const primaryColor = this.EVENT_COLORS[colorIndex];
+    const secondaryColor = this.lightenRgbColor(primaryColor);
+    return `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`;
   }
 
   static async retrieveScheduleFromUrl(calendarUrl?: string): Promise<InstanceType<typeof ICAL.Component>> {
@@ -160,7 +225,7 @@ export class ScheduleUtils {
     };
   }
 
-  static convertToScheduleEvent(vevent: InstanceType<typeof ICAL.Component>, index: number): ScheduleEvent {
+  static convertToScheduleEvent(vevent: InstanceType<typeof ICAL.Component>, index: number, customColors?: Record<string, string>): ScheduleEvent {
     const summary = vevent.getFirstProperty('summary')?.getFirstValue() as string || 'Untitled Event';
     const location = vevent.getFirstProperty('location')?.getFirstValue() as string || '';
     const description = vevent.getFirstProperty('description')?.getFirstValue() as string || '';
@@ -189,7 +254,7 @@ export class ScheduleUtils {
       endTime: endTime,
       duration: duration,
       startHour: startHour,
-      color: this.getSeededColor(summary), // Use seeded color based on event title
+      color: this.getSeededColor(summary, customColors), // Use seeded color with custom color support
       teachers: metadata.teachers,
       groups: metadata.groups,
       description: description,

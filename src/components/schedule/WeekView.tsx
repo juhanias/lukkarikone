@@ -1,13 +1,17 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useScheduleRange, useScheduleStore, default as useConfigStore } from '../../state/state-management'
+import type { ScheduleEvent } from '../../types/schedule'
+import { useScheduleRange, useScheduleStore, useRealizationColorStore, default as useConfigStore } from '../../state/state-management'
 import { ScheduleLayoutUtils } from '../../utils/schedule-layout-utils'
 import { ScheduleUtils } from '../../utils/schedule-utils'
 import { DateFormatUtils } from '../../utils/date-format-utils'
 import { WEEK_HOUR_HEIGHT, SCHEDULE_LAYOUT, START_HOUR } from '../../constants/schedule-layout-constants'
-import { Calendar, Clock } from 'lucide-react'
+import { Calendar, Clock, Palette } from 'lucide-react'
 import { useRealizationDialog } from '../../hooks/useRealizationDialog'
 import { useLectureDetailsDialog } from '../../hooks/useLectureDetailsDialog'
+import { RealizationApiService } from '../../services/realizationApi'
+import { RealizationColorCustomizer } from '../RealizationColorCustomizer'
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from '../ui/context-menu'
 import RealizationDialog from '../RealizationDialog'
 import LectureDetailsDialog from '../LectureDetailsDialog'
 
@@ -18,9 +22,15 @@ interface WeekViewProps {
 
 const WeekView = memo(({ currentDate }: WeekViewProps) => {
   const { t } = useTranslation('schedule')
+  const { t: tColor } = useTranslation('colorCustomization')
   const { getWeekStart, getWeekDates } = useScheduleRange()
   const { getEventsForWeek } = useScheduleStore()
   const { config } = useConfigStore()
+  const { customColors } = useRealizationColorStore()
+  
+  // Color customizer state
+  const [colorCustomizerOpen, setColorCustomizerOpen] = useState(false)
+  const [selectedEventForColor, setSelectedEventForColor] = useState<ScheduleEvent | null>(null)
   
   // Realization dialog hook
   const { 
@@ -39,20 +49,46 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
     openDialog: openLectureDetailsDialog,
     closeDialog: closeLectureDetailsDialog
   } = useLectureDetailsDialog()
+
+  // Helper functions for color customization
+  const openColorCustomizer = (event: ScheduleEvent) => {
+    const realizationCode = RealizationApiService.extractRealizationCode(event.title)
+    if (realizationCode) {
+      setSelectedEventForColor(event)
+      setColorCustomizerOpen(true)
+    }
+  }
+
+  const hasRealizationCode = (event: ScheduleEvent) => {
+    return RealizationApiService.hasRealizationCode(event.title)
+  }
   
   const weekStart = getWeekStart(currentDate)
   const weekDates = getWeekDates(currentDate)
   const weekEvents = getEventsForWeek(weekStart)
   
   // Filter dates and events based on showWeekends config
-  const filteredWeekDates = config.showWeekends 
+  // Always show weekends if they have events, regardless of setting
+  const hasWeekendEvents = weekDates.some(date => {
+    const dayOfWeek = date.getDay()
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6 // Sunday (0) or Saturday (6)
+    if (!isWeekend) return false
+    
+    const dateString = date.toDateString()
+    const eventsForDay = weekEvents[dateString] || []
+    return eventsForDay.length > 0
+  })
+  
+  const shouldShowWeekends = config.showWeekends || hasWeekendEvents
+  
+  const filteredWeekDates = shouldShowWeekends 
     ? weekDates 
     : weekDates.filter(date => {
         const dayOfWeek = date.getDay()
         return dayOfWeek !== 0 && dayOfWeek !== 6 // Exclude Sunday (0) and Saturday (6)
       })
   
-  const filteredWeekEvents = config.showWeekends 
+  const filteredWeekEvents = shouldShowWeekends 
     ? weekEvents
     : Object.fromEntries(
         Object.entries(weekEvents).filter(([dateString]) => {
@@ -62,7 +98,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
         })
       )
   
-  const filteredDayNames = DateFormatUtils.getDayNamesShort(config.showWeekends)
+  const filteredDayNames = DateFormatUtils.getDayNamesShort(shouldShowWeekends)
   
   // Calculate the time range for the week
   const timeSlots = ScheduleLayoutUtils.generateWeekTimeSlots(filteredWeekEvents)
@@ -193,41 +229,69 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                             if (eventStartHour >= slotHour && eventStartHour < nextSlotHour) {
                               const topOffset = ((eventStartHour - slotHour) * WEEK_HOUR_HEIGHT) // WEEK_HOUR_HEIGHT px per hour
                               const height = event.duration * WEEK_HOUR_HEIGHT // WEEK_HOUR_HEIGHT px per hour
-                              const colorPair = ScheduleUtils.getColorPair(event.title)
+                              const colorPair = ScheduleUtils.getColorPair(event.title, customColors)
                               
                               return (
-                                <div
-                                  key={event.id}
-                                  className={`absolute left-0.5 right-0.5 rounded text-white text-xs p-1 cursor-pointer overflow-hidden hover:z-50 hover:scale-101 transition-all duration-500 schedule-event-gradient`}
-                                  style={{
-                                    top: `${topOffset}px`,
-                                    height: `${Math.max(height, SCHEDULE_LAYOUT.EVENT.MIN_HEIGHT)}px`, // Minimum height
-                                    zIndex: 10,
-                                    background: colorPair.normal,
-                                    '--normal-gradient': colorPair.normal,
-                                    '--hover-gradient': colorPair.flipped,
-                                  } as React.CSSProperties & { '--normal-gradient': string; '--hover-gradient': string }}
-                                  onClick={(e) => {
-                                    // Prevent the click from causing scroll reset
-                                    e.preventDefault()
-                                    e.stopPropagation()
-                                    
-                                    // Open lecture details dialog for this event
-                                    openLectureDetailsDialog(event)
-                                  }}
-                                >
-                                  <div className="font-semibold line-clamp-2 leading-tight">
-                                    {event.title}
-                                  </div>
-                                  {event.location && height > 40 && (
-                                    <div className="text-xs opacity-90 leading-tight">
-                                      📍 {event.location}
+                                <ContextMenu key={event.id}>
+                                  <ContextMenuTrigger asChild>
+                                    <div
+                                      className={`absolute left-0.5 right-0.5 rounded text-white text-xs p-1 cursor-pointer overflow-hidden hover:z-50 hover:scale-101 transition-all duration-500 schedule-event-gradient`}
+                                      style={{
+                                        top: `${topOffset}px`,
+                                        height: `${Math.max(height, SCHEDULE_LAYOUT.EVENT.MIN_HEIGHT)}px`, // Minimum height
+                                        zIndex: 10,
+                                        background: colorPair.normal,
+                                        '--normal-gradient': colorPair.normal,
+                                        '--hover-gradient': colorPair.flipped,
+                                      } as React.CSSProperties & { '--normal-gradient': string; '--hover-gradient': string }}
+                                      onClick={(e) => {
+                                        // Prevent the click from causing scroll reset
+                                        e.preventDefault()
+                                        e.stopPropagation()
+                                        
+                                        // Open lecture details dialog for this event
+                                        openLectureDetailsDialog(event)
+                                      }}
+                                    >
+                                      <div className="font-semibold line-clamp-2 leading-tight">
+                                        {event.title}
+                                      </div>
+                                      {event.location && height > 40 && (
+                                        <div className="text-xs opacity-90 leading-tight">
+                                          📍 {event.location}
+                                        </div>
+                                      )}
+                                      <div className="text-xs opacity-75 line-clamp-2">
+                                        {ScheduleUtils.formatTimeRange(event.startTime, event.endTime)}
+                                      </div>
                                     </div>
-                                  )}
-                                  <div className="text-xs opacity-75 line-clamp-2">
-                                    {ScheduleUtils.formatTimeRange(event.startTime, event.endTime)}
-                                  </div>
-                                </div>
+                                  </ContextMenuTrigger>
+                                  <ContextMenuContent style={{
+                                    backgroundColor: 'var(--color-surface)',
+                                    borderColor: 'var(--color-border)',
+                                    color: 'var(--color-text)'
+                                  }}>
+                                    <ContextMenuItem
+                                      onClick={() => openLectureDetailsDialog(event)}
+                                      style={{ color: 'var(--color-text)' }}
+                                    >
+                                      <Calendar className="mr-2 h-4 w-4" />
+                                      {tColor('contextMenu.eventDetails')}
+                                    </ContextMenuItem>
+                                    {hasRealizationCode(event) && (
+                                      <>
+                                        <ContextMenuSeparator style={{ backgroundColor: 'var(--color-border)' }} />
+                                        <ContextMenuItem
+                                          onClick={() => openColorCustomizer(event)}
+                                          style={{ color: 'var(--color-text)' }}
+                                        >
+                                          <Palette className="mr-2 h-4 w-4" />
+                                          {tColor('contextMenu.customizeColor')}
+                                        </ContextMenuItem>
+                                      </>
+                                    )}
+                                  </ContextMenuContent>
+                                </ContextMenu>
                               )
                             }
                             return null
@@ -259,6 +323,16 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
         event={selectedEvent}
         onOpenRealizationDialog={openRealizationDialog}
       />
+
+      {/* Color Customizer Dialog */}
+      {selectedEventForColor && (
+        <RealizationColorCustomizer
+          open={colorCustomizerOpen}
+          onOpenChange={setColorCustomizerOpen}
+          realizationCode={RealizationApiService.extractRealizationCode(selectedEventForColor.title) || ''}
+          currentEventTitle={selectedEventForColor.title}
+        />
+      )}
     </div>
   )
 })

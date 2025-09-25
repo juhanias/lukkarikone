@@ -192,7 +192,7 @@ interface ConfigState {
 const defaultConfig: Config = {
   font: "lexend",
   theme: "default", // Use the correct default theme ID
-  showWeekends: true,
+  showWeekends: false,
   calendarUrl: "",
 };
 
@@ -323,6 +323,17 @@ const useScheduleRange = create<ScheduleRangeState>()(
   )
 );
 
+// Color customization state for realization colors
+interface RealizationColorState {
+  customColors: Record<string, string>; // realization code -> primary color (rgb)
+  
+  getRealizationColor: (realizationCode: string) => string;
+  setRealizationColor: (realizationCode: string, color: string) => void;
+  resetRealizationColor: (realizationCode: string) => void;
+  clearAllCustomColors: () => void;
+  hasCustomColor: (realizationCode: string) => boolean;
+}
+
 // Schedule state for managing events
 interface ScheduleState {
   events: ScheduleEvent[];
@@ -357,12 +368,16 @@ const useScheduleStore = create<ScheduleState>()((set, get) => ({
     try {
       // Get the calendar URL from config store
       const { config } = useConfigStore.getState();
+      
+      // Get custom colors from realization color store
+      const { customColors } = useRealizationColorStore.getState();
+      
       const calendar = await ScheduleUtils.retrieveScheduleFromUrl(config.calendarUrl);
       
       // Get all events from the calendar
       const vevents = calendar.getAllSubcomponents('vevent');
       const events = vevents.map((vevent, index) => 
-        ScheduleUtils.convertToScheduleEvent(vevent, index)
+        ScheduleUtils.convertToScheduleEvent(vevent, index, customColors)
       );
       
       set({ 
@@ -413,5 +428,53 @@ const useScheduleStore = create<ScheduleState>()((set, get) => ({
   clearError: () => set({ error: null }),
 }));
 
+const useRealizationColorStore = create<RealizationColorState>()(
+  persist(
+    (set, get) => ({
+      customColors: {},
+      
+      getRealizationColor: (realizationCode: string) => {
+        const { customColors } = get();
+        // Return custom color if it exists, otherwise return default generated color
+        if (customColors[realizationCode]) {
+          return customColors[realizationCode];
+        }
+        // Generate default color using the existing logic
+        return ScheduleUtils.getDefaultRealizationColor(realizationCode);
+      },
+      
+      setRealizationColor: (realizationCode: string, color: string) => {
+        set((state) => ({
+          customColors: {
+            ...state.customColors,
+            [realizationCode]: color
+          }
+        }));
+      },
+      
+      resetRealizationColor: (realizationCode: string) => {
+        set((state) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { [realizationCode]: _, ...rest } = state.customColors;
+          return { customColors: rest };
+        });
+      },
+      
+      clearAllCustomColors: () => {
+        set({ customColors: {} });
+      },
+      
+      hasCustomColor: (realizationCode: string) => {
+        const { customColors } = get();
+        return realizationCode in customColors;
+      }
+    }),
+    {
+      name: "realization-colors",
+      partialize: (state) => ({ customColors: state.customColors }),
+    }
+  )
+);
+
 export default useConfigStore;
-export { useScheduleRange, useScheduleStore };
+export { useScheduleRange, useScheduleStore, useRealizationColorStore };

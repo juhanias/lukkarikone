@@ -20,8 +20,8 @@
       "title": "Näkymäasetukset",
       "subtitle": "Mukauta kalenterinäkymää",
       "showWeekends": {
-        "label": "Näytä viikonloput",
-        "subtitle": "Näytä lauantai ja sunnuntai viikkonäkymässä"
+        "label": "Näytä viikonloput aina",
+        "subtitle": "Viikonloput näytetään automaattisesti jos niissä on tapahtumia"
       }
     },
     "language": {

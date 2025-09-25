@@ -1,0 +1,31 @@
+{
+  "dialog": {
+    "title": "Customize Realization Color",
+    "eventLabel": "Event:",
+    "realizationCodeLabel": "Realization Code:",
+    "colorPreviewLabel": "Color Preview",
+    "sampleEventText": "Sample Event ({{code}})",
+    "colorInputTypeLabel": {
+      "hex": "Hex Color",
+      "rgb": "RGB Color"
+    },
+    "inputPlaceholder": {
+      "rgb": "rgb(255, 0, 0)"
+    },
+    "status": {
+      "customized": "🎨 Custom color applied",
+      "default": "📋 Using default color"
+    },
+    "buttons": {
+      "apply": "Apply",
+      "resetToDefault": "Reset to Default",
+      "cancel": "Cancel",
+      "hex": "Hex",
+      "rgb": "RGB"
+    }
+  },
+  "contextMenu": {
+    "eventDetails": "Event Details",
+    "customizeColor": "Customize Color"
+  }
+}

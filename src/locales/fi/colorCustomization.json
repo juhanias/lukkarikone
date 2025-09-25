@@ -1,0 +1,31 @@
+{
+  "dialog": {
+    "title": "Mukauta toteutuksen väri",
+    "eventLabel": "Tapahtuma:",
+    "realizationCodeLabel": "Toteutuskoodi:",
+    "colorPreviewLabel": "Värin esikatselu",
+    "sampleEventText": "Esimerkkitapahtuma ({{code}})",
+    "colorInputTypeLabel": {
+      "hex": "Hex-väri",
+      "rgb": "RGB-väri"
+    },
+    "inputPlaceholder": {
+      "rgb": "rgb(255, 0, 0)"
+    },
+    "status": {
+      "customized": "🎨 Mukautettu väri käytössä",
+      "default": "📋 Käytetään oletusväriä"
+    },
+    "buttons": {
+      "apply": "Käytä",
+      "resetToDefault": "Palauta oletukseen",
+      "cancel": "Peruuta",
+      "hex": "Hex",
+      "rgb": "RGB"
+    }
+  },
+  "contextMenu": {
+    "eventDetails": "Tapahtuman tiedot",
+    "customizeColor": "Mukauta väriä"
+  }
+}

@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import type { ScheduleEvent, GapPeriod } from '../../types/schedule'
@@ -6,9 +6,13 @@ import { ScheduleUtils } from '../../utils/schedule-utils'
 import { ScheduleLayoutUtils, type PositionedEvent } from '../../utils/schedule-layout-utils'
 import { DateFormatUtils } from '../../utils/date-format-utils'
 import { START_HOUR, DAY_HOUR_HEIGHT } from '../../constants/schedule-layout-constants'
-import { Calendar, Clock } from 'lucide-react'
+import { Calendar, Clock, Palette } from 'lucide-react'
 import { useRealizationDialog } from '../../hooks/useRealizationDialog'
 import { useLectureDetailsDialog } from '../../hooks/useLectureDetailsDialog'
+import { useRealizationColorStore } from '../../state/state-management'
+import { RealizationApiService } from '../../services/realizationApi'
+import { RealizationColorCustomizer } from '../RealizationColorCustomizer'
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from '../ui/context-menu'
 import RealizationDialog from '../RealizationDialog'
 import LectureDetailsDialog from '../LectureDetailsDialog'
 
@@ -19,6 +23,14 @@ interface ScheduleDayProps {
 
 const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
   const { t } = useTranslation('schedule')
+  const { t: tColor } = useTranslation('colorCustomization')
+  
+  // Color customizer state
+  const [colorCustomizerOpen, setColorCustomizerOpen] = useState(false)
+  const [selectedEventForColor, setSelectedEventForColor] = useState<ScheduleEvent | null>(null)
+  
+  // Realization color store
+  const { customColors } = useRealizationColorStore()
   
   // Realization dialog hook
   const { 
@@ -37,6 +49,20 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
     openDialog: openLectureDetailsDialog,
     closeDialog: closeLectureDetailsDialog
   } = useLectureDetailsDialog()
+
+  // Helper function to open color customizer for an event
+  const openColorCustomizer = (event: ScheduleEvent) => {
+    const realizationCode = RealizationApiService.extractRealizationCode(event.title)
+    if (realizationCode) {
+      setSelectedEventForColor(event)
+      setColorCustomizerOpen(true)
+    }
+  }
+
+  // Helper function to check if event has realization code
+  const hasRealizationCode = (event: ScheduleEvent) => {
+    return RealizationApiService.hasRealizationCode(event.title)
+  }
 
   // Function to calculate gap periods between events
   const calculateGapPeriods = (events: ScheduleEvent[]): GapPeriod[] => {
@@ -173,59 +199,87 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
                 {/* Events */}
                 {positionedEvents.map((event) => {
                   const eventDurationInHours = (event.endTime.getTime() - event.startTime.getTime()) / (1000 * 60 * 60)
-                  const colorPair = ScheduleUtils.getColorPair(event.title)
+                  const colorPair = ScheduleUtils.getColorPair(event.title, customColors)
                   
                   return (
-                    <motion.div
-                      key={event.id}
-                      className={`absolute rounded-lg text-white shadow-lg cursor-pointer overflow-hidden hover:scale-101 transition-all duration-500 schedule-event-gradient`}
-                      style={{
-                        top: `${(event.startHour - START_HOUR) * DAY_HOUR_HEIGHT}px`,
-                        height: `${event.duration * DAY_HOUR_HEIGHT}px`,
-                        width: `${event.width}%`,
-                        left: `${event.left}%`,
-                        zIndex: event.zIndex,
-                        marginLeft: '2px',
-                        marginRight: '2px',
-                        background: colorPair.normal,
-                        '--normal-gradient': colorPair.normal,
-                        '--hover-gradient': colorPair.flipped,
-                      } as React.CSSProperties & { '--normal-gradient': string; '--hover-gradient': string }}
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.995 }}
-                      onClick={() => {
-                        // Open lecture details dialog for this event
-                        openLectureDetailsDialog(event)
-                      }}
-                    >
-                      {/* Event Time Badge */}
-                      <div className="bg-black/20 px-2 py-1 text-xs font-medium">
-                        {ScheduleUtils.formatTimeRange(event.startTime, event.endTime)}
-                      </div>
-                      
-                      {/* Event Content */}
-                      <div className="p-3 space-y-2">
-                        <h3 className={`font-bold leading-tight ${
-                          eventDurationInHours < 1.5 ? 'text-sm line-clamp-2' : 'text-base line-clamp-3'
-                        }`}>
-                          {event.title}
-                        </h3>
-                        
-                        {event.location && (
-                          <p className={`text-xs opacity-90 leading-tight ${
-                            eventDurationInHours >= 3 ? 'line-clamp-3' : 'line-clamp-2'
-                          }`}>
-                            {event.location}
-                          </p>
+                    <ContextMenu key={event.id}>
+                      <ContextMenuTrigger asChild>
+                        <motion.div
+                          className={`absolute rounded-lg text-white shadow-lg cursor-pointer overflow-hidden hover:scale-101 transition-all duration-500 schedule-event-gradient`}
+                          style={{
+                            top: `${(event.startHour - START_HOUR) * DAY_HOUR_HEIGHT}px`,
+                            height: `${event.duration * DAY_HOUR_HEIGHT}px`,
+                            width: `${event.width}%`,
+                            left: `${event.left}%`,
+                            zIndex: event.zIndex,
+                            marginLeft: '2px',
+                            marginRight: '2px',
+                            background: colorPair.normal,
+                            '--normal-gradient': colorPair.normal,
+                            '--hover-gradient': colorPair.flipped,
+                          } as React.CSSProperties & { '--normal-gradient': string; '--hover-gradient': string }}
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.995 }}
+                          onClick={() => {
+                            // Open lecture details dialog for this event
+                            openLectureDetailsDialog(event)
+                          }}
+                        >
+                          {/* Event Time Badge */}
+                          <div className="bg-black/20 px-2 py-1 text-xs font-medium">
+                            {ScheduleUtils.formatTimeRange(event.startTime, event.endTime)}
+                          </div>
+                          
+                          {/* Event Content */}
+                          <div className="p-3 space-y-2">
+                            <h3 className={`font-bold leading-tight ${
+                              eventDurationInHours < 1.5 ? 'text-sm line-clamp-2' : 'text-base line-clamp-3'
+                            }`}>
+                              {event.title}
+                            </h3>
+                            
+                            {event.location && (
+                              <p className={`text-xs opacity-90 leading-tight ${
+                                eventDurationInHours >= 3 ? 'line-clamp-3' : 'line-clamp-2'
+                              }`}>
+                                {event.location}
+                              </p>
+                            )}
+                            
+                            {event.teachers && event.teachers.length > 0 && eventDurationInHours >= 2 && (
+                              <p className="text-xs opacity-75 line-clamp-2">
+                                {event.teachers.join(', ')}
+                              </p>
+                            )}
+                          </div>
+                        </motion.div>
+                      </ContextMenuTrigger>
+                      <ContextMenuContent style={{
+                        backgroundColor: 'var(--color-surface)',
+                        borderColor: 'var(--color-border)',
+                        color: 'var(--color-text)'
+                      }}>
+                        <ContextMenuItem
+                          onClick={() => openLectureDetailsDialog(event)}
+                          style={{ color: 'var(--color-text)' }}
+                        >
+                          <Calendar className="mr-2 h-4 w-4" />
+                          {tColor('contextMenu.eventDetails')}
+                        </ContextMenuItem>
+                        {hasRealizationCode(event) && (
+                          <>
+                            <ContextMenuSeparator style={{ backgroundColor: 'var(--color-border)' }} />
+                            <ContextMenuItem
+                              onClick={() => openColorCustomizer(event)}
+                              style={{ color: 'var(--color-text)' }}
+                            >
+                              <Palette className="mr-2 h-4 w-4" />
+                              {tColor('contextMenu.customizeColor')}
+                            </ContextMenuItem>
+                          </>
                         )}
-                        
-                        {event.teachers && event.teachers.length > 0 && eventDurationInHours >= 2 && (
-                          <p className="text-xs opacity-75 line-clamp-2">
-                            {event.teachers.join(', ')}
-                          </p>
-                        )}
-                      </div>
-                    </motion.div>
+                      </ContextMenuContent>
+                    </ContextMenu>
                   )
                 })}
               </div>
@@ -250,6 +304,16 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
         event={selectedEvent}
         onOpenRealizationDialog={openRealizationDialog}
       />
+
+      {/* Color Customizer Dialog */}
+      {selectedEventForColor && (
+        <RealizationColorCustomizer
+          open={colorCustomizerOpen}
+          onOpenChange={setColorCustomizerOpen}
+          realizationCode={RealizationApiService.extractRealizationCode(selectedEventForColor.title) || ''}
+          currentEventTitle={selectedEventForColor.title}
+        />
+      )}
     </div>
   )
 })
