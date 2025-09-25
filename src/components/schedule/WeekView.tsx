@@ -150,7 +150,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
               {/* Week Grid */}
               <div style={{ minWidth: `${Math.max(320, filteredWeekDates.length * 100 + 48)}px` }}>
                 {/* Day Headers */}
-                <div className="sticky top-0 z-10" style={{ backgroundColor: 'var(--color-surface)' }}>
+                <div className="sticky top-0 z-50" style={{ backgroundColor: 'var(--color-surface)' }}>
                   <div className="flex">
                     <div className="w-12 flex-shrink-0 border-r" style={{ borderColor: 'var(--color-border-alpha-30)' }}>
                     </div>
@@ -175,7 +175,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                   {/* Current Time Indicator */}
                   {showCurrentTimeIndicator && (
                     <div
-                      className="absolute w-full z-30"
+                      className="absolute w-full z-40"
                       style={{
                         top: `${currentTimePosition}px`,
                         left: '0',
@@ -183,12 +183,12 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                       }}
                     >
                       {/* Time label */}
-                      <div className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1 z-30" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)' }}>
+                      <div className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1 z-40" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)' }}>
                         <Clock size={10} />
                         {currentTimeString}
                       </div>
                       {/* Line spanning all days */}
-                      <div className="absolute left-12 top-0 right-0 h-0.5 bg-red-500 shadow-sm z-20"></div>
+                      <div className="absolute left-12 top-0 right-0 h-0.5 bg-red-500 shadow-sm z-30"></div>
                     </div>
                   )}
 
@@ -235,7 +235,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                                 <ContextMenu key={event.id}>
                                   <ContextMenuTrigger asChild>
                                     <div
-                                      className={`absolute left-0.5 right-0.5 rounded text-white text-xs p-1 cursor-pointer overflow-hidden hover:z-50 hover:scale-101 transition-all duration-500 schedule-event-gradient`}
+                                      className={`absolute left-0.5 right-0.5 rounded text-white text-xs p-1 cursor-pointer overflow-hidden hover:z-20 hover:scale-101 transition-all duration-500 schedule-event-gradient`}
                                       style={{
                                         top: `${topOffset}px`,
                                         height: `${Math.max(height, SCHEDULE_LAYOUT.EVENT.MIN_HEIGHT)}px`, // Minimum height
