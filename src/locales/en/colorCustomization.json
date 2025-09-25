@@ -26,6 +26,8 @@
   },
   "contextMenu": {
     "eventDetails": "Event Details",
-    "customizeColor": "Customize Color"
+    "customizeColor": "Customize Color",
+    "hideEvent": "Hide Event",
+    "showEvent": "Show Event"
   }
 }

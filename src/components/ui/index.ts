@@ -1,4 +1,5 @@
 export { SettingsSection } from './SettingsSection'
 export { Toggle } from './Toggle'
+export { Switch } from './switch'
 export { RadioCard } from './RadioCard'
 export { ActionButton } from './ActionButton'

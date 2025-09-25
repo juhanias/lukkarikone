@@ -22,6 +22,10 @@
       "showWeekends": {
         "label": "Näytä viikonloput aina",
         "subtitle": "Viikonloput näytetään automaattisesti jos niissä on tapahtumia"
+      },
+      "hiddenEventOpacity": {
+        "label": "Piilotettujen tapahtumien läpinäkyvyys",
+        "subtitle": "Kuinka haaleina piilotetut tapahtumat näkyvät ({{value}}%)"
       }
     },
     "language": {

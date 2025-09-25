@@ -6,9 +6,12 @@ import { ThemeSelector } from '../components/ThemeSelector'
 import { FrogIcon } from '../components/FrogIcon'
 import LanguageSelector from '../components/LanguageSelector'
 import { SettingsSection, Toggle, RadioCard, ActionButton } from '../components/ui'
+import { Slider } from '@/components/ui/Slider'
 import { CalendarUrlModal } from '../components/CalendarUrlModal'
 import { Button } from '@/components/ui/button'
 import { FONT_OPTIONS, type Font } from '../types/config'
+import '../components/ui/slider-theme.css'
+
 
 // Animation variants moved to module scope to prevent recreation
 const containerVariants = {
@@ -107,6 +110,46 @@ export default function Settings() {
                   label={t('sections.view.showWeekends.label')}
                   subtitle={t('sections.view.showWeekends.subtitle')}
                 />
+                <motion.div 
+                  className="p-4 rounded-lg transition-all mt-4"
+                  style={{
+                    backgroundColor: 'var(--color-surface-secondary-alpha-30)',
+                    border: '1px solid var(--color-border-alpha-30)'
+                  }}
+                  whileHover={{ scale: 1.01 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                        {t('sections.view.hiddenEventOpacity.label')}
+                      </label>
+                      <p className="text-xs opacity-75" style={{ color: 'var(--color-text-secondary)' }}>
+                        {t('sections.view.hiddenEventOpacity.subtitle', { value: config.hiddenEventOpacity })}
+                      </p>
+                    </div>
+                    <div 
+                      className="font-mono text-sm px-2 py-1 rounded"
+                      style={{ 
+                        backgroundColor: 'var(--color-surface)',
+                        color: 'var(--color-text)',
+                        border: '1px solid var(--color-border-alpha-30)'
+                      }}
+                    >
+                      {config.hiddenEventOpacity}%
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <Slider
+                      value={[config.hiddenEventOpacity]}
+                      onValueChange={(value) => setConfig({ hiddenEventOpacity: value[0] })}
+                      min={5}
+                      max={50}
+                      step={5}
+                      className="w-full opacity-slider-themed"
+                    />
+                  </div>
+                </motion.div>
               </SettingsSection>
             </motion.div>
 

@@ -1,12 +1,12 @@
 import { memo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ScheduleEvent } from '../../types/schedule'
-import { useScheduleRange, useScheduleStore, useRealizationColorStore, default as useConfigStore } from '../../state/state-management'
+import { useScheduleRange, useScheduleStore, useRealizationColorStore, useHiddenEventsStore, default as useConfigStore } from '../../state/state-management'
 import { ScheduleLayoutUtils } from '../../utils/schedule-layout-utils'
 import { ScheduleUtils } from '../../utils/schedule-utils'
 import { DateFormatUtils } from '../../utils/date-format-utils'
 import { WEEK_HOUR_HEIGHT, SCHEDULE_LAYOUT, START_HOUR } from '../../constants/schedule-layout-constants'
-import { Calendar, Clock, Palette } from 'lucide-react'
+import { Calendar, Clock, Palette, Eye, EyeOff } from 'lucide-react'
 import { useRealizationDialog } from '../../hooks/useRealizationDialog'
 import { useLectureDetailsDialog } from '../../hooks/useLectureDetailsDialog'
 import { RealizationApiService } from '../../services/realizationApi'
@@ -27,6 +27,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
   const { getEventsForWeek } = useScheduleStore()
   const { config } = useConfigStore()
   const { customColors } = useRealizationColorStore()
+  const { isEventHidden, toggleEventVisibility } = useHiddenEventsStore()
   
   // Color customizer state
   const [colorCustomizerOpen, setColorCustomizerOpen] = useState(false)
@@ -230,6 +231,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                               const topOffset = ((eventStartHour - slotHour) * WEEK_HOUR_HEIGHT) // WEEK_HOUR_HEIGHT px per hour
                               const height = event.duration * WEEK_HOUR_HEIGHT // WEEK_HOUR_HEIGHT px per hour
                               const colorPair = ScheduleUtils.getColorPair(event.title, customColors)
+                              const isHidden = isEventHidden(event.id)
                               
                               return (
                                 <ContextMenu key={event.id}>
@@ -241,6 +243,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                                         height: `${Math.max(height, SCHEDULE_LAYOUT.EVENT.MIN_HEIGHT)}px`, // Minimum height
                                         zIndex: 10,
                                         background: colorPair.normal,
+                                        opacity: isHidden ? config.hiddenEventOpacity / 100 : 1,
                                         '--normal-gradient': colorPair.normal,
                                         '--hover-gradient': colorPair.flipped,
                                       } as React.CSSProperties & { '--normal-gradient': string; '--hover-gradient': string }}
@@ -277,6 +280,23 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                                     >
                                       <Calendar className="mr-2 h-4 w-4" />
                                       {tColor('contextMenu.eventDetails')}
+                                    </ContextMenuItem>
+                                    <ContextMenuSeparator style={{ backgroundColor: 'var(--color-border)' }} />
+                                    <ContextMenuItem
+                                      onClick={() => toggleEventVisibility(event.id)}
+                                      style={{ color: 'var(--color-text)' }}
+                                    >
+                                      {isHidden ? (
+                                        <>
+                                          <Eye className="mr-2 h-4 w-4" />
+                                          {tColor('contextMenu.showEvent')}
+                                        </>
+                                      ) : (
+                                        <>
+                                          <EyeOff className="mr-2 h-4 w-4" />
+                                          {tColor('contextMenu.hideEvent')}
+                                        </>
+                                      )}
                                     </ContextMenuItem>
                                     {hasRealizationCode(event) && (
                                       <>

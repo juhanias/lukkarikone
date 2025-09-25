@@ -26,6 +26,8 @@
   },
   "contextMenu": {
     "eventDetails": "Tapahtuman tiedot",
-    "customizeColor": "Mukauta väriä"
+    "customizeColor": "Mukauta väriä",
+    "hideEvent": "Piilota tapahtuma",
+    "showEvent": "Näytä tapahtuma"
   }
 }

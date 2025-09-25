@@ -1,0 +1,25 @@
+/* Custom theming for shadcn Slider component */
+.opacity-slider-themed [data-slot="slider-track"] {
+  background-color: var(--color-surface-secondary);
+}
+
+.opacity-slider-themed [data-slot="slider-range"] {
+  background-color: var(--color-accent);
+}
+
+.opacity-slider-themed [data-slot="slider-thumb"] {
+  background-color: var(--color-accent);
+  border: 2px solid var(--color-surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.opacity-slider-themed [data-slot="slider-thumb"]:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.opacity-slider-themed [data-slot="slider-thumb"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(var(--color-accent-rgb), 0.5);
+}

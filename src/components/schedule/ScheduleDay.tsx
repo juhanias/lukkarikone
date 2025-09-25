@@ -6,10 +6,10 @@ import { ScheduleUtils } from '../../utils/schedule-utils'
 import { ScheduleLayoutUtils, type PositionedEvent } from '../../utils/schedule-layout-utils'
 import { DateFormatUtils } from '../../utils/date-format-utils'
 import { START_HOUR, DAY_HOUR_HEIGHT } from '../../constants/schedule-layout-constants'
-import { Calendar, Clock, Palette } from 'lucide-react'
+import { Calendar, Clock, Palette, Eye, EyeOff } from 'lucide-react'
 import { useRealizationDialog } from '../../hooks/useRealizationDialog'
 import { useLectureDetailsDialog } from '../../hooks/useLectureDetailsDialog'
-import { useRealizationColorStore } from '../../state/state-management'
+import { useRealizationColorStore, useHiddenEventsStore, default as useConfigStore } from '../../state/state-management'
 import { RealizationApiService } from '../../services/realizationApi'
 import { RealizationColorCustomizer } from '../RealizationColorCustomizer'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from '../ui/context-menu'
@@ -31,6 +31,12 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
   
   // Realization color store
   const { customColors } = useRealizationColorStore()
+  
+  // Hidden events store
+  const { isEventHidden, toggleEventVisibility } = useHiddenEventsStore()
+  
+  // Config store for opacity setting
+  const { config } = useConfigStore()
   
   // Realization dialog hook
   const { 
@@ -200,6 +206,7 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
                 {positionedEvents.map((event) => {
                   const eventDurationInHours = (event.endTime.getTime() - event.startTime.getTime()) / (1000 * 60 * 60)
                   const colorPair = ScheduleUtils.getColorPair(event.title, customColors)
+                  const isHidden = isEventHidden(event.id)
                   
                   return (
                     <ContextMenu key={event.id}>
@@ -215,6 +222,7 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
                             marginLeft: '2px',
                             marginRight: '2px',
                             background: colorPair.normal,
+                            opacity: isHidden ? config.hiddenEventOpacity / 100 : 1,
                             '--normal-gradient': colorPair.normal,
                             '--hover-gradient': colorPair.flipped,
                           } as React.CSSProperties & { '--normal-gradient': string; '--hover-gradient': string }}
@@ -265,6 +273,23 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
                         >
                           <Calendar className="mr-2 h-4 w-4" />
                           {tColor('contextMenu.eventDetails')}
+                        </ContextMenuItem>
+                        <ContextMenuSeparator style={{ backgroundColor: 'var(--color-border)' }} />
+                        <ContextMenuItem
+                          onClick={() => toggleEventVisibility(event.id)}
+                          style={{ color: 'var(--color-text)' }}
+                        >
+                          {isHidden ? (
+                            <>
+                              <Eye className="mr-2 h-4 w-4" />
+                              {tColor('contextMenu.showEvent')}
+                            </>
+                          ) : (
+                            <>
+                              <EyeOff className="mr-2 h-4 w-4" />
+                              {tColor('contextMenu.hideEvent')}
+                            </>
+                          )}
                         </ContextMenuItem>
                         {hasRealizationCode(event) && (
                           <>

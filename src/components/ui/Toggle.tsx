@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Switch } from './switch'
 
 interface ToggleProps {
   checked: boolean
@@ -9,21 +10,27 @@ interface ToggleProps {
 }
 
 export function Toggle({ checked, onChange, label, subtitle, disabled = false }: ToggleProps) {
+  const handleContainerClick = () => {
+    if (!disabled) {
+      onChange(!checked)
+    }
+  }
+
+  const handleSwitchClick = (e: React.MouseEvent) => {
+    // Prevent the container click from firing when clicking directly on the switch
+    e.stopPropagation()
+  }
+
   return (
-    <motion.button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      disabled={disabled}
-      className="w-full flex items-center justify-between p-4 rounded-lg transition-all text-left"
+    <motion.div
+      className="w-full flex items-center justify-between p-4 rounded-lg transition-all cursor-pointer"
       style={{
         backgroundColor: 'var(--color-surface-secondary-alpha-30)',
         border: '1px solid var(--color-border-alpha-30)'
       }}
       whileHover={{ scale: disabled ? 1 : 1.02 }}
       whileTap={{ scale: disabled ? 1 : 0.98 }}
-      onClick={() => !disabled && onChange(!checked)}
+      onClick={handleContainerClick}
     >
       <div className="flex-1">
         <span className="font-medium" style={{ color: 'var(--color-text)' }}>{label}</span>
@@ -33,18 +40,14 @@ export function Toggle({ checked, onChange, label, subtitle, disabled = false }:
           </p>
         )}
       </div>
-      <div 
-        className={`w-12 h-6 rounded-full transition-all duration-300 ${checked ? '' : 'opacity-50'}`} 
-        style={{
-          backgroundColor: checked ? 'var(--color-accent)' : 'var(--color-surface-secondary)'
-        }}
-      >
-        <div 
-          className={`w-4 h-4 rounded-full bg-white shadow-sm transition-all duration-300 mt-1 ${
-            checked ? 'translate-x-7' : 'translate-x-1'
-          }`}
+      <div onClick={handleSwitchClick}>
+        <Switch
+          checked={checked}
+          onCheckedChange={onChange}
+          disabled={disabled}
+          aria-label={label}
         />
       </div>
-    </motion.button>
+    </motion.div>
   )
 }
