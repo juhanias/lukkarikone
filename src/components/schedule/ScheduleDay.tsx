@@ -144,8 +144,6 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
                     </div>
                     {/* Line */}
                     <div className="absolute left-14 top-0 h-0.5 bg-red-500 shadow-sm" style={{ right: '1rem' }}></div>
-                    {/* Circle at the end */}
-                    <div className="absolute top-0 w-2 h-2 bg-red-500 rounded-full transform -translate-y-1/2 shadow-sm" style={{ right: '1rem' }}></div>
                   </div>
                 )}
 

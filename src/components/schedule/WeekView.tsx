@@ -153,18 +153,6 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                       </div>
                       {/* Line spanning all days */}
                       <div className="absolute left-12 top-0 right-0 h-0.5 bg-red-500 shadow-sm z-20"></div>
-                      {/* Individual day indicators for today */}
-                      {filteredWeekDates.map((date) => (
-                        DateFormatUtils.isToday(date) && (
-                          <div
-                            key={date.toDateString()}
-                            className="absolute top-0 w-2 h-2 bg-red-500 rounded-full transform -translate-y-1/2 shadow-sm z-20"
-                            style={{
-                              left: `${12 + (filteredWeekDates.indexOf(date) + 1) * (100 / filteredWeekDates.length)}%`,
-                            }}
-                          />
-                        )
-                      ))}
                     </div>
                   )}
 
@@ -192,7 +180,8 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                       
                       {filteredWeekDates.map((date) => (
                         <div key={date.toDateString()} className="flex-1 min-w-24 relative border-r last:border-r-0" style={{
-                          borderColor: 'var(--color-border-alpha-30)'
+                          borderColor: 'var(--color-border-alpha-30)',
+                          backgroundColor: DateFormatUtils.isToday(date) ? 'var(--color-accent-alpha-5)' : 'transparent'
                         }}>
                           {/* Events for this time slot */}
                           {filteredWeekEvents[date.toDateString()]?.map((event) => {

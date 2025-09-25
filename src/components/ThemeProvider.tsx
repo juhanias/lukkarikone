@@ -47,6 +47,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     root.style.setProperty('--color-border-alpha-30', toRgba(theme.colors.border, 0.3));
     root.style.setProperty('--color-border-alpha-50', toRgba(theme.colors.border, 0.5));
     root.style.setProperty('--color-accent-alpha-20', toRgba(theme.colors.accent, 0.2));
+    root.style.setProperty('--color-accent-alpha-10', toRgba(theme.colors.accent, 0.1));
+    root.style.setProperty('--color-accent-alpha-5', toRgba(theme.colors.accent, 0.05));
     root.style.setProperty('--color-accent-alpha-30', toRgba(theme.colors.accent, 0.3));
     root.style.setProperty('--color-success-alpha-20', toRgba(theme.colors.success, 0.2));
     root.style.setProperty('--color-error-alpha-20', toRgba(theme.colors.error, 0.2));
