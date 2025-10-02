@@ -90,14 +90,8 @@ export const RealizationColorCustomizer = ({
             borderColor: 'var(--color-border)'
           }}>
             <h4 className="font-semibold text-sm mb-1" style={{ color: 'var(--color-text)' }}>
-              {t('dialog.eventLabel')} {currentEventTitle}
+              {currentEventTitle}
             </h4>
-            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-              {t('dialog.realizationCodeLabel')} <code className="px-1 py-0.5 rounded" style={{ 
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-accent)'
-              }}>{realizationCode}</code>
-            </p>
           </div>
 
           {/* Color Preview */}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // thingamajig for ical.js
 declare module 'ical.js' {
   type JCalData = unknown[];

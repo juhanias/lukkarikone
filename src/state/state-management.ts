@@ -198,19 +198,33 @@ const defaultConfig: Config = {
   hiddenEventOpacity: 25,
 };
 
+const mergeConfigWithDefaults = (config?: Partial<Config>): Config => {
+  if (!config) {
+    return { ...defaultConfig };
+  }
+
+  const sanitizedEntries = Object.entries(config).filter(([, value]) => value !== undefined);
+  const sanitizedConfig = Object.fromEntries(sanitizedEntries) as Partial<Config>;
+
+  return {
+    ...defaultConfig,
+    ...sanitizedConfig,
+  };
+};
+
 const useConfigStore = create<ConfigState>()(
   persist(
     (set, get) => ({
-      config: defaultConfig,
+  config: mergeConfigWithDefaults(defaultConfig),
       previousTheme: "default", // Initialize with default
       getThemes,
       getListedThemes,
       getAllThemes,
       setConfig: (partial) =>
         set((state) => ({
-          config: { ...state.config, ...partial },
+          config: mergeConfigWithDefaults({ ...state.config, ...partial }),
         })),
-      resetConfig: () => set({ config: defaultConfig, previousTheme: "default" }),
+  resetConfig: () => set({ config: mergeConfigWithDefaults(), previousTheme: "default" }),
       getCurrentTheme: () => {
         const { config } = get();
         const themes = getAllThemes();
@@ -243,6 +257,16 @@ const useConfigStore = create<ConfigState>()(
     {
       name: "app-config", 
       partialize: (state) => ({ config: state.config, previousTheme: state.previousTheme }),
+      merge: (persistedState, currentState) => {
+        const typedPersisted = persistedState as Partial<ConfigState> | undefined;
+
+        return {
+          ...currentState,
+          ...typedPersisted,
+          config: mergeConfigWithDefaults(typedPersisted?.config),
+          previousTheme: typedPersisted?.previousTheme ?? currentState.previousTheme,
+        };
+      },
     }
   )
 );

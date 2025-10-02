@@ -291,7 +291,6 @@ export default function Settings() {
               </SettingsSection>
             </motion.div>
 
-            {/* Debug Configuration Display - Development only */}
             {import.meta.env.DEV && (
               <motion.div variants={itemVariants}>
                 <SettingsSection

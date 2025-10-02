@@ -11,7 +11,11 @@
     "delete": "Delete",
     "add": "Add",
     "copy": "Copy",
-    "or": "or"
+    "or": "or",
+    "dismiss": "Dismiss",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "reset": "Reset"
   },
   "labels": {
     "language": "Language",

@@ -11,7 +11,11 @@
     "delete": "Poista",
     "add": "Lisää",
     "copy": "Kopioi",
-    "or": "tai"
+    "or": "tai",
+    "dismiss": "Sulje",
+    "enabled": "Käytössä",
+    "disabled": "Pois käytöstä",
+    "reset": "Palauta"
   },
   "labels": {
     "language": "Kieli",

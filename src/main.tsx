@@ -5,13 +5,16 @@ import { I18nextProvider } from 'react-i18next'
 import './tw.css'
 import { router } from './router'
 import { ThemeProvider } from './components/ThemeProvider'
+import { NotificationProvider } from './components/notifications/NotificationProvider'
 import i18n from './i18n'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <I18nextProvider i18n={i18n}>
       <ThemeProvider>
-        <RouterProvider router={router} />
+        <NotificationProvider>
+          <RouterProvider router={router} />
+        </NotificationProvider>
       </ThemeProvider>
     </I18nextProvider>
   </StrictMode>,
