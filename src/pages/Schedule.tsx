@@ -8,6 +8,8 @@ import { ScheduleDay, WeekView } from '../components/schedule'
 import { CalendarUrlModal } from '../components/CalendarUrlModal'
 import { Button } from '@/components/ui/button'
 
+const VIEW_MODES = ['day', 'week'] as const
+
 export default function Schedule() {
   const { t } = useTranslation('schedule')
   const { 
@@ -29,6 +31,18 @@ export default function Schedule() {
   } = useScheduleStore()
   const { config } = useConfigStore()
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const rotateViewMode = useCallback((direction: 'forward' | 'backward') => {
+    const currentIndex = VIEW_MODES.indexOf(viewMode)
+
+    if (currentIndex === -1) {
+      return
+    }
+
+    const step = direction === 'forward' ? 1 : -1
+    const nextIndex = (currentIndex + step + VIEW_MODES.length) % VIEW_MODES.length
+
+    setViewMode(VIEW_MODES[nextIndex])
+  }, [viewMode, setViewMode])
 
   // Fetch schedule on component mount
   useEffect(() => {
@@ -106,18 +120,9 @@ export default function Schedule() {
           handleSwipe('left') // Right arrow goes to next
           break
         case 'ArrowUp':
-          event.preventDefault()
-          // Up arrow switches to week view
-          if (viewMode === 'day') {
-            setViewMode('week')
-          }
-          break
         case 'ArrowDown':
           event.preventDefault()
-          // Down arrow switches to day view
-          if (viewMode === 'week') {
-            setViewMode('day')
-          }
+          rotateViewMode(event.key === 'ArrowUp' ? 'backward' : 'forward')
           break
       }
     }
@@ -129,7 +134,7 @@ export default function Schedule() {
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [viewMode, handleSwipe, setViewMode])
+  }, [handleSwipe, rotateViewMode])
 
   return (
     <div className="h-full flex flex-col" style={{ backgroundColor: 'var(--color-background)' }}>
