@@ -38,6 +38,9 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
   
   // Config store for opacity setting
   const { config } = useConfigStore()
+
+  const getDisplayTitle = (title: string) =>
+    config.showCourseIdInSchedule ? title : RealizationApiService.stripRealizationCode(title)
   
   // Realization dialog hook
   const { 
@@ -245,7 +248,7 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
                             <h3 className={`font-bold leading-tight ${
                               eventDurationInHours < 1.5 ? 'text-sm line-clamp-2' : 'text-base line-clamp-3'
                             }`}>
-                              {event.title}
+                              {getDisplayTitle(event.title)}
                             </h3>
                             
                             {event.location && (
@@ -338,7 +341,7 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
           open={colorCustomizerOpen}
           onOpenChange={setColorCustomizerOpen}
           realizationCode={RealizationApiService.extractRealizationCode(selectedEventForColor.title) || ''}
-          currentEventTitle={selectedEventForColor.title}
+          currentEventTitle={getDisplayTitle(selectedEventForColor.title)}
         />
       )}
     </div>

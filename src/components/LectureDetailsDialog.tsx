@@ -26,7 +26,6 @@ const LectureDetailsDialog = ({
   onOpenRealizationDialog
 }: LectureDetailsDialogProps) => {
   const { t } = useTranslation('dialogs')
-  
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('fi-FI', {
       hour: '2-digit',
@@ -57,6 +56,18 @@ const LectureDetailsDialog = ({
       onOpenRealizationDialog(event.title)
     }
   }
+
+  const displayTitle = event
+    ? (() => {
+        const baseTitle = RealizationApiService.stripRealizationCode(event.title)
+        const realizationCode = RealizationApiService.extractRealizationCode(event.title)
+        if (!realizationCode) {
+          return baseTitle
+        }
+        const codeForDisplay = realizationCode.toUpperCase()
+        return `${baseTitle} ${codeForDisplay}`.trim()
+      })()
+    : ''
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -90,7 +101,7 @@ const LectureDetailsDialog = ({
               borderColor: 'var(--color-accent-alpha-40)'
             }}>
               <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
-                {event.title}
+                {displayTitle}
               </h3>
               {event.description && (
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>

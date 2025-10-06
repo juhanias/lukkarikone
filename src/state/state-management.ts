@@ -175,6 +175,7 @@ interface Config {
   showWeekends: boolean;
   calendarUrl: string;
   hiddenEventOpacity: number; // Opacity for hidden events (0-100)
+  showCourseIdInSchedule: boolean;
 }
 
 interface ConfigState {
@@ -196,6 +197,7 @@ const defaultConfig: Config = {
   showWeekends: false,
   calendarUrl: "",
   hiddenEventOpacity: 25,
+  showCourseIdInSchedule: false,
 };
 
 const mergeConfigWithDefaults = (config?: Partial<Config>): Config => {

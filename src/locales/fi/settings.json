@@ -23,6 +23,10 @@
         "label": "Näytä viikonloput aina",
         "subtitle": "Viikonloput näytetään automaattisesti jos niissä on tapahtumia"
       },
+      "showCourseId": {
+        "label": "Näytä toteutuksen tunnus lukujärjestyksessä",
+        "subtitle": "Näytä toteutuksen ID kurssinimen lopussa (esim. TE00DH11-3001)"
+      },
       "hiddenEventOpacity": {
         "label": "Piilotettujen tapahtumien läpinäkyvyys",
         "subtitle": "Kuinka haaleina piilotetut tapahtumat näkyvät ({{value}}%)"

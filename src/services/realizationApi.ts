@@ -52,6 +52,44 @@ export class RealizationApiService {
   }
 
   /**
+   * Removes the realization code suffix from an event title when present.
+   * (e.g TE00DH11-3001)
+   */
+  static stripRealizationCode(eventTitle: string): string {
+    if (!eventTitle) {
+      return eventTitle
+    }
+
+    const trimmedTitle = eventTitle.trim()
+    if (trimmedTitle.length === 0) {
+      return eventTitle
+    }
+
+    const words = trimmedTitle.split(/\s+/)
+    if (words.length === 0) {
+      return eventTitle
+    }
+
+    const lastWordRaw = words[words.length - 1]
+    let lastWord = lastWordRaw
+
+    while (lastWord.length > 0 && '([{'.includes(lastWord[0])) {
+      lastWord = lastWord.substring(1)
+    }
+
+    while (lastWord.length > 0 && ')]}.,;:!?'.includes(lastWord[lastWord.length - 1])) {
+      lastWord = lastWord.substring(0, lastWord.length - 1)
+    }
+
+    if (lastWord.toUpperCase().startsWith('TE') && lastWord.includes('-')) {
+      const withoutLast = words.slice(0, -1).join(' ').trim()
+      return withoutLast.length > 0 ? withoutLast : eventTitle
+    }
+
+    return eventTitle
+  }
+
+  /**
    * Fetches realization data from the backend API
    */
   static async fetchRealizationData(realizationCode: string): Promise<RealizationApiResponse> {

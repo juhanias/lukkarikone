@@ -23,7 +23,7 @@ export function Toggle({ checked, onChange, label, subtitle, disabled = false }:
 
   return (
     <motion.div
-      className="w-full flex items-center justify-between p-4 rounded-lg transition-all cursor-pointer"
+      className="w-full flex items-center justify-between p-4 rounded-lg transition-all cursor-pointer mt-4"
       style={{
         backgroundColor: 'var(--color-surface-secondary-alpha-30)',
         border: '1px solid var(--color-border-alpha-30)'

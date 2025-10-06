@@ -23,6 +23,10 @@
         "label": "Always show weekends",
         "subtitle": "Weekends are automatically shown if they contain events"
       },
+      "showCourseId": {
+        "label": "Show course ID in schedule",
+        "subtitle": "Display the realization ID at the end of each course name"
+      },
       "hiddenEventOpacity": {
         "label": "Hidden event opacity",
         "subtitle": "How faded hidden events appear ({{value}}%)"

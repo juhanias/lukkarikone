@@ -33,6 +33,9 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
   // Color customizer state
   const [colorCustomizerOpen, setColorCustomizerOpen] = useState(false)
   const [selectedEventForColor, setSelectedEventForColor] = useState<ScheduleEvent | null>(null)
+
+  const getDisplayTitle = (title: string) =>
+    config.showCourseIdInSchedule ? title : RealizationApiService.stripRealizationCode(title)
   
   // Realization dialog hook
   const { 
@@ -259,7 +262,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
                                       }}
                                     >
                                       <div className="font-semibold line-clamp-2 leading-tight">
-                                        {event.title}
+                                        {getDisplayTitle(event.title)}
                                       </div>
                                       {event.location && height > 40 && (
                                         <div className="text-xs opacity-90 leading-tight">
@@ -352,7 +355,7 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
           open={colorCustomizerOpen}
           onOpenChange={setColorCustomizerOpen}
           realizationCode={RealizationApiService.extractRealizationCode(selectedEventForColor.title) || ''}
-          currentEventTitle={selectedEventForColor.title}
+          currentEventTitle={getDisplayTitle(selectedEventForColor.title)}
         />
       )}
     </div>

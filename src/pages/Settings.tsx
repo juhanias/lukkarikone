@@ -110,6 +110,12 @@ export default function Settings() {
                   label={t('sections.view.showWeekends.label')}
                   subtitle={t('sections.view.showWeekends.subtitle')}
                 />
+                <Toggle
+                  checked={config.showCourseIdInSchedule}
+                  onChange={(checked) => setConfig({ showCourseIdInSchedule: checked })}
+                  label={t('sections.view.showCourseId.label')}
+                  subtitle={t('sections.view.showCourseId.subtitle')}
+                />
                 <motion.div 
                   className="p-4 rounded-lg transition-all mt-4"
                   style={{
