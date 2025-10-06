@@ -5,6 +5,7 @@ import type { ScheduleEvent, GapPeriod } from '../../types/schedule'
 import { ScheduleUtils } from '../../utils/schedule-utils'
 import { ScheduleLayoutUtils, type PositionedEvent } from '../../utils/schedule-layout-utils'
 import { DateFormatUtils } from '../../utils/date-format-utils'
+import { useCurrentTime } from '../../hooks/useCurrentTime'
 import { START_HOUR, DAY_HOUR_HEIGHT } from '../../constants/schedule-layout-constants'
 import { Calendar, Clock, Palette, Eye, EyeOff } from 'lucide-react'
 import { useRealizationDialog } from '../../hooks/useRealizationDialog'
@@ -95,9 +96,10 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
   const dateInfo = formatDate(date)
 
   // Current time indicator
+  const currentTime = useCurrentTime()
   const isToday = DateFormatUtils.isToday(date)
-  const currentTimeInHours = DateFormatUtils.getCurrentTimeInHours()
-  const currentTimeString = DateFormatUtils.getCurrentTimeString()
+  const currentTimeInHours = DateFormatUtils.getCurrentTimeInHours(currentTime)
+  const currentTimeString = DateFormatUtils.getCurrentTimeString(currentTime)
   const showCurrentTimeIndicator = isToday && currentTimeInHours >= START_HOUR && currentTimeInHours <= (START_HOUR + timeSlots.length)
   const currentTimePosition = showCurrentTimeIndicator ? (currentTimeInHours - START_HOUR) * DAY_HOUR_HEIGHT : 0
 

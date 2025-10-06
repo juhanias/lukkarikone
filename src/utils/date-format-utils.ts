@@ -132,9 +132,8 @@ export class DateFormatUtils {
   /**
    * Gets the current time in hours as a decimal (e.g., 14.5 for 2:30 PM)
    */
-  static getCurrentTimeInHours(): number {
-    const now = new Date()
-    return now.getHours() + (now.getMinutes() / 60)
+  static getCurrentTimeInHours(referenceDate: Date = new Date()): number {
+    return referenceDate.getHours() + (referenceDate.getMinutes() / 60)
   }
 
   /**
@@ -148,10 +147,9 @@ export class DateFormatUtils {
   /**
    * Formats current time as HH:MM in 24-hour format
    */
-  static getCurrentTimeString(): string {
-    const now = new Date()
+  static getCurrentTimeString(referenceDate: Date = new Date()): string {
     const locale = this.getCurrentLocale()
-    return now.toLocaleTimeString(locale, { 
+    return referenceDate.toLocaleTimeString(locale, { 
       hour: '2-digit', 
       minute: '2-digit',
       hour12: false  // Force 24-hour format

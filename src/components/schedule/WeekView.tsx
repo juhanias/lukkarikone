@@ -9,6 +9,7 @@ import { WEEK_HOUR_HEIGHT, SCHEDULE_LAYOUT, START_HOUR } from '../../constants/s
 import { Calendar, Clock, Palette, Eye, EyeOff } from 'lucide-react'
 import { useRealizationDialog } from '../../hooks/useRealizationDialog'
 import { useLectureDetailsDialog } from '../../hooks/useLectureDetailsDialog'
+import { useCurrentTime } from '../../hooks/useCurrentTime'
 import { RealizationApiService } from '../../services/realizationApi'
 import { RealizationColorCustomizer } from '../RealizationColorCustomizer'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from '../ui/context-menu'
@@ -106,8 +107,9 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
   const totalEventsThisWeek = Object.values(filteredWeekEvents).reduce((sum, dayEvents) => sum + dayEvents.length, 0)
 
   // Current time indicator
-  const currentTimeInHours = DateFormatUtils.getCurrentTimeInHours()
-  const currentTimeString = DateFormatUtils.getCurrentTimeString()
+  const currentTime = useCurrentTime()
+  const currentTimeInHours = DateFormatUtils.getCurrentTimeInHours(currentTime)
+  const currentTimeString = DateFormatUtils.getCurrentTimeString(currentTime)
   const showCurrentTimeIndicator = filteredWeekDates.some(date => DateFormatUtils.isToday(date)) &&
                                    currentTimeInHours >= START_HOUR && 
                                    timeSlots.length > 0
