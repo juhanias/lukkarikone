@@ -200,6 +200,25 @@ const defaultConfig: Config = {
   showCourseIdInSchedule: false,
 };
 
+const LEGACY_PTIVIS25B_URL = "http://lukkari.turkuamk.fi/ical.php?hash=A64E5FCC3647C6FB5D7770DD86526B01FC67BD8A";
+const UPDATED_PTIVIS25B_URL = "http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8";
+
+const normalizeCalendarUrl = (url: string): string => url.trim();
+
+const migrateCalendarUrl = (url: string): string => {
+  const normalizedUrl = normalizeCalendarUrl(url);
+
+  if (!normalizedUrl) {
+    return normalizedUrl;
+  }
+
+  if (normalizedUrl === LEGACY_PTIVIS25B_URL) {
+    return UPDATED_PTIVIS25B_URL;
+  }
+
+  return normalizedUrl;
+};
+
 const mergeConfigWithDefaults = (config?: Partial<Config>): Config => {
   if (!config) {
     return { ...defaultConfig };
@@ -208,9 +227,14 @@ const mergeConfigWithDefaults = (config?: Partial<Config>): Config => {
   const sanitizedEntries = Object.entries(config).filter(([, value]) => value !== undefined);
   const sanitizedConfig = Object.fromEntries(sanitizedEntries) as Partial<Config>;
 
-  return {
+  const mergedConfig: Config = {
     ...defaultConfig,
     ...sanitizedConfig,
+  };
+
+  return {
+    ...mergedConfig,
+    calendarUrl: migrateCalendarUrl(mergedConfig.calendarUrl),
   };
 };
 
@@ -258,6 +282,28 @@ const useConfigStore = create<ConfigState>()(
     }),
     {
       name: "app-config", 
+      version: 1,
+      migrate: (persistedState) => {
+        if (!persistedState) {
+          return persistedState;
+        }
+
+        const typedPersisted = persistedState as Partial<ConfigState>;
+
+        if (!typedPersisted.config) {
+          return typedPersisted;
+        }
+
+        const migratedCalendarUrl = migrateCalendarUrl(typedPersisted.config.calendarUrl ?? "");
+
+        return {
+          ...typedPersisted,
+          config: {
+            ...typedPersisted.config,
+            calendarUrl: migratedCalendarUrl,
+          },
+        };
+      },
       partialize: (state) => ({ config: state.config, previousTheme: state.previousTheme }),
       merge: (persistedState, currentState) => {
         const typedPersisted = persistedState as Partial<ConfigState> | undefined;

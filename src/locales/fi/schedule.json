@@ -79,11 +79,18 @@
   },
   "calendarModal": {
     "title": "Määritä kalenterin URL",
-    "description": "Valitse PTIVIS25B pikasetup tai anna oma kalenterisi URL-osoite.",
+    "description": "Valitse PTIVIS25-ryhmäsi pikasetupilla tai anna oma kalenterisi URL-osoite.",
     "quickSetup": {
-      "title": "PTIVIS25B",
-      "description": "Pikasetup ryhmän kalenterille",
-      "useButton": "Käytä"
+      "title": "PTIVIS25 pikasetup",
+      "description": "Valitse ryhmäsi, niin kalenterin URL asetetaan automaattisesti.",
+      "groups": {
+        "ptivis25a": "PTIVIS25A",
+        "ptivis25b": "PTIVIS25B",
+        "ptivis25c": "PTIVIS25C",
+        "ptivis25d": "PTIVIS25D",
+        "ptivis25e": "PTIVIS25E",
+        "ptivis25f": "PTIVIS25F"
+      }
     },
     "customUrl": {
       "title": "Oma URL",

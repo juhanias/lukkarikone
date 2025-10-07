@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,6 +10,39 @@ interface CalendarUrlModalProps {
   children: React.ReactNode
 }
 
+const QUICK_SETUP_CALENDARS = [
+  {
+    id: 'ptivis25a',
+    url: 'http://lukkari.turkuamk.fi/ical.php?hash=9385A6CBC6B79C3DDCE6B2738B5C1B882A6D64CA',
+    fallbackLabel: 'PTIVIS25A'
+  },
+  {
+    id: 'ptivis25b',
+    url: 'http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8',
+    fallbackLabel: 'PTIVIS25B'
+  },
+  {
+    id: 'ptivis25c',
+    url: 'http://lukkari.turkuamk.fi/ical.php?hash=E4AC87D135AF921A83B677DD15A19E6119DDF0BB',
+    fallbackLabel: 'PTIVIS25C'
+  },
+  {
+    id: 'ptivis25d',
+    url: 'http://lukkari.turkuamk.fi/ical.php?hash=E8F13D455EA82E8A7D0990CF6983BBE61AD839A7',
+    fallbackLabel: 'PTIVIS25D'
+  },
+  {
+    id: 'ptivis25e',
+    url: 'http://lukkari.turkuamk.fi/ical.php?hash=346C225AD26BD6966FC656F8E77B5A3EA38A73B5',
+    fallbackLabel: 'PTIVIS25E'
+  },
+  {
+    id: 'ptivis25f',
+    url: 'http://lukkari.turkuamk.fi/ical.php?hash=6EAF3A6D4FC2B07836C2B742EC923629839CA0B7',
+    fallbackLabel: 'PTIVIS25F'
+  }
+] as const
+
 export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
   const { t } = useTranslation('schedule')
   const { t: tCommon } = useTranslation('common')
@@ -18,6 +51,11 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
   const [inputUrl, setInputUrl] = useState(config.calendarUrl)
   const [isOpen, setIsOpen] = useState(false)
   const [error, setError] = useState("")
+
+  const selectedQuickSetupId = useMemo(() => {
+    const trimmedInput = inputUrl.trim()
+    return QUICK_SETUP_CALENDARS.find(({ url }) => url === trimmedInput)?.id
+  }, [inputUrl])
 
   const validateUrl = (url: string) => {
     if (!url.trim()) {
@@ -54,9 +92,11 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
     await refreshSchedule()
   }
 
-  const handleQuickSetup = async () => {
-    const ptivis25bUrl = "http://lukkari.turkuamk.fi/ical.php?hash=A64E5FCC3647C6FB5D7770DD86526B01FC67BD8A"
-    setConfig({ calendarUrl: ptivis25bUrl })
+  const handleQuickSetup = async (calendarUrl: string) => {
+    const trimmedUrl = calendarUrl.trim()
+
+    setConfig({ calendarUrl: trimmedUrl })
+    setInputUrl(trimmedUrl)
     setError("")
     setIsOpen(false)
     
@@ -115,7 +155,7 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
         </DialogHeader>
         
         <div className="space-y-4 py-4">
-          {/* Quick Setup Option */}
+          {/* Quick Setup Options */}
           <div 
             className="p-4 rounded-md border"
             style={{ 
@@ -124,32 +164,46 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
               fontFamily: `var(--font-${config.font})`
             }}
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium mb-1" style={{ 
-                  color: 'var(--color-text)',
-                  fontFamily: `var(--font-${config.font})`
-                }}>
-                  {t('calendarModal.quickSetup.title')}
-                </h4>
-                <p className="text-sm" style={{ 
-                  color: 'var(--color-text-secondary)',
-                  fontFamily: `var(--font-${config.font})`
-                }}>
-                  {t('calendarModal.quickSetup.description')}
-                </p>
-              </div>
-              <Button 
-                onClick={handleQuickSetup}
-                style={{
-                  backgroundColor: 'var(--color-accent)',
-                  color: 'var(--color-text)',
-                  border: 'none',
-                  fontFamily: `var(--font-${config.font})`
-                }}
-              >
-                {t('calendarModal.quickSetup.useButton')}
-              </Button>
+            <div className="mb-3">
+              <h4 className="font-medium mb-1" style={{ 
+                color: 'var(--color-text)',
+                fontFamily: `var(--font-${config.font})`
+              }}>
+                {t('calendarModal.quickSetup.title')}
+              </h4>
+              <p className="text-sm" style={{ 
+                color: 'var(--color-text-secondary)',
+                fontFamily: `var(--font-${config.font})`
+              }}>
+                {t('calendarModal.quickSetup.description')}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {QUICK_SETUP_CALENDARS.map((calendar) => {
+                const translatedLabel = t(`calendarModal.quickSetup.groups.${calendar.id}`, {
+                  defaultValue: calendar.fallbackLabel
+                })
+                const isSelected = calendar.id === selectedQuickSetupId
+                return (
+                  <Button
+                    key={calendar.id}
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleQuickSetup(calendar.url)}
+                    aria-pressed={isSelected}
+                    style={{
+                      backgroundColor: 'var(--color-surface-secondary)',
+                      borderColor: isSelected ? 'var(--color-accent)' : 'var(--color-border)',
+                      color: 'var(--color-text)',
+                      fontFamily: `var(--font-${config.font})`
+                    }}
+                    className="justify-center"
+                  >
+                    {translatedLabel}
+                  </Button>
+                )
+              })}
             </div>
           </div>
 

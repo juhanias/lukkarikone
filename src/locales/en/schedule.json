@@ -79,11 +79,18 @@
   },
   "calendarModal": {
     "title": "Set Calendar URL",
-    "description": "Choose PTIVIS25B quick setup or enter your own calendar URL.",
+    "description": "Select your PTIVIS25 group with quick setup or enter your own calendar URL.",
     "quickSetup": {
-      "title": "PTIVIS25B",
-      "description": "Quick setup for group calendar",
-      "useButton": "Use"
+      "title": "PTIVIS25 quick setup",
+      "description": "Select your class to automatically configure the calendar URL.",
+      "groups": {
+        "ptivis25a": "PTIVIS25A",
+        "ptivis25b": "PTIVIS25B",
+        "ptivis25c": "PTIVIS25C",
+        "ptivis25d": "PTIVIS25D",
+        "ptivis25e": "PTIVIS25E",
+        "ptivis25f": "PTIVIS25F"
+      }
     },
     "customUrl": {
       "title": "Custom URL",
