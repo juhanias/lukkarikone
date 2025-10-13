@@ -25,6 +25,11 @@
   "loading": {
     "schedule": "Loading schedule..."
   },
+  "status": {
+    "updatedAt": "Updated {{time}}",
+    "lastRefresh": "Last Refresh",
+    "refreshInfo": "The schedule is automatically refreshed every 15 minutes to keep your calendar up to date. Data is provided by Lukkarikone's iCal-service."
+  },
   "errors": {
     "loadingFailed": "Schedule loading failed",
     "close": "Close"

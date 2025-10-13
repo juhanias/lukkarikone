@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useScheduleRange, useScheduleStore } from '../state/state-management'
@@ -7,11 +7,12 @@ import { ChevronLeft, ChevronRight, CircleX, Calendar } from 'lucide-react'
 import { ScheduleDay, WeekView } from '../components/schedule'
 import { CalendarUrlModal } from '../components/CalendarUrlModal'
 import { Button } from '@/components/ui/button'
+import { isToday } from 'date-fns'
 
 const VIEW_MODES = ['day', 'week'] as const
 
 export default function Schedule() {
-  const { t } = useTranslation('schedule')
+  const { t, i18n } = useTranslation('schedule')
   const { 
     currentDate, 
     viewMode,
@@ -27,7 +28,8 @@ export default function Schedule() {
     fetchSchedule, 
     isLoading, 
     error, 
-    clearError 
+    clearError,
+    lastUpdated
   } = useScheduleStore()
   const { config } = useConfigStore()
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -51,6 +53,33 @@ export default function Schedule() {
 
   // Get events for the current date (only for day view)
   const currentEvents = viewMode === 'day' ? getEventsForDate(currentDate) : []
+
+  const lastUpdatedDisplay = useMemo(() => {
+    if (!lastUpdated) {
+      return null
+    }
+
+    try {
+      if (isToday(lastUpdated)) {
+        const timeFormatter = new Intl.DateTimeFormat(i18n.language, {
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+        return t('status.updatedAt', { time: timeFormatter.format(lastUpdated) })
+      }
+
+      const dateTimeFormatter = new Intl.DateTimeFormat(i18n.language, {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      })
+      return t('status.updatedAt', { time: dateTimeFormatter.format(lastUpdated) })
+    } catch {
+      if (isToday(lastUpdated)) {
+        return t('status.updatedAt', { time: lastUpdated.toLocaleTimeString() })
+      }
+      return t('status.updatedAt', { time: lastUpdated.toLocaleString() })
+    }
+  }, [lastUpdated, i18n.language, t])
 
   const handleSwipe = useCallback((direction: 'left' | 'right') => {
     if (isTransitioning) return
@@ -363,11 +392,13 @@ export default function Schedule() {
               <ScheduleDay 
                 date={currentDate}
                 events={currentEvents}
+                lastUpdatedLabel={lastUpdatedDisplay}
               />
             ) : (
               <WeekView 
                 currentDate={currentDate}
                 setViewMode={setViewMode}
+                lastUpdatedLabel={lastUpdatedDisplay}
               />
             )}
           </div>

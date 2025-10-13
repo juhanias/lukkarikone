@@ -13,6 +13,7 @@ import { useLectureDetailsDialog } from '../../hooks/useLectureDetailsDialog'
 import { useRealizationColorStore, useHiddenEventsStore, default as useConfigStore } from '../../state/state-management'
 import { RealizationApiService } from '../../services/realizationApi'
 import { RealizationColorCustomizer } from '../RealizationColorCustomizer'
+import { LastUpdatedBadge } from '../LastUpdatedBadge'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from '../ui/context-menu'
 import RealizationDialog from '../RealizationDialog'
 import LectureDetailsDialog from '../LectureDetailsDialog'
@@ -20,9 +21,10 @@ import LectureDetailsDialog from '../LectureDetailsDialog'
 interface ScheduleDayProps {
   date: Date
   events: ScheduleEvent[]
+  lastUpdatedLabel?: string | null
 }
 
-const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
+const ScheduleDay = memo(({ date, events, lastUpdatedLabel }: ScheduleDayProps) => {
   const { t } = useTranslation('schedule')
   const { t: tColor } = useTranslation('colorCustomization')
   
@@ -112,9 +114,20 @@ const ScheduleDay = memo(({ date, events }: ScheduleDayProps) => {
       <div className="w-full flex-shrink-0" style={{
         background: `linear-gradient(to bottom, var(--color-surface-alpha-40), transparent)`
       }}>
-        <div className="max-w-7xl mx-auto px-4 py-6 text-center">
+        <div className="max-w-7xl mx-auto px-4 py-6 text-center relative">
+          {/* Mobile Icon Button - Top Right */}
+          {lastUpdatedLabel && (
+            <div className="absolute right-4 top-4 md:hidden">
+              <LastUpdatedBadge lastUpdatedLabel={lastUpdatedLabel} variant="icon-only" />
+            </div>
+          )}
           <div className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>{dateInfo.dayWeek}</div>
           <h2 className="text-2xl font-medium" style={{ color: 'var(--color-text)' }}>{dateInfo.fullDate}</h2>
+          {lastUpdatedLabel && (
+            <div className="mt-3 hidden md:flex justify-center">
+              <LastUpdatedBadge lastUpdatedLabel={lastUpdatedLabel} variant="full" />
+            </div>
+          )}
         </div>
       </div>
 

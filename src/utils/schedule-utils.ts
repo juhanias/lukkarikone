@@ -152,7 +152,10 @@ export class ScheduleUtils {
     return `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`;
   }
 
-  static async retrieveScheduleFromUrl(calendarUrl?: string): Promise<InstanceType<typeof ICAL.Component>> {
+  static async retrieveScheduleFromUrl(calendarUrl?: string): Promise<{
+    calendar: InstanceType<typeof ICAL.Component>;
+    lastUpdated: string | null;
+  }> {
     try {
       if (!calendarUrl) {
         throw new Error('Calendar URL is required. Please configure your calendar URL in settings.');
@@ -167,10 +170,13 @@ export class ScheduleUtils {
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
       
-      const { data } = await response.json();
+      const { data, timestamp } = await response.json();
       const jcalData = ICAL.parse(data);
       const comp = new ICAL.Component(jcalData);
-      return comp;
+      return {
+        calendar: comp,
+        lastUpdated: typeof timestamp === 'string' ? timestamp : null
+      };
     } catch (error) {
       console.error('Error fetching schedule:', error);
       throw error;

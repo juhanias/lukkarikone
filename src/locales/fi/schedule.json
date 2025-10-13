@@ -25,6 +25,11 @@
   "loading": {
     "schedule": "Ladataan lukkaria..."
   },
+  "status": {
+    "updatedAt": "Päivitetty {{time}}",
+    "lastRefresh": "Viimeisin päivitys",
+    "refreshInfo": "Lukujärjestys päivitetään automaattisesti 15 minuutin välein pitääkseen kalenterisi ajan tasalla. Datan lähteenä toimii Lukkarikoneen iCal-palvelu."
+  },
   "errors": {
     "loadingFailed": "Lukujärjestyksen lataus epäonnistui",
     "close": "Sulje"

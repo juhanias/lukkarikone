@@ -12,6 +12,7 @@ import { useLectureDetailsDialog } from '../../hooks/useLectureDetailsDialog'
 import { useCurrentTime } from '../../hooks/useCurrentTime'
 import { RealizationApiService } from '../../services/realizationApi'
 import { RealizationColorCustomizer } from '../RealizationColorCustomizer'
+import { LastUpdatedBadge } from '../LastUpdatedBadge'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from '../ui/context-menu'
 import RealizationDialog from '../RealizationDialog'
 import LectureDetailsDialog from '../LectureDetailsDialog'
@@ -19,9 +20,10 @@ import LectureDetailsDialog from '../LectureDetailsDialog'
 interface WeekViewProps {
   currentDate: Date
   setViewMode: (mode: 'day' | 'week') => void
+  lastUpdatedLabel?: string | null
 }
 
-const WeekView = memo(({ currentDate }: WeekViewProps) => {
+const WeekView = memo(({ currentDate, lastUpdatedLabel }: WeekViewProps) => {
   const { t } = useTranslation('schedule')
   const { t: tColor } = useTranslation('colorCustomization')
   const { getWeekStart, getWeekDates } = useScheduleRange()
@@ -132,13 +134,26 @@ const WeekView = memo(({ currentDate }: WeekViewProps) => {
       <div className="w-full flex-shrink-0" style={{
         background: `linear-gradient(to bottom, var(--color-surface-alpha-40), transparent)`
       }}>
-        <div className="max-w-7xl mx-auto px-4 py-6 text-center">
-          <div className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-            {t('weekView.week')} {DateFormatUtils.getWeekNumber(currentDate)}
+        <div className="max-w-7xl mx-auto px-4 py-6 relative">
+          {/* Mobile Icon Button - Top Right */}
+          {lastUpdatedLabel && (
+            <div className="absolute right-4 top-4 md:hidden">
+              <LastUpdatedBadge lastUpdatedLabel={lastUpdatedLabel} variant="icon-only" />
+            </div>
+          )}
+          <div className="text-center">
+            <div className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>
+              {t('weekView.week')} {DateFormatUtils.getWeekNumber(currentDate)}
+            </div>
+            <h2 className="text-2xl font-medium" style={{ color: 'var(--color-text)' }}>
+              {formatWeekHeader()}
+            </h2>
           </div>
-          <h2 className="text-2xl font-medium" style={{ color: 'var(--color-text)' }}>
-            {formatWeekHeader()}
-          </h2>
+          {lastUpdatedLabel && (
+            <div className="hidden md:block absolute right-0 bottom-4 mx-4">
+              <LastUpdatedBadge lastUpdatedLabel={lastUpdatedLabel} variant="full" />
+            </div>
+          )}
         </div>
       </div>
 

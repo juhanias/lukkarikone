@@ -415,6 +415,7 @@ interface ScheduleState {
   isLoading: boolean;
   error: string | null;
   lastFetched: Date | null;
+  lastUpdated: Date | null;
   
   fetchSchedule: () => Promise<void>;
   getEventsForDate: (date: Date) => ScheduleEvent[];
@@ -429,6 +430,7 @@ const useScheduleStore = create<ScheduleState>()((set, get) => ({
   isLoading: false,
   error: null,
   lastFetched: null,
+  lastUpdated: null,
 
   fetchSchedule: async () => {
     // Don't fetch if we already have data from today
@@ -446,19 +448,23 @@ const useScheduleStore = create<ScheduleState>()((set, get) => ({
       // Get custom colors from realization color store
       const { customColors } = useRealizationColorStore.getState();
       
-      const calendar = await ScheduleUtils.retrieveScheduleFromUrl(config.calendarUrl);
+  const { calendar, lastUpdated } = await ScheduleUtils.retrieveScheduleFromUrl(config.calendarUrl);
       
       // Get all events from the calendar
       const vevents = calendar.getAllSubcomponents('vevent');
       const events = vevents.map((vevent, index) => 
         ScheduleUtils.convertToScheduleEvent(vevent, index, customColors)
       );
+
+      const parsedLastUpdated = lastUpdated ? new Date(lastUpdated) : null;
+      const validLastUpdated = parsedLastUpdated && !isNaN(parsedLastUpdated.getTime()) ? parsedLastUpdated : null;
       
       set({ 
         calendar, 
         events, 
         isLoading: false, 
-        lastFetched: new Date() 
+        lastFetched: new Date(),
+        lastUpdated: validLastUpdated
       });
     } catch (error) {
       set({ 
