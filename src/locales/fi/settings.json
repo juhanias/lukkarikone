@@ -1,6 +1,9 @@
 {
   "title": "Asetukset",
   "subtitle": "Mukauta sovelluksen ulkoasua ja toimintoja",
+  "navigation": {
+    "contents": "Sisältö"
+  },
   "sections": {
     "font": {
       "title": "Fonttiasetukset",

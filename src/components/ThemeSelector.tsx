@@ -107,12 +107,12 @@ export function ThemeSelector({ themes, selectedThemeId, onThemeSelect }: ThemeS
             </div>
 
             {/* Theme Info */}
-            <div className="p-4" style={{ backgroundColor: `${currentTheme.colors.surface}99` }}>
+            <div className="p-4 h-32 flex flex-col" style={{ backgroundColor: `${currentTheme.colors.surface}99` }}>
               <div className="flex items-start justify-between mb-2">
                 <h3 className="font-semibold text-sm" style={{ color: currentTheme.colors.text }}>{theme.name}</h3>
-                <Palette className="w-4 h-4 opacity-60" style={{ color: currentTheme.colors.textSecondary }} />
+                <Palette className="w-4 h-4 opacity-60 flex-shrink-0" style={{ color: currentTheme.colors.textSecondary }} />
               </div>
-              <p className="text-xs leading-relaxed" style={{ color: currentTheme.colors.textSecondary }}>{theme.description}</p>
+              <p className="text-xs leading-relaxed flex-1 overflow-hidden" style={{ color: currentTheme.colors.textSecondary }}>{theme.description}</p>
               
               {/* Color dots */}
               <div className="flex gap-1 mt-3">

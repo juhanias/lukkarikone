@@ -192,7 +192,7 @@ interface ConfigState {
 }
 
 const defaultConfig: Config = {
-  font: "lexend",
+  font: "system",
   theme: "default",
   showWeekends: false,
   calendarUrl: "",

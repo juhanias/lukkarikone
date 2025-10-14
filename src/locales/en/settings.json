@@ -1,6 +1,9 @@
 {
   "title": "Settings",
   "subtitle": "Customize the application appearance and functionality",
+  "navigation": {
+    "contents": "Contents"
+  },
   "sections": {
     "font": {
       "title": "Font Settings",
