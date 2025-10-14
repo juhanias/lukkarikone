@@ -125,7 +125,7 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
           {children}
         </DialogTrigger>
         <DialogContent 
-          className="sm:max-w-[525px]"
+          className="sm:max-w-[525px] max-h-[90vh] overflow-y-auto"
           style={{ 
             backgroundColor: 'var(--color-surface)',
             borderColor: 'var(--color-border)',
