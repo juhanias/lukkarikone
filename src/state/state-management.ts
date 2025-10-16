@@ -8,9 +8,11 @@ import { ScheduleUtils } from '../utils/schedule-utils';
 // Color theme definitions
 interface Theme {
   id: string;
-  name: string;
-  description: string;
-  delisted?: boolean; // Hidden from normal theme selector
+  nameKey?: string;
+  descriptionKey?: string
+  name?: string; // deprecated, use nameKey
+  description?: string; // deprecated, use descriptionKey
+  delisted?: boolean;
   colors: {
     background: string;
     surface: string;
@@ -34,8 +36,8 @@ interface Theme {
 const getThemes = (): Theme[] => [
   {
     id: "default",
-    name: "Default",
-    description: "wowww",
+    nameKey: "sections.theme.themes.default.name",
+    descriptionKey: "sections.theme.themes.default.description",
     colors: {
       background: "rgb(15, 23, 42)", // slate-900
       surface: "rgb(30, 41, 59)", // slate-800
@@ -56,9 +58,32 @@ const getThemes = (): Theme[] => [
     }
   },
   {
+    id: "purple",
+    nameKey: "sections.theme.themes.purple.name",
+    descriptionKey: "sections.theme.themes.purple.description",
+    colors: {
+      background: "rgb(17, 15, 28)", // very dark muted purple
+      surface: "rgb(28, 24, 42)", // dark muted purple
+      surfaceSecondary: "rgb(42, 36, 60)", // medium muted purple
+      border: "rgb(75, 60, 100)", // subdued purple
+      text: "rgb(248, 250, 252)", // slate-50
+      textSecondary: "rgb(155, 140, 180)", // muted purple-grey
+      accent: "rgb(140, 100, 210)", // muted purple
+      accentSecondary: "rgb(120, 80, 190)", // darker muted purple
+      success: "rgb(34, 197, 94)", // green-500
+      warning: "rgb(245, 158, 11)", // amber-500
+      error: "rgb(239, 68, 68)", // red-500
+      // Header colors (purple theme)
+      headerAccent: "rgb(140, 100, 210)", // muted purple
+      headerAccentSecondary: "rgb(120, 80, 190)", // darker muted purple
+      headerText: "rgb(155, 140, 180)", // muted purple-grey
+      headerBackground: "rgb(28, 24, 42)", // dark muted purple - matches surface
+    }
+  },
+  {
     id: "light",
-    name: "Light One",
-    description: "light mode (thumbs up)",
+    nameKey: "sections.theme.themes.light.name",
+    descriptionKey: "sections.theme.themes.light.description",
     colors: {
       background: "rgb(226, 232, 240)", // slate-200 - darker than previous slate-100
       surface: "rgb(241, 245, 249)", // slate-100 - slightly lighter surface
@@ -80,8 +105,8 @@ const getThemes = (): Theme[] => [
   },
   {
     id: "boring",
-    name: "Boring",
-    description: "A slightly darker, less vibrant option",
+    nameKey: "sections.theme.themes.boring.name",
+    descriptionKey: "sections.theme.themes.boring.description",
     colors: {
       background: "rgb(23, 23, 23)", // neutral-900
       surface: "rgb(38, 38, 38)", // neutral-800
@@ -103,9 +128,8 @@ const getThemes = (): Theme[] => [
   },
   {
     id: "frog",
-    name: "🐸 Frog Mode",
-    description: "Ribbit ribbit! A wacky green swamp adventure",
-    delisted: true, // This theme is hidden from normal theme selector
+    nameKey: "sections.theme.themes.frog.name",
+    descriptionKey: "sections.theme.themes.frog.description",
     colors: {
       background: "rgb(13, 46, 17)", // very dark forest green
       surface: "rgb(22, 78, 29)", // dark swamp green

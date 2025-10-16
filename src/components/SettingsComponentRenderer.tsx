@@ -89,49 +89,6 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
       )
 
     case 'button': {
-      const isFrogButton = component.id === 'frog-toggle'
-      const isFrogMode = config.theme === 'frog'
-      
-      if (isFrogButton) {
-        return (
-          <motion.div
-            className="w-full flex items-center p-4 rounded-lg cursor-pointer transition-all"
-            style={{
-              backgroundColor: isFrogMode
-                ? 'rgba(72, 214, 89, 0.15)'
-                : 'var(--color-surface-secondary-alpha-30)',
-              border: isFrogMode
-                ? '1px solid rgba(72, 214, 89, 0.4)'
-                : '1px solid var(--color-border-alpha-30)'
-            }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={component.data.onClick}
-            role="button"
-            tabIndex={0}
-          >
-            <div className="flex-1">
-              <span className="font-medium block" style={{ color: 'var(--color-text)' }}>
-                {component.data.label}
-              </span>
-              {component.data.subtitle && (
-                <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-                  {component.data.subtitle}
-                </p>
-              )}
-            </div>
-            {isFrogMode && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="w-2 h-2 rounded-full ml-4 flex-shrink-0"
-                style={{ backgroundColor: '#48d659' }}
-              />
-            )}
-          </motion.div>
-        )
-      }
-      
       return (
         <motion.div
           className="w-full flex items-center p-4 rounded-lg cursor-pointer transition-all"

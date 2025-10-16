@@ -50,16 +50,29 @@
     },
     "theme": {
       "title": "Teema-asetukset",
-      "subtitle": "Valitse sovelluksen värimaailma"
-    },
-    "frog": {
-      "title": "🐸 mode",
-      "subtitle": "aktivoi 🐸-moodi elääksesi villisti",
-      "subtitleActive": "🐸🐸🐸",
-      "activate": "Aktivoi 🐸-tila",
-      "deactivate": "Poistu sammakkotilasta",
-      "activateSubtitle": "aktivoi 🐸-moodi elääksesi villisti. voit kyllä palata takaisin jos kaduttaa",
-      "deactivateSubtitle": "Palaa takaisin normaaliin teemaan"
+      "subtitle": "Valitse sovelluksen värimaailma",
+      "themes": {
+        "default": {
+          "name": "Oletus",
+          "description": "Siisti tumma teema sinisillä korostuksilla"
+        },
+        "purple": {
+          "name": "Purppura",
+          "description": "Purppurateemainen tumma tila"
+        },
+        "light": {
+          "name": "Vaalea",
+          "description": "Vaalea teema päivänkäyttöä varten"
+        },
+        "boring": {
+          "name": "Kurja",
+          "description": "Hieman tummempi ja vähemmän elävä vaihtoehto"
+        },
+        "frog": {
+          "name": "🐸 Sammakko-tila",
+          "description": "Sammakkofanien iloksi"
+        }
+      }
     },
     "actions": {
       "title": "Toiminnot",

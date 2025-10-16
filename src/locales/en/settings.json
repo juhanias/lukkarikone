@@ -50,16 +50,29 @@
     },
     "theme": {
       "title": "Theme Settings",
-      "subtitle": "Choose application color scheme"
-    },
-    "frog": {
-      "title": "🐸 mode",
-      "subtitle": "activate 🐸-mode to live wildly",
-      "subtitleActive": "🐸🐸🐸",
-      "activate": "Activate 🐸-mode",
-      "deactivate": "Exit frog mode",
-      "activateSubtitle": "activate 🐸-mode to live wildly. you can return if you regret it",
-      "deactivateSubtitle": "Return to normal theme"
+      "subtitle": "Choose application color scheme",
+      "themes": {
+        "default": {
+          "name": "Default",
+          "description": "Clean dark theme with blue accents"
+        },
+        "purple": {
+          "name": "Purple",
+          "description": "A purple-themed dark mode"
+        },
+        "light": {
+          "name": "Light One",
+          "description": "Light theme with blue accents"
+        },
+        "boring": {
+          "name": "Boring",
+          "description": "A slightly darker, less vibrant option"
+        },
+        "frog": {
+          "name": "🐸 Frog Mode",
+          "description": "For the frog enthusiasts 🐸"
+        }
+      }
     },
     "actions": {
       "title": "Actions",

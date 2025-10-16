@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Type, RotateCcw, Code, Palette, Calendar, Link, Languages } from 'lucide-react'
 import useConfigStore, { useRealizationColorStore } from '../state/state-management'
-import { FrogIcon } from '../components/FrogIcon'
 import { FONT_OPTIONS, type Font } from '../types/config'
 import type { SettingsConfig } from '../types/settings-config'
 
@@ -11,7 +10,6 @@ export function useSettingsConfig(): SettingsConfig {
   const { config, setConfig, resetConfig, getListedThemes } = useConfigStore()
   const { customColors, clearAllCustomColors } = useRealizationColorStore()
   const listedThemes = getListedThemes()
-  const isFrogMode = config.theme === 'frog'
 
   return useMemo(() => {
     const settingsConfig: SettingsConfig = [
@@ -132,7 +130,7 @@ export function useSettingsConfig(): SettingsConfig {
         ]
       },
 
-      // Theme Settings (conditional - not shown in frog mode)
+      // Theme Settings
       {
         id: 'theme-settings',
         blockName: t('sections.theme.title'),
@@ -140,7 +138,6 @@ export function useSettingsConfig(): SettingsConfig {
         icon: Palette,
         iconColor: '#9333ea',
         iconBgColor: '#9333ea33',
-        condition: () => !isFrogMode,
         components: [
           {
             componentType: 'theme-selector',
@@ -149,32 +146,6 @@ export function useSettingsConfig(): SettingsConfig {
               themes: listedThemes,
               selectedThemeId: config.theme,
               onThemeSelect: (themeId) => setConfig({ theme: themeId })
-            }
-          }
-        ]
-      },
-
-      // Frog Mode Settings
-      {
-        id: 'frog-settings',
-        blockName: t('sections.frog.title'),
-        blockDescription: isFrogMode ? t('sections.frog.subtitleActive') : t('sections.frog.subtitle'),
-        icon: () => <FrogIcon style={{
-            width: '16px',
-            height: '16px',
-        }} />,
-        variant: 'default',
-        components: [
-          {
-            componentType: 'button',
-            id: 'frog-toggle',
-            data: {
-              label: isFrogMode ? t('sections.frog.deactivate') : t('sections.frog.activate'),
-              subtitle: isFrogMode 
-                ? t('sections.frog.deactivateSubtitle')
-                : t('sections.frog.activateSubtitle'),
-              onClick: () => setConfig({ theme: isFrogMode ? 'default' : 'frog' }),
-              variant: 'default'
             }
           }
         ]
@@ -273,5 +244,5 @@ export function useSettingsConfig(): SettingsConfig {
     }
 
     return settingsConfig
-  }, [t, config, setConfig, resetConfig, listedThemes, isFrogMode, customColors, clearAllCustomColors])
+  }, [t, config, setConfig, resetConfig, listedThemes, customColors, clearAllCustomColors])
 }
