@@ -12,6 +12,17 @@ export function useSettingsConfig(): SettingsConfig {
   const listedThemes = getListedThemes()
 
   return useMemo(() => {
+    const transformedThemes = listedThemes.map(theme => ({
+      id: theme.id,
+      name: theme.nameKey ? t(theme.nameKey) : theme.name || theme.id,
+      description: theme.descriptionKey ? t(theme.descriptionKey) : theme.description || '',
+      colors: {
+        background: theme.colors.background,
+        surface: theme.colors.surface,
+        accent: theme.colors.accent,
+        text: theme.colors.text
+      }
+    }))
     const settingsConfig: SettingsConfig = [
       // Font Settings
       {
@@ -143,7 +154,7 @@ export function useSettingsConfig(): SettingsConfig {
             componentType: 'theme-selector',
             id: 'theme-selector',
             data: {
-              themes: listedThemes,
+              themes: transformedThemes,
               selectedThemeId: config.theme,
               onThemeSelect: (themeId) => setConfig({ theme: themeId })
             }

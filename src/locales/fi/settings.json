@@ -62,7 +62,7 @@
         },
         "light": {
           "name": "Vaalea",
-          "description": "Vaalea teema päivänkäyttöä varten"
+          "description": "Vaalea teema sinisillä korostuksilla"
         },
         "boring": {
           "name": "Kurja",
@@ -70,7 +70,7 @@
         },
         "frog": {
           "name": "🐸 Sammakko-tila",
-          "description": "Sammakkofanien iloksi"
+          "description": "Sammakkofanien iloksi 🐸"
         }
       }
     },
