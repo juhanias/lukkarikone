@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
 import { 
   Dialog, 
   DialogContent, 
@@ -26,6 +27,22 @@ const LectureDetailsDialog = ({
   onOpenRealizationDialog
 }: LectureDetailsDialogProps) => {
   const { t } = useTranslation('dialogs')
+  const [isClosing, setIsClosing] = useState(false)
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      setIsClosing(true)
+      // Wait for animation to complete before actually closing
+      setTimeout(() => {
+        onOpenChange(false)
+        setIsClosing(false)
+      }, 20)
+    } else {
+      setIsClosing(false)
+      onOpenChange(true)
+    }
+  }
+  
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('fi-FI', {
       hour: '2-digit',
@@ -70,13 +87,14 @@ const LectureDetailsDialog = ({
     : ''
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open || isClosing} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto" style={{
         backgroundColor: 'var(--color-surface)',
         borderColor: 'var(--color-border)',
         color: 'var(--color-text)',
         width: '90vw',
-        maxWidth: '600px'
+        maxWidth: '600px',
+        pointerEvents: open ? 'auto' : 'none'
       }}>
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
@@ -88,13 +106,16 @@ const LectureDetailsDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        {event && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+        <AnimatePresence mode="wait">
+          {event && (
+            <motion.div
+              key="lecture-details"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
             {/* Course Title */}
             <div className="rounded-lg p-4 border" style={{
               backgroundColor: 'var(--color-accent-alpha-20)',
@@ -220,8 +241,9 @@ const LectureDetailsDialog = ({
                 </div>
               </div>
             )}
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </DialogContent>
     </Dialog>
   )

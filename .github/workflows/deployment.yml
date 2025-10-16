@@ -50,4 +50,4 @@ jobs:
             podman pull $DOCKER_USERNAME/$DOCKER_REPO:$RELEASE_CODE
             podman stop lukkari-api
             podman rm -f lukkari-api
-            podman run -d --network host --name "lukkari-api" $DOCKER_USERNAME/$DOCKER_REPO:$RELEASE_CODE
+            podman run -d --network host --name "lukkari-api" --restart=always $DOCKER_USERNAME/$DOCKER_REPO:$RELEASE_CODE
