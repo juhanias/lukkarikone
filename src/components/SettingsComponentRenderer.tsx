@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion'
-import { Button } from './ui/button'
-import { Toggle, RadioCard, ActionButton } from './ui'
+import { Toggle, RadioCard } from './ui'
 import { Slider } from './ui/Slider'
 import LanguageSelector from './LanguageSelector'
 import { ThemeSelector } from './ThemeSelector'
 import { CalendarUrlModal } from './CalendarUrlModal'
+import { Button } from './ui/button'
 import type { SettingComponent } from '../types/settings-config'
 import useConfigStore from '../state/state-management'
 
@@ -95,49 +95,73 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
       if (isFrogButton) {
         return (
           <motion.div
+            className="w-full flex items-center p-4 rounded-lg cursor-pointer transition-all"
+            style={{
+              backgroundColor: isFrogMode
+                ? 'rgba(72, 214, 89, 0.15)'
+                : 'var(--color-surface-secondary-alpha-30)',
+              border: isFrogMode
+                ? '1px solid rgba(72, 214, 89, 0.4)'
+                : '1px solid var(--color-border-alpha-30)'
+            }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            onClick={component.data.onClick}
+            role="button"
+            tabIndex={0}
           >
-            <Button
-              variant="ghost"
-              className="w-full flex items-center p-4 rounded-lg cursor-pointer transition-all justify-start h-auto"
-              style={{
-                backgroundColor: isFrogMode
-                  ? 'rgba(72, 214, 89, 0.15)'
-                  : 'var(--color-surface-secondary-alpha-30)',
-                border: isFrogMode
-                  ? '1px solid rgba(72, 214, 89, 0.4)'
-                  : '1px solid var(--color-border-alpha-30)'
-              }}
-              onClick={component.data.onClick}
-            >
-              <div className="flex-1 text-left">
-                <span className="font-medium" style={{ color: 'var(--color-text)' }}>
-                  {component.data.label}
-                </span>
-                {component.data.subtitle && (
-                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-                    {component.data.subtitle}
-                  </p>
-                )}
-              </div>
-              {isFrogMode && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="w-2 h-2 rounded-full ml-4"
-                  style={{ backgroundColor: '#48d659' }}
-                />
+            <div className="flex-1">
+              <span className="font-medium block" style={{ color: 'var(--color-text)' }}>
+                {component.data.label}
+              </span>
+              {component.data.subtitle && (
+                <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                  {component.data.subtitle}
+                </p>
               )}
-            </Button>
+            </div>
+            {isFrogMode && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="w-2 h-2 rounded-full ml-4 flex-shrink-0"
+                style={{ backgroundColor: '#48d659' }}
+              />
+            )}
           </motion.div>
         )
       }
       
       return (
-        <ActionButton onClick={component.data.onClick} variant={component.data.variant === 'danger' ? 'danger' : 'primary'}>
-          {component.data.label}
-        </ActionButton>
+        <motion.div
+          className="w-full flex items-center p-4 rounded-lg cursor-pointer transition-all"
+          style={{
+            backgroundColor: component.data.variant === 'danger'
+              ? 'rgba(239, 68, 68, 0.15)'
+              : 'var(--color-surface-secondary-alpha-30)',
+            border: component.data.variant === 'danger'
+              ? '1px solid rgba(239, 68, 68, 0.4)'
+              : '1px solid var(--color-border-alpha-30)'
+          }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={component.data.onClick}
+          role="button"
+          tabIndex={0}
+        >
+          <div className="flex-1">
+            <span className="font-medium block" style={{ 
+              color: component.data.variant === 'danger' ? '#ef4444' : 'var(--color-text)'
+            }}>
+              {component.data.label}
+            </span>
+            {component.data.subtitle && (
+              <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                {component.data.subtitle}
+              </p>
+            )}
+          </div>
+        </motion.div>
       )
     }
 

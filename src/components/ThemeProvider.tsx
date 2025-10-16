@@ -43,21 +43,36 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     // Alpha variants
     root.style.setProperty('--color-surface-alpha-40', toRgba(theme.colors.surface, 0.4));
     root.style.setProperty('--color-surface-alpha-60', toRgba(theme.colors.surface, 0.6));
+    root.style.setProperty('--color-surface-secondary-alpha-20', toRgba(theme.colors.surfaceSecondary, 0.2));
     root.style.setProperty('--color-surface-secondary-alpha-30', toRgba(theme.colors.surfaceSecondary, 0.3));
     root.style.setProperty('--color-border-alpha-30', toRgba(theme.colors.border, 0.3));
     root.style.setProperty('--color-border-alpha-50', toRgba(theme.colors.border, 0.5));
-    root.style.setProperty('--color-accent-alpha-20', toRgba(theme.colors.accent, 0.2));
-    root.style.setProperty('--color-accent-alpha-10', toRgba(theme.colors.accent, 0.1));
     root.style.setProperty('--color-accent-alpha-5', toRgba(theme.colors.accent, 0.05));
+    root.style.setProperty('--color-accent-alpha-10', toRgba(theme.colors.accent, 0.1));
+    root.style.setProperty('--color-accent-alpha-20', toRgba(theme.colors.accent, 0.2));
     root.style.setProperty('--color-accent-alpha-30', toRgba(theme.colors.accent, 0.3));
+    root.style.setProperty('--color-accent-alpha-40', toRgba(theme.colors.accent, 0.4));
     root.style.setProperty('--color-success-alpha-20', toRgba(theme.colors.success, 0.2));
     root.style.setProperty('--color-error-alpha-20', toRgba(theme.colors.error, 0.2));
     root.style.setProperty('--color-error-alpha-30', toRgba(theme.colors.error, 0.3));
+    root.style.setProperty('--color-error-alpha-40', toRgba(theme.colors.error, 0.4));
     root.style.setProperty('--color-background-alpha-60', toRgba(theme.colors.background, 0.6));
+    root.style.setProperty('--color-background-alpha-80', toRgba(theme.colors.background, 0.8));
+    
+    // Alias danger colors to error colors for compatibility
+    root.style.setProperty('--color-danger', theme.colors.error);
+    root.style.setProperty('--color-danger-alpha-20', toRgba(theme.colors.error, 0.2));
+    root.style.setProperty('--color-danger-alpha-30', toRgba(theme.colors.error, 0.3));
     
     // Header alpha variants
     root.style.setProperty('--color-header-accent-alpha-20', toRgba(theme.colors.headerAccent, 0.2));
     root.style.setProperty('--color-header-accent-alpha-30', toRgba(theme.colors.headerAccent, 0.3));
+    
+    // RGB variant for slider theming (extract just the RGB part without rgb(...))
+    const accentMatch = theme.colors.accent.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (accentMatch) {
+      root.style.setProperty('--color-accent-rgb', `${accentMatch[1]}, ${accentMatch[2]}, ${accentMatch[3]}`);
+    }
 
     // Also set the body background
     document.body.style.backgroundColor = theme.colors.background;

@@ -64,7 +64,8 @@
     "actions": {
       "title": "Actions",
       "subtitle": "Restore default settings",
-      "resetButton": "Restore default settings"
+      "resetButton": "Restore default settings",
+      "resetSubtitle": "Reset all settings to their default values"
     },
     "debug": {
       "title": "Configuration",

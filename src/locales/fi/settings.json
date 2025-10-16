@@ -64,7 +64,8 @@
     "actions": {
       "title": "Toiminnot",
       "subtitle": "Palauta oletusasetukset",
-      "resetButton": "Palauta oletusasetukset"
+      "resetButton": "Palauta oletusasetukset",
+      "resetSubtitle": "Palauta kaikki asetukset niiden oletusarvoihin"
     },
     "debug": {
       "title": "Konfiguraatio",

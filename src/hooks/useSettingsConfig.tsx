@@ -193,6 +193,7 @@ export function useSettingsConfig(): SettingsConfig {
             id: 'reset-config',
             data: {
               label: t('sections.actions.resetButton'),
+              subtitle: t('sections.actions.resetSubtitle'),
               onClick: resetConfig,
               variant: 'danger'
             }

@@ -51,10 +51,10 @@ export function SettingsNavigation({ sections, activeSection, onSectionClick }: 
               <div className="flex items-center gap-3">
                 <motion.div 
                   className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-md"
-                  animate={{
+                    animate={{
                     backgroundColor: isActive && section.iconColor
                       ? `${section.iconColor}33`
-                      : 'var(--color-surface-alpha-30)',
+                      : 'var(--color-surface-secondary-alpha-30)',
                     color: isActive && section.iconColor
                       ? section.iconColor
                       : 'var(--color-text-secondary)'
