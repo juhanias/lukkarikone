@@ -46,8 +46,13 @@ jobs:
             DOCKER_PASSWORD="${{ secrets.DOCKER_PASSWORD }}"
             DOCKER_REPO=${{ secrets.DOCKER_REPO }}
             RELEASE_CODE=${{ github.sha }}
+            GOATCOUNTER_SERVICE_URL="${{ secrets.GOATCOUNTER_SERVICE_URL }}"
+            GOATCOUNTER_API_KEY="${{ secrets.GOATCOUNTER_API_KEY }}"
             podman login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             podman pull $DOCKER_USERNAME/$DOCKER_REPO:$RELEASE_CODE
             podman stop lukkari-api
             podman rm -f lukkari-api
-            podman run -d --network host --name "lukkari-api" --restart=always $DOCKER_USERNAME/$DOCKER_REPO:$RELEASE_CODE
+            podman run -d --network host --name "lukkari-api" --restart=always \
+              -e GOATCOUNTER_SERVICE_URL="$GOATCOUNTER_SERVICE_URL" \
+              -e GOATCOUNTER_API_KEY="$GOATCOUNTER_API_KEY" \
+              $DOCKER_USERNAME/$DOCKER_REPO:$RELEASE_CODE

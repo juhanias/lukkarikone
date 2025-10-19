@@ -42,6 +42,9 @@ EXPOSE 3001
 ENV NODE_ENV=production
 ENV PORT=3001
 
+# ENV GOATCOUNTER_SERVICE_URL=https://goats-lukkarikone.juh.fi
+# ENV GOATCOUNTER_API_KEY=api_key!!!!!!!!!
+
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD bun --bun /app/dist/index.js || exit 1
