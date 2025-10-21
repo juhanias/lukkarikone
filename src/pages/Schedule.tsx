@@ -267,8 +267,8 @@ export default function Schedule() {
       </AnimatePresence>
 
       {/* Navigation Buttons - Fixed at top */}
-      <div className="flex flex-col backdrop-blur-sm border-b" style={{
-        background: `linear-gradient(to bottom, var(--color-surface-alpha-40), transparent)`,
+      <div className="flex flex-col border-b" style={{
+        backgroundColor: 'var(--color-surface-alpha-40)',
         borderColor: 'var(--color-border-alpha-30)'
       }}>
         {/* View Tabs */}
