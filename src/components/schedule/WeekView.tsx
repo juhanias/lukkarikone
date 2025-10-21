@@ -169,14 +169,14 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel }: WeekViewProps) => {
           ) : (
             <div className="flex-1 relative overflow-x-auto">
               {/* Week Grid */}
-              <div style={{ minWidth: `${Math.max(320, filteredWeekDates.length * 100 + 48)}px` }}>
+              <div style={{ minWidth: config.squeezeWeekOnMobile ? 'auto' : `${Math.max(320, filteredWeekDates.length * 100 + 48)}px` }}>
                 {/* Day Headers */}
                 <div className="sticky top-0 z-50" style={{ backgroundColor: 'var(--color-surface)' }}>
                   <div className="flex">
                     <div className="w-12 flex-shrink-0 border-r" style={{ borderColor: 'var(--color-border-alpha-30)' }}>
                     </div>
                     {filteredWeekDates.map((date, index) => (
-                      <div key={date.toDateString()} className="flex-1 min-w-24 p-2 text-center border-r last:border-r-0" style={{
+                      <div key={date.toDateString()} className={`flex-1 ${config.squeezeWeekOnMobile ? '' : 'min-w-24'} p-2 text-center border-r last:border-r-0`} style={{
                         borderColor: 'var(--color-border-alpha-30)',
                         backgroundColor: date.toDateString() === new Date().toDateString() ? 'var(--color-accent-alpha-20)' : 'transparent'
                       }}>
@@ -236,7 +236,7 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel }: WeekViewProps) => {
                       </div>
                       
                       {filteredWeekDates.map((date) => (
-                        <div key={date.toDateString()} className="flex-1 min-w-24 relative border-r last:border-r-0" style={{
+                        <div key={date.toDateString()} className={`flex-1 ${config.squeezeWeekOnMobile ? '' : 'min-w-24'} relative border-r last:border-r-0`} style={{
                           borderColor: 'var(--color-border-alpha-30)',
                           backgroundColor: DateFormatUtils.isToday(date) ? 'var(--color-accent-alpha-5)' : 'transparent'
                         }}>

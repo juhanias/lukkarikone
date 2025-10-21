@@ -24,7 +24,7 @@
       "subtitle": "Customize calendar view",
       "showWeekends": {
         "label": "Always show weekends",
-        "subtitle": "Weekends are automatically shown if they contain events"
+        "subtitle": "Weekends are already automatically shown if they contain events"
       },
       "showCourseId": {
         "label": "Show course ID in schedule",
@@ -33,6 +33,10 @@
       "hiddenEventOpacity": {
         "label": "Hidden event opacity",
         "subtitle": "How faded hidden events appear ({{value}}%)"
+      },
+      "squeezeWeekOnMobile": {
+        "label": "Squeeze week view on mobile",
+        "subtitle": "Fit the entire week into the screen width on mobile devices without horizontal scrolling. NOTE! This may make the view cramped on small screens. Not recommended for general users."
       }
     },
     "styling": {

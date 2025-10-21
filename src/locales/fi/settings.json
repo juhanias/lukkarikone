@@ -24,7 +24,7 @@
       "subtitle": "Mukauta kalenterinäkymää",
       "showWeekends": {
         "label": "Näytä viikonloput aina",
-        "subtitle": "Viikonloput näytetään automaattisesti jos niissä on tapahtumia"
+        "subtitle": "Viikonloput näytetään jo automaattisesti jos niissä on tapahtumia"
       },
       "showCourseId": {
         "label": "Näytä toteutuksen tunnus lukujärjestyksessä",
@@ -33,6 +33,10 @@
       "hiddenEventOpacity": {
         "label": "Piilotettujen tapahtumien läpinäkyvyys",
         "subtitle": "Kuinka haaleina piilotetut tapahtumat näkyvät ({{value}}%)"
+      },
+      "squeezeWeekOnMobile": {
+        "label": "Sovita viikkonäkymä mobiilissa",
+        "subtitle": "Sovita koko viikko näytön leveyteen mobiililaitteilla ilman vaakasuuntaista vieritystä. HUOM! Tämä voi tehdä näkymästä tukalan pienillä näytöillä. Ei suositella peruskäyttäjälle."
       }
     },
     "styling": {

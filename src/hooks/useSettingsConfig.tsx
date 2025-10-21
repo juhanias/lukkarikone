@@ -93,6 +93,16 @@ export function useSettingsConfig(): SettingsConfig {
               unit: '%',
               onChange: (value) => setConfig({ hiddenEventOpacity: value })
             }
+          },
+          {
+            componentType: 'toggle',
+            id: 'squeeze-week-on-mobile',
+            data: {
+              label: t('sections.view.squeezeWeekOnMobile.label'),
+              subtitle: t('sections.view.squeezeWeekOnMobile.subtitle'),
+              checked: config.squeezeWeekOnMobile,
+              onChange: (checked) => setConfig({ squeezeWeekOnMobile: checked })
+            }
           }
         ]
       },

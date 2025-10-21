@@ -56,11 +56,11 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
           transition={{ duration: 0.2 }}
         >
           <div className="flex items-center justify-between mb-3">
-            <div className="space-y-1">
-              <label className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+            <div className="flex-1 min-w-0 mr-4">
+              <label className="font-medium" style={{ color: 'var(--color-text)' }}>
                 {component.data.label}
               </label>
-              <p className="text-xs opacity-75" style={{ color: 'var(--color-text-secondary)' }}>
+              <p className="text-xs mt-1 opacity-75 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
                 {component.data.subtitle}
               </p>
             </div>

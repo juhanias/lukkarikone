@@ -247,6 +247,7 @@ interface Config {
   hiddenEventOpacity: number; // Opacity for hidden events (0-100)
   showCourseIdInSchedule: boolean;
   enhancedDialogs: boolean;
+  squeezeWeekOnMobile: boolean;
 }
 
 interface ConfigState {
@@ -270,6 +271,7 @@ const defaultConfig: Config = {
   hiddenEventOpacity: 25,
   showCourseIdInSchedule: false,
   enhancedDialogs: true,
+  squeezeWeekOnMobile: false,
 };
 
 const LEGACY_PTIVIS25B_URL = "http://lukkari.turkuamk.fi/ical.php?hash=A64E5FCC3647C6FB5D7770DD86526B01FC67BD8A";

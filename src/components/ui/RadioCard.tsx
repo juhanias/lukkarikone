@@ -42,10 +42,10 @@ export function RadioCard({
         style={{ accentColor: 'var(--color-accent)' }}
         aria-describedby={subtitle ? `${name}-${value}-desc` : undefined}
       />
-      <div className="flex-1">
+      <div className="flex-1 min-w-0 mr-4">
         <span className="font-medium" style={{ color: 'var(--color-text)' }}>{label}</span>
         {subtitle && (
-          <p id={`${name}-${value}-desc`} className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+          <p id={`${name}-${value}-desc`} className="text-xs mt-1 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
             {subtitle}
           </p>
         )}
