@@ -88,6 +88,7 @@ export interface ThemeSelectorConfig extends BaseComponentConfig {
         background: string
         surface: string
         accent: string
+        accentSecondary: string
         text: string
       }
     }>
