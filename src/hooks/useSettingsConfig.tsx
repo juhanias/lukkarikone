@@ -20,6 +20,7 @@ export function useSettingsConfig(): SettingsConfig {
         background: theme.colors.background,
         surface: theme.colors.surface,
         accent: theme.colors.accent,
+        accentSecondary: theme.colors.accentSecondary,
         text: theme.colors.text
       }
     }))

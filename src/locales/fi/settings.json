@@ -58,29 +58,7 @@
     },
     "theme": {
       "title": "Teema-asetukset",
-      "subtitle": "Valitse sovelluksen värimaailma",
-      "themes": {
-        "default": {
-          "name": "Oletus",
-          "description": "Siisti tumma teema sinisillä korostuksilla"
-        },
-        "purple": {
-          "name": "Purppura",
-          "description": "Purppurateemainen tumma tila"
-        },
-        "light": {
-          "name": "Vaalea",
-          "description": "Vaalea teema sinisillä korostuksilla"
-        },
-        "boring": {
-          "name": "Kurja",
-          "description": "Hieman tummempi ja vähemmän elävä vaihtoehto"
-        },
-        "frog": {
-          "name": "🐸 Sammakko-tila",
-          "description": "Sammakkofanien iloksi 🐸"
-        }
-      }
+      "subtitle": "Valitse sovelluksen värimaailma"
     },
     "actions": {
       "title": "Toiminnot",

@@ -81,6 +81,29 @@ const getThemes = (): Theme[] => [
     }
   },
   {
+    id: "dark-pink",
+    nameKey: "sections.theme.themes.dark-pink.name",
+    descriptionKey: "sections.theme.themes.dark-pink.description",
+    colors: {
+      background: "rgb(28, 15, 22)", // very dark muted pink
+      surface: "rgb(42, 24, 34)", // dark muted pink
+      surfaceSecondary: "rgb(60, 36, 48)", // medium muted pink
+      border: "rgb(100, 60, 85)", // subdued pink
+      text: "rgb(248, 250, 252)", // slate-50
+      textSecondary: "rgb(200, 140, 175)", // muted pink-grey
+      accent: "rgb(210, 100, 160)", // muted dark pink
+      accentSecondary: "rgb(190, 80, 140)", // darker muted pink
+      success: "rgb(34, 197, 94)", // green-500
+      warning: "rgb(245, 158, 11)", // amber-500
+      error: "rgb(239, 68, 68)", // red-500
+      // Header colors (dark pink theme)
+      headerAccent: "rgb(210, 100, 160)", // muted dark pink
+      headerAccentSecondary: "rgb(190, 80, 140)", // darker muted pink
+      headerText: "rgb(200, 140, 175)", // muted pink-grey
+      headerBackground: "rgb(42, 24, 34)", // dark muted pink - matches surface
+    }
+  },
+  {
     id: "light",
     nameKey: "sections.theme.themes.light.name",
     descriptionKey: "sections.theme.themes.light.description",
@@ -149,6 +172,29 @@ const getThemes = (): Theme[] => [
       headerBackground: "rgb(22, 78, 29)", // dark swamp green - matches surface-alpha-40 for consistency
     }
   },
+  {
+    id: "forest",
+    nameKey: "sections.theme.themes.forest.name",
+    descriptionKey: "sections.theme.themes.forest.description",
+    colors: {
+      background: "rgb(23, 23, 23)", // neutral-900
+      surface: "rgb(38, 38, 38)", // neutral-800
+      surfaceSecondary: "rgb(64, 64, 64)", // neutral-700
+      border: "rgb(82, 82, 91)", // zinc-600
+      text: "rgb(250, 250, 250)", // neutral-50
+      textSecondary: "rgb(161, 161, 170)", // zinc-400
+      accent: "rgb(34, 197, 94)", // green-500
+      accentSecondary: "rgb(22, 163, 74)", // green-600
+      success: "rgb(34, 197, 94)", // green-500
+      warning: "rgb(245, 158, 11)", // amber-500
+      error: "rgb(239, 68, 68)", // red-500
+      // Header colors (green accent)
+      headerAccent: "rgb(34, 197, 94)", // green-500
+      headerAccentSecondary: "rgb(22, 163, 74)", // green-600
+      headerText: "rgb(161, 161, 170)", // zinc-400
+      headerBackground: "rgb(38, 38, 38)", // neutral-800 - matches surface
+    }
+  }
 ];
 
 // Get only the listed themes for normal theme selector
