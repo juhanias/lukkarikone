@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Type, RotateCcw, Code, Palette, Calendar, Link, Languages } from 'lucide-react'
+import { Type, RotateCcw, Code, Palette, Calendar, Link, Languages, Sparkles } from 'lucide-react'
 import useConfigStore, { useRealizationColorStore } from '../state/state-management'
 import { FONT_OPTIONS, type Font } from '../types/config'
 import type { SettingsConfig } from '../types/settings-config'
@@ -136,6 +136,28 @@ export function useSettingsConfig(): SettingsConfig {
               notConfiguredText: t('sections.calendar.notConfigured'),
               editLinkText: t('sections.calendar.editLink'),
               linkCalendarText: t('sections.calendar.linkCalendar')
+            }
+          }
+        ]
+      },
+
+      // Styling Settings
+      {
+        id: 'styling-settings',
+        blockName: t('sections.styling.title'),
+        blockDescription: t('sections.styling.subtitle'),
+        icon: Sparkles,
+        iconColor: '#a855f7',
+        iconBgColor: '#a855f733',
+        components: [
+          {
+            componentType: 'toggle',
+            id: 'enhanced-dialogs',
+            data: {
+              label: t('sections.styling.enhancedDialogs.label'),
+              subtitle: t('sections.styling.enhancedDialogs.subtitle'),
+              checked: config.enhancedDialogs,
+              onChange: (checked) => setConfig({ enhancedDialogs: checked })
             }
           }
         ]

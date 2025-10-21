@@ -3,14 +3,159 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import useConfigStore from "@/state/state-management"
 
-function Dialog({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Root>) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+let dialogIdCounter = 0
+const dialogStack: Array<{ id: number; close: () => void }> = []
+let isPopStateListenerAttached = false
+let closingViaBackButton = false
+let programmaticHistoryChange = false
+
+function handlePopState() {
+  // Ignore if this was triggered by a programmatic history.back()
+  if (programmaticHistoryChange) {
+    programmaticHistoryChange = false
+    return
+  }
+
+  const entry = dialogStack.pop()
+
+  if (!entry) {
+    detachPopStateListener()
+    return
+  }
+
+  closingViaBackButton = true
+  entry.close()
+  
+  // Reset flag after a short delay
+  setTimeout(() => {
+    closingViaBackButton = false
+  }, 20)
 }
 
-function DialogTrigger({
+function attachPopStateListener() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  if (!isPopStateListenerAttached) {
+    window.addEventListener('popstate', handlePopState)
+    isPopStateListenerAttached = true
+  }
+}
+
+function detachPopStateListener() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  if (isPopStateListenerAttached && dialogStack.length === 0) {
+    window.removeEventListener('popstate', handlePopState)
+    isPopStateListenerAttached = false
+  }
+}
+
+function removeDialogFromStack(dialogId: number) {
+  const index = dialogStack.findIndex(item => item.id === dialogId)
+
+  if (index !== -1) {
+    dialogStack.splice(index, 1)
+  }
+}
+
+function Dialog({
+  open,
+  onOpenChange,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  const dialogIdRef = React.useRef<number | null>(null)
+  const onOpenChangeRef = React.useRef(onOpenChange)
+  const [isClosing, setIsClosing] = React.useState(false)
+
+  if (dialogIdRef.current === null) {
+    dialogIdRef.current = ++dialogIdCounter
+  }
+
+  React.useEffect(() => {
+    onOpenChangeRef.current = onOpenChange
+  }, [onOpenChange])
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const dialogId = dialogIdRef.current as number
+
+    if (!open || typeof onOpenChangeRef.current !== 'function') {
+      removeDialogFromStack(dialogId)
+      detachPopStateListener()
+      
+      // If dialog was closed normally (not via back button), remove the history entry
+      // Only remove THIS dialog's history entry, not trigger other dialogs to close
+      if (!closingViaBackButton && window.history.state?.__dialogId === dialogId) {
+        try {
+          // Set flag to prevent handlePopState from closing other dialogs
+          programmaticHistoryChange = true
+          window.history.back()
+        } catch {
+          // Ignore if history.back() fails
+          programmaticHistoryChange = false
+        }
+      }
+      return
+    }
+
+    const close = () => {
+      const handler = onOpenChangeRef.current
+
+      if (handler) {
+        handler(false)
+      }
+    }
+
+    // Ensure the dialog is not already in the stack (e.g., re-open)
+    removeDialogFromStack(dialogId)
+
+    dialogStack.push({ id: dialogId, close })
+    attachPopStateListener()
+
+    try {
+      window.history.pushState({ ...window.history.state, __dialogId: dialogId }, '')
+    } catch {
+      // If pushState fails, silently ignore to avoid breaking dialog open behavior
+    }
+
+    return () => {
+      removeDialogFromStack(dialogId)
+      detachPopStateListener()
+    }
+  }, [open])
+
+  // Handle closing animation delay
+  const handleOpenChange = React.useCallback((newOpen: boolean) => {
+    if (!newOpen) {
+      setIsClosing(true)
+      // Use requestAnimationFrame for smoother timing, aligned with browser render cycles
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          if (onOpenChangeRef.current) {
+            onOpenChangeRef.current(false)
+          }
+          setIsClosing(false)
+        }, 20)
+      })
+    } else {
+      setIsClosing(false)
+      if (onOpenChangeRef.current) {
+        onOpenChangeRef.current(true)
+      }
+    }
+  }, [])
+
+  return <DialogPrimitive.Root data-slot="dialog" open={open || isClosing} onOpenChange={handleOpenChange} {...props} />
+}function DialogTrigger({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
@@ -37,6 +182,7 @@ function DialogOverlay({
       data-slot="dialog-overlay"
       className={cn(
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+        "[will-change:opacity]",
         className
       )}
       {...props}
@@ -48,19 +194,41 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  style,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
 }) {
+  const useEnhancedDialogs = useConfigStore(state => state.config.enhancedDialogs)
+
+  const enhancedClasses = "bg-transparent backdrop-blur-xl border-[var(--color-border-alpha-30)] text-[var(--color-text)] shadow-[0_35px_120px_rgba(0,0,0,0.45)]"
+  const basicClasses = "bg-[var(--color-surface)] border-[var(--color-border-alpha-30)] text-[var(--color-text)] shadow-lg"
+
+  const enhancedStyle: React.CSSProperties = useEnhancedDialogs
+    ? {
+        background: 'linear-gradient(160deg, var(--color-surface-alpha-60) 0%, var(--color-background-alpha-80) 100%)',
+        willChange: 'transform, opacity'
+      }
+    : {
+        willChange: 'transform, opacity'
+      }
+
+  const overlayClassName = useEnhancedDialogs
+    ? "bg-black/60"
+    : undefined
+
   return (
     <DialogPortal data-slot="dialog-portal">
-      <DialogOverlay />
+      <DialogOverlay className={overlayClassName} />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-2xl border p-6 duration-150 sm:max-w-lg",
+          "[transform:translate3d(0,0,0)]",
+          useEnhancedDialogs ? enhancedClasses : basicClasses,
           className
         )}
+        style={{ ...(useEnhancedDialogs ? enhancedStyle : {}), ...style }}
         {...props}
       >
         {children}
@@ -121,7 +289,7 @@ function DialogDescription({
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-muted-foreground text-sm text-start", className)}
       {...props}
     />
   )

@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, CircleX, Calendar } from 'lucide-react'
 import { ScheduleDay, WeekView } from '../components/schedule'
 import { CalendarUrlModal } from '../components/CalendarUrlModal'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogPortal, DialogOverlay } from '@/components/ui/dialog'
 import { isToday } from 'date-fns'
 
 const VIEW_MODES = ['day', 'week'] as const
@@ -167,54 +168,47 @@ export default function Schedule() {
 
   return (
     <div className="h-full flex flex-col" style={{ backgroundColor: 'var(--color-background)' }}>
-      {/* Calendar URL Configuration Prompt */}
-      {!config.calendarUrl && (
-        <div className="absolute inset-0 z-50 backdrop-blur-sm flex items-center justify-center"
-             style={{ backgroundColor: 'var(--color-background-alpha-80)' }}>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="max-w-md mx-4 p-6 rounded-lg border shadow-lg"
-            style={{
-              backgroundColor: 'var(--color-surface)',
-              borderColor: 'var(--color-border)',
-              fontFamily: `var(--font-${config.font})`
-            }}
-          >
-            <div className="text-center">
-              <Calendar className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--color-accent)' }} />
-              <h2 className="text-xl font-semibold mb-2" style={{ 
+      {/* Calendar URL Configuration Dialog */}
+      <Dialog open={!config.calendarUrl} onOpenChange={() => {}}>
+        <DialogPortal>
+          <DialogOverlay className="backdrop-blur-[20px]" style={{ backgroundColor: 'var(--color-background-alpha-80)' }} />
+          <DialogContent showCloseButton={false} className="sm:max-w-[425px]" style={{ fontFamily: `var(--font-${config.font})` }}>
+            <DialogHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <Calendar className="h-12 w-12" style={{ color: 'var(--color-accent)' }} />
+              </div>
+              <DialogTitle className="text-center" style={{ 
                 color: 'var(--color-text)',
                 fontFamily: `var(--font-${config.font})`
               }}>
                 {t('calendar.urlMissing')}
-              </h2>
-              <p className="mb-6" style={{ 
+              </DialogTitle>
+              <DialogDescription className="text-center" style={{ 
                 color: 'var(--color-text-secondary)',
                 fontFamily: `var(--font-${config.font})`
               }}>
                 {t('calendar.urlMissingDescription')}
-              </p>
-              <div className="flex gap-3 justify-center">
-                <CalendarUrlModal>
-                  <Button 
-                    className="flex items-center gap-2"
-                    style={{
-                      backgroundColor: 'var(--color-accent)',
-                      color: 'var(--color-text)',
-                      border: 'none',
-                      fontFamily: `var(--font-${config.font})`
-                    }}
-                  >
-                    <Calendar className="h-4 w-4" />
-                    {t('calendar.linkCalendar')}
-                  </Button>
-                </CalendarUrlModal>
-              </div>
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-3 justify-center pt-4">
+              <CalendarUrlModal>
+                <Button 
+                  className="flex items-center gap-2"
+                  style={{
+                    backgroundColor: 'var(--color-accent)',
+                    color: 'var(--color-text)',
+                    border: 'none',
+                    fontFamily: `var(--font-${config.font})`
+                  }}
+                >
+                  <Calendar className="h-4 w-4" />
+                  {t('calendar.linkCalendar')}
+                </Button>
+              </CalendarUrlModal>
             </div>
-          </motion.div>
-        </div>
-      )}
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
 
       {/* Loading and Error States */}
       <AnimatePresence>

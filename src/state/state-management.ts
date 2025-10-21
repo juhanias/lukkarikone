@@ -200,6 +200,7 @@ interface Config {
   calendarUrl: string;
   hiddenEventOpacity: number; // Opacity for hidden events (0-100)
   showCourseIdInSchedule: boolean;
+  enhancedDialogs: boolean;
 }
 
 interface ConfigState {
@@ -222,6 +223,7 @@ const defaultConfig: Config = {
   calendarUrl: "",
   hiddenEventOpacity: 25,
   showCourseIdInSchedule: false,
+  enhancedDialogs: true,
 };
 
 const LEGACY_PTIVIS25B_URL = "http://lukkari.turkuamk.fi/ical.php?hash=A64E5FCC3647C6FB5D7770DD86526B01FC67BD8A";

@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
 import { 
   Dialog, 
   DialogContent, 
@@ -57,20 +56,6 @@ const RealizationDialog = ({
   error
 }: RealizationDialogProps) => {
   const { t } = useTranslation('dialogs')
-  const [isClosing, setIsClosing] = useState(false)
-
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
-      setIsClosing(true)
-      setTimeout(() => {
-        onOpenChange(false)
-        setIsClosing(false)
-      }, 20)
-    } else {
-      setIsClosing(false)
-      onOpenChange(true)
-    }
-  }
   
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -98,15 +83,8 @@ const RealizationDialog = ({
   }
 
   return (
-    <Dialog open={open || isClosing} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto" style={{
-        backgroundColor: 'var(--color-surface)',
-        borderColor: 'var(--color-border)',
-        color: 'var(--color-text)',
-        width: '90vw',
-        maxWidth: '1200px',
-        pointerEvents: open ? 'auto' : 'none'
-      }}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[1200px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
             <GraduationCap className="h-6 w-6" />
@@ -124,9 +102,9 @@ const RealizationDialog = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
               className="flex items-center justify-center py-8"
-              style={{ color: 'var(--color-text)' }}
+              style={{ color: 'var(--color-text)', willChange: 'opacity' }}
             >
               <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: 'var(--color-accent)' }}></div>
               <span className="ml-3">{t('realizationDialog.loading')}</span>
@@ -139,11 +117,12 @@ const RealizationDialog = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
               className="rounded-lg p-4 border"
               style={{
                 backgroundColor: 'var(--color-error-alpha-20)',
-                borderColor: 'var(--color-error-alpha-40)'
+                borderColor: 'var(--color-error-alpha-40)',
+                willChange: 'opacity'
               }}
             >
               <div className="flex items-center gap-2" style={{ color: 'var(--color-error)' }}>
@@ -160,8 +139,9 @@ const RealizationDialog = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className="space-y-6"
+              style={{ willChange: 'transform, opacity' }}
           >
             {/* Basic Info */}
             <div className="rounded-lg p-4 border" style={{

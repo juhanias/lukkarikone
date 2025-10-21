@@ -71,11 +71,7 @@ export const RealizationColorCustomizer = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md" style={{
-        backgroundColor: 'var(--color-surface)',
-        borderColor: 'var(--color-border)',
-        color: 'var(--color-text)'
-      }}>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
             <Palette className="h-5 w-5" style={{ color: 'var(--color-accent)' }} />

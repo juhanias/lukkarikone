@@ -1,12 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogDescription 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription
 } from './ui/dialog'
 import { ActionButton } from './ui/ActionButton'
 import { Calendar, Clock, MapPin, Users, GraduationCap, BookOpen, Info, ExternalLink } from 'lucide-react'
@@ -27,21 +26,6 @@ const LectureDetailsDialog = ({
   onOpenRealizationDialog
 }: LectureDetailsDialogProps) => {
   const { t } = useTranslation('dialogs')
-  const [isClosing, setIsClosing] = useState(false)
-
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
-      setIsClosing(true)
-      // Wait for animation to complete before actually closing
-      setTimeout(() => {
-        onOpenChange(false)
-        setIsClosing(false)
-      }, 20)
-    } else {
-      setIsClosing(false)
-      onOpenChange(true)
-    }
-  }
   
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('fi-FI', {
@@ -87,15 +71,8 @@ const LectureDetailsDialog = ({
     : ''
 
   return (
-    <Dialog open={open || isClosing} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto" style={{
-        backgroundColor: 'var(--color-surface)',
-        borderColor: 'var(--color-border)',
-        color: 'var(--color-text)',
-        width: '90vw',
-        maxWidth: '600px',
-        pointerEvents: open ? 'auto' : 'none'
-      }}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
             <BookOpen className="h-6 w-6" />
@@ -113,8 +90,9 @@ const LectureDetailsDialog = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className="space-y-4"
+              style={{ willChange: 'transform, opacity' }}
             >
             {/* Course Title */}
             <div className="rounded-lg p-4 border" style={{

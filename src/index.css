@@ -37,3 +37,20 @@ html, body, #root {
 .hover\:scale-101:hover {
   transform: scale(1.01);
 }
+
+/* Dialog performance optimizations */
+[data-slot="dialog-content"] {
+  /* Force GPU acceleration for smoother animations */
+  /* TODO: experimental. will get back to this */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize backdrop-blur performance on enhanced dialogs */
+.backdrop-blur-xl {
+  /* Use hardware acceleration */
+  transform: translateZ(0);
+  /* Contain paint and layout for better performance */
+  contain: layout style paint;
+}

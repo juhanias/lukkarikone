@@ -35,6 +35,14 @@
         "subtitle": "Kuinka haaleina piilotetut tapahtumat näkyvät ({{value}}%)"
       }
     },
+    "styling": {
+      "title": "Tyylitys",
+      "subtitle": "Hallitse visuaalisia elementtejä ja sivusuunnittelua",
+      "enhancedDialogs": {
+        "label": "'Frosted Glass'-dialogit",
+        "subtitle": "Tekee dialogien taustoista sumeampia ja kiinnostavampia. Mikäli tämä vaikuttaa negatiivisesti suorituskykyyn, voit poistaa sen käytöstä."
+      }
+    },
     "language": {
       "title": "Kieliasetukset",
       "subtitle": "Valitse haluamasi kieli"

@@ -35,6 +35,14 @@
         "subtitle": "How faded hidden events appear ({{value}}%)"
       }
     },
+    "styling": {
+      "title": "Styling",
+      "subtitle": "Control design elements and page aesthetics",
+      "enhancedDialogs": {
+        "label": "Use frosted glass dialogs",
+        "subtitle": "Enable gradient backgrounds and blur for dialogs to make them more visually appealing. If this negatively impacts performance, you can disable it."
+      }
+    },
     "language": {
       "title": "Language Settings",
       "subtitle": "Choose your preferred language"

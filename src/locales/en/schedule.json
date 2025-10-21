@@ -18,8 +18,8 @@
     "today": "Today"
   },
   "calendar": {
-    "urlMissing": "Calendar URL missing",
-    "urlMissingDescription": "Configure the URL from Turku AMK calendar system to see your schedule.",
+    "urlMissing": "Let's configure your schedule!",
+    "urlMissingDescription": "You've not linked your schedule to the page yet. This is a quick process!",
     "linkCalendar": "Link calendar"
   },
   "loading": {

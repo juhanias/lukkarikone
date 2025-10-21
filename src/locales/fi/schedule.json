@@ -18,8 +18,8 @@
     "today": "Tänään"
   },
   "calendar": {
-    "urlMissing": "Kalenterin URL puuttuu",
-    "urlMissingDescription": "Määritä Turku AMK:n kalenterijärjestelmän URL-osoite nähdäksesi lukujärjestyksesi.",
+    "urlMissing": "Laitetaan kalenteri pystyyn!",
+    "urlMissingDescription": "Et ole vielä yhdistänyt lukujärjestystäsi näkymään. Tämä on nopea prosessi!",
     "linkCalendar": "Linkkaa kalenteri"
   },
   "loading": {

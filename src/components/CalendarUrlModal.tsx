@@ -127,9 +127,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
         <DialogContent 
           className="sm:max-w-[525px] max-h-[90vh] overflow-y-auto"
           style={{ 
-            backgroundColor: 'var(--color-surface)',
-            borderColor: 'var(--color-border)',
-            color: 'var(--color-text)',
             fontFamily: `var(--font-${config.font})`
           }}
         >
@@ -157,10 +154,8 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
         <div className="space-y-4 py-4">
           {/* Quick Setup Options */}
           <div 
-            className="p-4 rounded-md border"
+            className="rounded-md"
             style={{ 
-              backgroundColor: 'var(--color-surface-secondary)',
-              borderColor: 'var(--color-border)',
               fontFamily: `var(--font-${config.font})`
             }}
           >
@@ -274,7 +269,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
           <div 
             className="p-3 rounded-md text-sm"
             style={{ 
-              backgroundColor: 'var(--color-surface-secondary)',
               fontFamily: `var(--font-${config.font})`
             }}
           >

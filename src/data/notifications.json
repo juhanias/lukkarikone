@@ -1,7 +1,7 @@
 [
   {
     "id": "2025-10-release-1.1-um",
-    "enabled": true,
+    "enabled": false,
     "priority": 10,
     "title": {
       "en": "Lukkarikone v1.1",
