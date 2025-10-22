@@ -6,8 +6,98 @@ import ICAL from 'ical.js';
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Initialize cache with 1 hour ttl
-const cache = new NodeCache({ stdTTL: 3600 });
+// Initialize cache with no automatic TTL - we'll handle staleness manually
+const cache = new NodeCache({ stdTTL: 0, useClones: false });
+
+// Track last fetch times for stale-while-revalidate pattern
+const lastFetchTimes = new Map<string, number>();
+
+// Common calendar URLs to pre-cache at startup
+const PRECACHE_URLS = [
+  'http://lukkari.turkuamk.fi/ical.php?hash=9385A6CBC6B79C3DDCE6B2738B5C1B882A6D64CA', // PTIVIS25A
+  'http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8', // PTIVIS25B
+  'http://lukkari.turkuamk.fi/ical.php?hash=E4AC87D135AF921A83B677DD15A19E6119DDF0BB', // PTIVIS25C
+  'http://lukkari.turkuamk.fi/ical.php?hash=E8F13D455EA82E8A7D0990CF6983BBE61AD839A7', // PTIVIS25D
+  'http://lukkari.turkuamk.fi/ical.php?hash=346C225AD26BD6966FC656F8E77B5A3EA38A73B5', // PTIVIS25E
+  'http://lukkari.turkuamk.fi/ical.php?hash=6EAF3A6D4FC2B07836C2B742EC923629839CA0B7', // PTIVIS25F
+];
+
+const STALE_AFTER_MS = 60 * 60 * 1000; // 1 hour
+
+// Helper function to fetch and cache calendar data
+async function fetchAndCacheCalendar(calendarUrl: string, cacheKey: string, isBackground = false): Promise<string | null> {
+  try {
+    if (!isBackground) {
+      console.log(`Fetching calendar from URL: ${calendarUrl}`);
+    } else {
+      console.log(`Background refresh for URL: ${calendarUrl}`);
+    }
+
+    const response = await fetch(calendarUrl);
+    
+    if (!response.ok) {
+      console.error(`Failed to fetch calendar: HTTP ${response.status}`);
+      return null;
+    }
+
+    const calendarData = await response.text();
+
+    // Validate iCal format
+    try {
+      const jcalData = ICAL.parse(calendarData);
+      const comp = new ICAL.Component(jcalData);
+      
+      if (comp.name !== 'vcalendar') {
+        throw new Error('Not a valid iCalendar file');
+      }
+
+      // Cache the data and update fetch time
+      cache.set(cacheKey, calendarData);
+      lastFetchTimes.set(cacheKey, Date.now());
+      
+      if (!isBackground) {
+        console.log(`Successfully cached calendar data for URL: ${calendarUrl}`);
+      }
+      
+      return calendarData;
+    } catch (parseError) {
+      console.error('iCal parsing error:', parseError);
+      return null;
+    }
+  } catch (error) {
+    console.error('Calendar fetch error:', error);
+    return null;
+  }
+}
+
+// Pre-cache common calendar URLs at startup
+async function precacheCalendars() {
+  console.log('Pre-caching common calendar URLs...');
+  const promises = PRECACHE_URLS.map(async (url) => {
+    const cacheKey = `calendar_${url}`;
+    await fetchAndCacheCalendar(url, cacheKey);
+  });
+  
+  await Promise.all(promises);
+  console.log('Pre-caching complete!');
+}
+
+// Check if cache entry is stale (older than 1 hour)
+function isCacheStale(cacheKey: string): boolean {
+  const lastFetch = lastFetchTimes.get(cacheKey);
+  if (!lastFetch) return true;
+  return Date.now() - lastFetch > STALE_AFTER_MS;
+}
+
+// Background refresh if stale
+function refreshIfStale(calendarUrl: string, cacheKey: string) {
+  if (isCacheStale(cacheKey)) {
+    // Don't await - let it refresh in background
+    fetchAndCacheCalendar(calendarUrl, cacheKey, true).catch(err => {
+      console.error('Background refresh failed:', err);
+    });
+  }
+}
 
 app.use(cors());
 app.use(express.json());
@@ -175,57 +265,43 @@ app.get('/api/calendar', async (req: Request, res: Response) => {
     }
 
     const cacheKey = `calendar_${calendarUrl}`;
-    const cachedData = cache.get(cacheKey);
+    const cachedData = cache.get<string>(cacheKey);
     
+    // If we have cached data, serve it immediately
     if (cachedData) {
-      console.log(`Cache hit for URL: ${calendarUrl}`);
+      const isStale = isCacheStale(cacheKey);
+      
+      // If stale, trigger background refresh but still serve cached data
+      if (isStale) {
+        refreshIfStale(calendarUrl, cacheKey);
+      }
+      
+      console.log(`Cache hit for URL: ${calendarUrl}${isStale ? ' (stale, refreshing in background)' : ''}`);
       return res.json({
         data: cachedData,
         cached: true,
+        stale: isStale,
         timestamp: new Date().toISOString()
       });
     }
 
-    console.log(`Fetching calendar from URL: ${calendarUrl}`);
-
-    const response = await fetch(calendarUrl);
+    // No cached data - fetch it now (user has to wait. BAD 1!)
+    const calendarData = await fetchAndCacheCalendar(calendarUrl, cacheKey);
     
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: `Failed to fetch calendar`,
-        message: `HTTP ${response.status}: ${response.statusText}`,
-        url: calendarUrl
-      });
-    }
-
-    const calendarData = await response.text();
-
-    try {
-      const jcalData = ICAL.parse(calendarData);
-      const comp = new ICAL.Component(jcalData);
-      
-      if (comp.name !== 'vcalendar') {
-        throw new Error('Not a valid iCalendar file');
-      }
-
-      cache.set(cacheKey, calendarData);
-      
-      console.log(`Successfully cached calendar data for URL: ${calendarUrl}`);
-      
-      res.json({
-        data: calendarData,
-        cached: false,
-        timestamp: new Date().toISOString()
-      });
-
-    } catch (parseError) {
-      console.error('iCal parsing error:', parseError);
+    if (!calendarData) {
       return res.status(400).json({
-        error: 'Invalid iCalendar format',
+        error: 'Failed to fetch or parse calendar',
         message: 'The provided URL does not contain valid iCalendar data',
         url: calendarUrl
       });
     }
+
+    res.json({
+      data: calendarData,
+      cached: false,
+      stale: false,
+      timestamp: new Date().toISOString()
+    });
 
   } catch (error) {
     console.error('Calendar fetch error:', error);
@@ -238,4 +314,9 @@ app.get('/api/calendar', async (req: Request, res: Response) => {
 
 app.listen(port, () => {
   console.log(`beep boop on port ${port}`);
+  
+  // Pre-cache common calendars after server starts
+  precacheCalendars().catch(err => {
+    console.error('Pre-caching failed:', err);
+  });
 });
