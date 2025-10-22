@@ -159,7 +159,7 @@ export default function Landing() {
                   srcSet="/landing/showcase-2-400.webp 400w, /landing/showcase-2-800.webp 800w, /landing/showcase-2.webp 1600w"
                   sizes="(max-width: 1024px) 0px, 400px"
                   style={{
-                    boxShadow: `0 10px 25px -5px rgba(0, 0, 0, 0.3)`
+                    boxShadow: `0 10px 25px -5px rgba(0, 0, 0, 0.2)`
                   }}
                 />
               </motion.div>
@@ -179,7 +179,7 @@ export default function Landing() {
                     srcSet="/landing/showcase-800.webp 800w, /landing/showcase-1200.webp 1200w, /landing/showcase.webp 2803w"
                     sizes="(max-width: 1024px) 0px, 800px"
                     style={{
-                      boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.5)`
+                      boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.3)`
                     }}
                     initial={{ opacity: 0, scale: 0.94 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -202,7 +202,7 @@ export default function Landing() {
                   srcSet="/landing/showcase-3-400.webp 400w, /landing/showcase-3-800.webp 800w, /landing/showcase-3.webp 1600w"
                   sizes="(max-width: 1024px) 0px, 400px"
                   style={{
-                    boxShadow: `0 10px 25px -5px rgba(0, 0, 0, 0.3)`
+                    boxShadow: `0 10px 25px -5px rgba(0, 0, 0, 0.2)`
                   }}
                 />
               </motion.div>
@@ -219,7 +219,7 @@ export default function Landing() {
                 srcSet="/landing/showcase-800.webp 800w, /landing/showcase-1200.webp 1200w, /landing/showcase.webp 2803w"
                 sizes="(max-width: 768px) 100vw, 75vw"
                 style={{
-                  boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.5)`
+                  boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.3)`
                 }}
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -295,7 +295,7 @@ export default function Landing() {
             <motion.div className="order-2 md:order-1" variants={fadeInUp}>
               <motion.div
                 className="w-full rounded-lg overflow-hidden shadow-xl"
-                style={{ boxShadow: `0 20px 40px -10px rgba(0, 0, 0, 0.4)` }}
+                style={{ boxShadow: `0 20px 40px -10px rgba(0, 0, 0, 0.25)` }}
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: 'spring', stiffness: 230, damping: 20 }}
               >
@@ -343,7 +343,7 @@ export default function Landing() {
             <motion.div variants={fadeInUp}>
               <motion.div
                 className="w-full rounded-lg overflow-hidden shadow-xl"
-                style={{ boxShadow: `0 20px 40px -10px rgba(0, 0, 0, 0.4)` }}
+                style={{ boxShadow: `0 20px 40px -10px rgba(0, 0, 0, 0.25)` }}
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: 'spring', stiffness: 230, damping: 20 }}
               >
@@ -366,7 +366,7 @@ export default function Landing() {
             <motion.div className="order-2 md:order-1" variants={fadeInUp}>
               <motion.div
                 className="w-full rounded-lg overflow-hidden shadow-xl"
-                style={{ boxShadow: `0 20px 40px -10px rgba(0, 0, 0, 0.4)` }}
+                style={{ boxShadow: `0 20px 40px -10px rgba(0, 0, 0, 0.25)` }}
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: 'spring', stiffness: 230, damping: 20 }}
               >
@@ -466,7 +466,7 @@ export default function Landing() {
               className="rounded-lg p-8 md:p-12 shadow-2xl"
               style={{ 
                 backgroundColor: blueTheme.background,
-                boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.5)`
+                boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.3)`
               }}
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.5, ease: easeOutExpo }}

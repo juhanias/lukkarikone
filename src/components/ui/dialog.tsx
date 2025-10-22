@@ -200,21 +200,28 @@ function DialogContent({
   showCloseButton?: boolean
 }) {
   const useEnhancedDialogs = useConfigStore(state => state.config.enhancedDialogs)
+  const isLightTheme = useConfigStore(state => state.isCurrentThemeLight())
 
-  const enhancedClasses = "bg-transparent backdrop-blur-xl border-[var(--color-border-alpha-30)] text-[var(--color-text)] shadow-[0_35px_120px_rgba(0,0,0,0.45)]"
-  const basicClasses = "bg-[var(--color-surface)] border-[var(--color-border-alpha-30)] text-[var(--color-text)] shadow-lg"
+  const enhancedClasses = "bg-transparent backdrop-blur-xl border-[var(--color-border-alpha-30)] text-[var(--color-text)]"
+  const basicClasses = "bg-[var(--color-surface)] border-[var(--color-border-alpha-30)] text-[var(--color-text)]"
 
   const enhancedStyle: React.CSSProperties = useEnhancedDialogs
     ? {
         background: 'linear-gradient(160deg, var(--color-surface-alpha-60) 0%, var(--color-background-alpha-80) 100%)',
-        willChange: 'transform, opacity'
+        willChange: 'transform, opacity',
+        boxShadow: isLightTheme 
+          ? '0 35px 120px rgba(0, 0, 0, 0.15)' 
+          : '0 35px 120px rgba(0, 0, 0, 0.45)'
       }
     : {
-        willChange: 'transform, opacity'
+        willChange: 'transform, opacity',
+        boxShadow: isLightTheme 
+          ? '0 10px 30px rgba(0, 0, 0, 0.1)' 
+          : undefined
       }
 
   const overlayClassName = useEnhancedDialogs
-    ? "bg-black/60"
+    ? isLightTheme ? "bg-black/40" : "bg-black/60"
     : undefined
 
   return (

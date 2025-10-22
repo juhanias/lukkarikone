@@ -28,7 +28,7 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel }: WeekViewProps) => {
   const { t: tColor } = useTranslation('colorCustomization')
   const { getWeekStart, getWeekDates } = useScheduleRange()
   const { getEventsForWeek } = useScheduleStore()
-  const { config } = useConfigStore()
+  const { config, isCurrentThemeLight } = useConfigStore()
   const { customColors } = useRealizationColorStore()
   const { isEventHidden, toggleEventVisibility } = useHiddenEventsStore()
   
@@ -175,19 +175,25 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel }: WeekViewProps) => {
                   <div className="flex">
                     <div className="w-12 flex-shrink-0 border-r" style={{ borderColor: 'var(--color-border-alpha-30)' }}>
                     </div>
-                    {filteredWeekDates.map((date, index) => (
-                      <div key={date.toDateString()} className={`flex-1 ${config.squeezeWeekOnMobile ? '' : 'min-w-24'} p-2 text-center border-r last:border-r-0`} style={{
-                        borderColor: 'var(--color-border-alpha-30)',
-                        backgroundColor: date.toDateString() === new Date().toDateString() ? 'var(--color-accent-alpha-20)' : 'transparent'
-                      }}>
-                        <div className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-                          {filteredDayNames[index]}
+                    {filteredWeekDates.map((date, index) => {
+                      const isToday = date.toDateString() === new Date().toDateString();
+                      const isLight = isCurrentThemeLight();
+                      return (
+                        <div key={date.toDateString()} className={`flex-1 ${config.squeezeWeekOnMobile ? '' : 'min-w-24'} p-2 text-center border-r last:border-r-0`} style={{
+                          borderColor: 'var(--color-border-alpha-30)',
+                          backgroundColor: isLight 
+                            ? (isToday ? 'var(--color-header-accent)' : 'var(--color-accent-alpha-20)')
+                            : (isToday ? 'var(--color-header-accent)' : 'transparent')
+                        }}>
+                          <div className="text-xs font-medium" style={{ color: isToday ? 'white' : 'var(--color-text-secondary)' }}>
+                            {filteredDayNames[index]}
+                          </div>
+                          <div className="text-sm font-bold mt-1" style={{ color: isToday ? 'white' : 'var(--color-text)' }}>
+                            {date.getDate()}
+                          </div>
                         </div>
-                        <div className="text-sm font-bold mt-1" style={{ color: 'var(--color-text)' }}>
-                          {date.getDate()}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -214,15 +220,19 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel }: WeekViewProps) => {
                   )}
 
                   {timeSlots.map((time, timeIndex) => (
-                    <div key={time} className="flex border-b relative" style={{
-                      borderColor: 'var(--color-border-alpha-30)',
+                    <div key={time} className="flex relative" style={{
+                      borderColor: isCurrentThemeLight() ? 'var(--color-border-alpha-50)' : 'var(--color-border-alpha-30)',
+                      borderBottomWidth: isCurrentThemeLight() ? '1.5px' : '1px',
+                      borderBottomStyle: 'solid',
                       minHeight: `${WEEK_HOUR_HEIGHT}px`
                     }}>
                       {/* Half-hour dashed line */}
                       <div 
-                        className="absolute left-0 right-0 border-t border-dashed opacity-75" 
+                        className={isCurrentThemeLight() ? "absolute left-0 right-0 opacity-100" : "absolute left-0 right-0 opacity-75"} 
                         style={{
                           borderColor: 'var(--color-border-alpha-30)',
+                          borderTopWidth: '1px',
+                          borderTopStyle: 'dashed',
                           top: `${WEEK_HOUR_HEIGHT / 2}px`,
                           zIndex: 5
                         }}

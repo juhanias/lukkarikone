@@ -37,7 +37,7 @@ export default function Layout() {
       }}>
         <div className='w-full max-w-7xl mx-auto flex gap-4 justify-between items-center'>
           <Link to="/?landing" className='text-xl font-medium transition-colors hover:opacity-80' style={{
-            color: 'var(--color-header-accent)'
+            color: 'var(--color-header-text)'
           }}>
             juh.fi/lukkari
           </Link>

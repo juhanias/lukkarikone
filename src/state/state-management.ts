@@ -108,22 +108,22 @@ const getThemes = (): Theme[] => [
     nameKey: "sections.theme.themes.light.name",
     descriptionKey: "sections.theme.themes.light.description",
     colors: {
-      background: "rgb(226, 232, 240)", // slate-200 - darker than previous slate-100
-      surface: "rgb(241, 245, 249)", // slate-100 - slightly lighter surface
-      surfaceSecondary: "rgb(203, 213, 225)", // slate-300
-      border: "rgb(148, 163, 184)", // slate-400 - more prominent borders
-      text: "rgb(15, 23, 42)", // slate-900
-      textSecondary: "rgb(71, 85, 105)", // slate-600
-      accent: "rgb(56, 189, 248)", // sky-400
-      accentSecondary: "rgb(14, 165, 233)", // sky-500
+      background: "rgb(243, 244, 246)", // gray-100
+      surface: "rgb(255, 255, 255)", // white
+      surfaceSecondary: "rgb(229, 231, 235)", // gray-200
+      border: "rgb(209, 213, 219)", // gray-300
+      text: "rgb(17, 24, 39)", // gray-900
+      textSecondary: "rgb(75, 85, 99)", // gray-600
+      accent: "rgb(37, 99, 235)", // blue-600
+      accentSecondary: "rgb(29, 78, 216)", // blue-700
       success: "rgb(34, 197, 94)", // green-500
       warning: "rgb(245, 158, 11)", // amber-500
       error: "rgb(239, 68, 68)", // red-500
-      // Header colors - strong blue even in light mode
-      headerAccent: "rgb(37, 99, 235)", // blue-600 - deeper blue for good contrast
+      // Header colors
+      headerAccent: "rgb(37, 99, 235)", // blue-600
       headerAccentSecondary: "rgb(29, 78, 216)", // blue-700
-      headerText: "rgb(37, 99, 235)", // blue-600 - blue text for header elements
-      headerBackground: "rgb(219, 234, 254)", // blue-100 - light blue background
+      headerText: "rgb(255, 255, 255)", // white
+      headerBackground: "rgb(37, 99, 235)", // blue-600
     }
   },
   {

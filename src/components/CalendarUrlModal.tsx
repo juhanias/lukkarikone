@@ -322,7 +322,7 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
             onClick={handleSave}
             style={{
               backgroundColor: 'var(--color-accent)',
-              color: 'var(--color-text)',
+              color: 'white',
               border: 'none',
               fontFamily: `var(--font-${config.font})`
             }}

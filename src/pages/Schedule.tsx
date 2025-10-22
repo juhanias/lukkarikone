@@ -196,7 +196,7 @@ export default function Schedule() {
                   className="flex items-center gap-2"
                   style={{
                     backgroundColor: 'var(--color-accent)',
-                    color: 'var(--color-text)',
+                    color: 'white',
                     border: 'none',
                     fontFamily: `var(--font-${config.font})`
                   }}
@@ -303,12 +303,13 @@ export default function Schedule() {
               <Button 
                 onClick={() => handleSwipe('right')}
                 disabled={isTransitioning}
-                variant="ghost"
+                variant="outline"
                 size="icon"
                 className="p-3 rounded-full disabled:opacity-50"
                 style={{
-                  backgroundColor: 'var(--color-surface-secondary-alpha-30)',
-                  color: 'var(--color-text-secondary)'
+                  backgroundColor: 'var(--color-surface)',
+                  color: 'var(--color-text)',
+                  borderColor: 'var(--color-border)'
                 }}
               >
                 <ChevronLeft size={20} />
@@ -349,12 +350,13 @@ export default function Schedule() {
               <Button 
                 onClick={() => handleSwipe('left')}
                 disabled={isTransitioning}
-                variant="ghost"
+                variant="outline"
                 size="icon"
                 className="p-3 rounded-full disabled:opacity-50"
                 style={{
-                  backgroundColor: 'var(--color-surface-secondary-alpha-30)',
-                  color: 'var(--color-text-secondary)'
+                  backgroundColor: 'var(--color-surface)',
+                  color: 'var(--color-text)',
+                  borderColor: 'var(--color-border)'
                 }}
               >
                 <ChevronRight size={20} />

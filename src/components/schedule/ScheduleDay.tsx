@@ -188,7 +188,7 @@ const ScheduleDay = memo(({ date, events, lastUpdatedLabel }: ScheduleDayProps) 
                     }}
                   >
                     {/* Time label */}
-                    <div className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1" style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)' }}>
+                    <div className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1" style={{ textShadow: 'none' }}>
                       <Clock size={12} />
                       {currentTimeString}
                     </div>

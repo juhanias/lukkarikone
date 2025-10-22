@@ -74,6 +74,28 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       root.style.setProperty('--color-accent-rgb', `${accentMatch[1]}, ${accentMatch[2]}, ${accentMatch[3]}`);
     }
 
+    // Theme-aware shadows for events - lighter in light mode, darker in dark mode
+    const isLightTheme = (): boolean => {
+      const match = theme.colors.background.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+      if (match) {
+        const [, r, g, b] = match.map(Number);
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        return luminance > 0.5;
+      }
+      return false;
+    };
+    
+    const eventShadow = isLightTheme() 
+      ? '0 2px 8px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08)'
+      : '0 4px 12px rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.2)';
+    
+    const eventTextShadow = isLightTheme()
+      ? 'none'
+      : '0 1px 2px rgba(0, 0, 0, 0.8)';
+    
+    root.style.setProperty('--event-shadow', eventShadow);
+    root.style.setProperty('--event-text-shadow', eventTextShadow);
+
     // Also set the body background
     document.body.style.backgroundColor = theme.colors.background;
     
