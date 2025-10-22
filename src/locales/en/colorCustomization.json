@@ -5,23 +5,13 @@
     "realizationCodeLabel": "Realization Code:",
     "colorPreviewLabel": "Color Preview",
     "sampleEventText": "Sample Event ({{code}})",
-    "colorInputTypeLabel": {
-      "hex": "Hex Color",
-      "rgb": "RGB Color"
-    },
-    "inputPlaceholder": {
-      "rgb": "rgb(255, 0, 0)"
-    },
-    "status": {
-      "customized": "🎨 Custom color applied",
-      "default": "📋 Using default color"
-    },
+    "selectColorLabel": "Select a preset color",
+    "customColorLabel": "Or choose a custom color",
     "buttons": {
       "apply": "Apply",
       "resetToDefault": "Reset to Default",
       "cancel": "Cancel",
-      "hex": "Hex",
-      "rgb": "RGB"
+      "useCustomColor": "Use Custom Color"
     }
   },
   "contextMenu": {

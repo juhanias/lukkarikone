@@ -4,6 +4,7 @@ import { Palette, RotateCcw, Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useRealizationColorStore } from '../state/state-management';
 import { RealizationColorUtils } from '../utils/realization-color-utils';
+import { ScheduleUtils } from '../utils/schedule-utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 
@@ -14,6 +15,25 @@ interface RealizationColorCustomizerProps {
   currentEventTitle: string;
 }
 
+const PRESET_COLORS = [
+  'rgb(30, 64, 175)', // blue
+  'rgb(88, 28, 135)', // purple
+  'rgb(22, 101, 52)', // green
+  'rgb(194, 65, 12)', // orange
+  'rgb(13, 148, 136)', // teal
+  'rgb(67, 56, 202)', // indigo
+  'rgb(185, 28, 28)', // red
+  'rgb(180, 83, 9)', // amber
+  'rgb(71, 85, 105)', // slate
+  'rgb(75, 85, 99)', // gray
+  'rgb(5, 150, 105)', // emerald
+  'rgb(190, 18, 60)', // rose
+  'rgb(8, 145, 178)', // cyan
+  'rgb(124, 58, 237)', // violet
+  'rgb(101, 163, 13)', // lime
+  'rgb(7, 89, 133)', // sky
+];
+
 export const RealizationColorCustomizer = ({ 
   open, 
   onOpenChange, 
@@ -23,50 +43,45 @@ export const RealizationColorCustomizer = ({
   const { t } = useTranslation('colorCustomization');
   const { customColors, setRealizationColor, resetRealizationColor, hasCustomColor } = useRealizationColorStore();
   
-  const [tempColor, setTempColor] = useState<string>('');
-  const [colorInputType, setColorInputType] = useState<'hex' | 'rgb'>('hex');
+  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [customHexColor, setCustomHexColor] = useState('#3B82F6');
 
   const effectiveColor = RealizationColorUtils.getEffectiveColor(realizationCode, customColors);
   const isCustomized = hasCustomColor(realizationCode);
 
-  const handleColorChange = (color: string) => {
-    let rgbColor: string | null = null;
-    
-    if (colorInputType === 'hex') {
-      rgbColor = RealizationColorUtils.hexToRgb(color);
-    } else {
-      rgbColor = RealizationColorUtils.isValidRgbColor(color) ? color : null;
-    }
-    
+  const handlePresetColorSelect = (color: string) => {
+    setSelectedColor(color);
+  };
+
+  const handleCustomColorChange = (hex: string) => {
+    setCustomHexColor(hex);
+    const rgbColor = RealizationColorUtils.hexToRgb(hex);
     if (rgbColor) {
-      setTempColor(rgbColor);
+      setSelectedColor(rgbColor);
     }
   };
 
   const handleApply = () => {
-    if (tempColor && RealizationColorUtils.isValidRgbColor(tempColor)) {
-      setRealizationColor(realizationCode, tempColor);
+    if (selectedColor && RealizationColorUtils.isValidRgbColor(selectedColor)) {
+      setRealizationColor(realizationCode, selectedColor);
       onOpenChange(false);
     }
   };
 
   const handleReset = () => {
     resetRealizationColor(realizationCode);
-    setTempColor('');
+    setSelectedColor('');
     onOpenChange(false);
   };
 
   const handleCancel = () => {
-    setTempColor('');
+    setSelectedColor('');
     onOpenChange(false);
   };
-
-  // Convert current effective color to hex for the color input
-  const currentHexColor = RealizationColorUtils.rgbToHex(effectiveColor) || '#3B82F6';
   
   const previewColorPair = RealizationColorUtils.getEffectiveColorPair(realizationCode, {
     ...customColors,
-    ...(tempColor ? { [realizationCode]: tempColor } : {})
+    ...(selectedColor ? { [realizationCode]: selectedColor } : {})
   });
 
   return (
@@ -114,67 +129,68 @@ export const RealizationColorCustomizer = ({
             </div>
           </div>
 
-          {/* Color Input Type Toggle */}
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setColorInputType('hex')}
-              variant={colorInputType === 'hex' ? 'default' : 'outline'}
-              size="sm"
-            >
-              {t('dialog.buttons.hex')}
-            </Button>
-            <Button
-              onClick={() => setColorInputType('rgb')}
-              variant={colorInputType === 'rgb' ? 'default' : 'outline'}
-              size="sm"
-            >
-              {t('dialog.buttons.rgb')}
-            </Button>
-          </div>
-
-          {/* Color Input */}
+          {/* Preset Colors Grid */}
           <div className="space-y-2">
             <label className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-              {colorInputType === 'hex' ? t('dialog.colorInputTypeLabel.hex') : t('dialog.colorInputTypeLabel.rgb')}
+              {t('dialog.selectColorLabel')}
             </label>
-            {colorInputType === 'hex' ? (
-              <input
-                type="color"
-                value={currentHexColor}
-                onChange={(e) => handleColorChange(e.target.value)}
-                className="w-full h-10 rounded border cursor-pointer"
-                style={{ borderColor: 'var(--color-border)' }}
-              />
-            ) : (
-              <input
-                type="text"
-                placeholder={t('dialog.inputPlaceholder.rgb')}
-                value={tempColor ? RealizationColorUtils.rgbToHex(tempColor) ? '' : tempColor : ''}
-                onChange={(e) => handleColorChange(e.target.value)}
-                className="w-full px-3 py-2 rounded border text-sm"
-                style={{
-                  backgroundColor: 'var(--color-surface-secondary)',
-                  borderColor: 'var(--color-border)',
-                  color: 'var(--color-text)'
-                }}
-              />
-            )}
+            <div className="grid grid-cols-8 gap-2">
+              {PRESET_COLORS.map((color) => {
+                const isSelected = selectedColor === color;
+                const isCurrentColor = effectiveColor === color && !selectedColor;
+                
+                return (
+                  <button
+                    key={color}
+                    onClick={() => handlePresetColorSelect(color)}
+                    className="relative w-10 h-10 rounded-lg border-2 transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    style={{
+                      background: `linear-gradient(135deg, ${color} 0%, ${ScheduleUtils.lightenRgbColor(color)} 100%)`,
+                      borderColor: isSelected || isCurrentColor ? 'var(--color-accent)' : 'var(--color-border)',
+                      transform: isSelected || isCurrentColor ? 'scale(1.1)' : 'scale(1)',
+                    }}
+                    title={color}
+                  >
+                    {(isSelected || isCurrentColor) && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Check className="h-5 w-5 text-white drop-shadow-lg" />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Current Status */}
-          <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-            {isCustomized ? (
-              <span className="text-orange-400">{t('dialog.status.customized')}</span>
-            ) : (
-              <span>{t('dialog.status.default')}</span>
-            )}
+          {/* Custom Color Option */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+              {t('dialog.customColorLabel')}
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="color"
+                value={customHexColor}
+                onChange={(e) => handleCustomColorChange(e.target.value)}
+                className="w-16 h-10 rounded border cursor-pointer"
+                style={{ borderColor: 'var(--color-border)' }}
+              />
+              <Button
+                onClick={() => handleCustomColorChange(customHexColor)}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              >
+                {t('dialog.buttons.useCustomColor')}
+              </Button>
+            </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex gap-2 pt-2">
             <Button
               onClick={handleApply}
-              disabled={!tempColor}
+              disabled={!selectedColor}
               size="sm"
             >
               <Check className="h-4 w-4" />

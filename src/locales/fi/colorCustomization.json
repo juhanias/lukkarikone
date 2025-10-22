@@ -5,23 +5,13 @@
     "realizationCodeLabel": "Toteutuskoodi:",
     "colorPreviewLabel": "Värin esikatselu",
     "sampleEventText": "Esimerkkitapahtuma ({{code}})",
-    "colorInputTypeLabel": {
-      "hex": "Hex-väri",
-      "rgb": "RGB-väri"
-    },
-    "inputPlaceholder": {
-      "rgb": "rgb(255, 0, 0)"
-    },
-    "status": {
-      "customized": "🎨 Mukautettu väri käytössä",
-      "default": "📋 Käytetään oletusväriä"
-    },
+    "selectColorLabel": "Valitse esiasettu väri",
+    "customColorLabel": "Tai valitse oma väri",
     "buttons": {
       "apply": "Käytä",
       "resetToDefault": "Palauta oletukseen",
       "cancel": "Peruuta",
-      "hex": "Hex",
-      "rgb": "RGB"
+      "useCustomColor": "Käytä omaa väriä"
     }
   },
   "contextMenu": {
