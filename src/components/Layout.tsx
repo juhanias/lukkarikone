@@ -10,10 +10,10 @@ export default function Layout() {
 
   const handleSettingsClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    if (location.pathname === '/settings') {
-      navigate('/')
+    if (location.pathname === '/app/settings') {
+      navigate('/app')
     } else {
-      navigate('/settings')
+      navigate('/app/settings')
     }
   }
 
@@ -36,7 +36,7 @@ export default function Layout() {
         borderBottom: '1px solid var(--color-border-alpha-30)'
       }}>
         <div className='w-full max-w-7xl mx-auto flex gap-4 justify-between items-center'>
-          <Link to="/" className='text-xl font-medium transition-colors hover:opacity-80' style={{
+          <Link to="/?landing" className='text-xl font-medium transition-colors hover:opacity-80' style={{
             color: 'var(--color-header-accent)'
           }}>
             juh.fi/lukkari
@@ -57,7 +57,7 @@ export default function Layout() {
             >
               {isCurrentThemeLight() ? <Moon size={18} /> : <Sun size={18} />}
             </Button>
-            <Link to="/">
+            <Link to="/app">
               <Button
                 variant="ghost"
                 size="sm"

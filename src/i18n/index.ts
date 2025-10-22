@@ -12,6 +12,8 @@ import dialogsEn from '../locales/en/dialogs.json'
 import dialogsFi from '../locales/fi/dialogs.json'
 import colorCustomizationEn from '../locales/en/colorCustomization.json'
 import colorCustomizationFi from '../locales/fi/colorCustomization.json'
+import landingEn from '../locales/en/landing.json'
+import landingFi from '../locales/fi/landing.json'
 
 // Language detection order: localStorage -> navigator -> fallback
 const getInitialLanguage = (): string => {
@@ -42,7 +44,7 @@ i18n
     
     // Namespace configuration
     defaultNS: 'common',
-    ns: ['common', 'schedule', 'settings', 'dialogs', 'colorCustomization'],
+    ns: ['common', 'schedule', 'settings', 'dialogs', 'colorCustomization', 'landing'],
     
     interpolation: {
       escapeValue: false, // React already escapes
@@ -56,6 +58,7 @@ i18n
         settings: settingsEn,
         dialogs: dialogsEn,
         colorCustomization: colorCustomizationEn,
+        landing: landingEn,
       },
       fi: {
         common: commonFi,
@@ -63,6 +66,7 @@ i18n
         settings: settingsFi,
         dialogs: dialogsFi,
         colorCustomization: colorCustomizationFi,
+        landing: landingFi,
       },
     },
     

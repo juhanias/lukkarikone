@@ -714,4 +714,5 @@ const useHiddenEventsStore = create<HiddenEventsState>()(
 );
 
 export default useConfigStore;
+export type { ConfigState };
 export { useScheduleRange, useScheduleStore, useRealizationColorStore, useHiddenEventsStore };

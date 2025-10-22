@@ -1,0 +1,67 @@
+{
+  "header": {
+    "title": "juh.fi/lukkari",
+    "nav": {
+      "app": "App",
+      "github": "GitHub",
+      "updates": "Päivitykset"
+    }
+  },
+  "hero": {
+    "title": "lukkari",
+    "titleSite": ".juh.fi",
+    "subtitle": "Toimiva, mukautuva ja nopea vaihtoehtoinen lukkarikone Turun Ammattikorkeakoulun opiskelijoille. Ilmainen ja mainokseton.",
+    "disclaimer": "Tämä on epävirallinen sovellus eikä se ole Turun AMK:n hyväksymä tai tukema.<br />Data pohjautuu viraallisen Lukkarikoneen iCal-palveluun.",
+    "cta": "Aloita käyttö"
+  },
+  "features": {
+    "colorful": {
+      "title": "Värikäs",
+      "description": "Sivun värimaailmaa voi muokata asetuksista mieleisekseen. Useita esiasetuksia tarjolla. Voit mukauttaa kurssien väritkin oman makusi mukaan."
+    },
+    "fast": {
+      "title": "Tarpeettoman nopea",
+      "description": "Sovellus ei tarvitse kirjautumista tai käyttäjätilejä. Lukujärjestyksen sivut vaihtuvat salamannopeasti ilman turhia latauksia."
+    },
+    "manageable": {
+      "title": "Hallittava",
+      "description": "Voit piilottaa yksittäisiä luentoja tai kursseja näkyvistä tarpeidesi mukaan."
+    }
+  },
+  "comparison": {
+    "title": "Rehellinen vertailu",
+    "subtitle": "lukkari.juh.fi pohjautuu Lukkarikoneen iCal-palveluun, jota on käytettävä viraallisen lukkarikoneen kautta.",
+    "headers": {
+      "feature": "Ominaisuus",
+      "lukkari": "lukkari.juh.fi",
+      "official": "Lukkarikone 4"
+    },
+    "features": {
+      "extremelyFast": "Äärimmäisen nopea",
+      "darkTheme": "Tumma teema",
+      "customColors": "Mukautettavat värit",
+      "openSource": "Avoin lähdekoodi",
+      "hideLectures": "Luentojen piilotus",
+      "lectureDetails": "Lisätietoja luennoista",
+      "courseDetails": "Lisätietoja kursseista",
+      "calendarExport": "Kalenterin vienti",
+      "freeHourSearch": "Hyppytuntihaku",
+      "officialService": "Viraallinen palvelu",
+      "languageSupport": "Kielituki",
+      "dataUpdateFrequency": "Datan päivitystiheys"
+    },
+    "values": {
+      "finEng": "Fin/Eng",
+      "hourly": "~joka tunti",
+      "immediate": "Välitön"
+    }
+  },
+  "development": {
+    "title": "Kehitystoiminta",
+    "description": "Ehdota ja osallistu. lukkari.juh.fi on avoimen lähdekoodin projekti, johon voit osallistua GitHubin kautta. Jos olet kiinnostunut kehityksestä ja sinulla on vapaa-aikaa, kommentoi tai luo issueita GitHubissa.",
+    "cta": "Noniin"
+  },
+  "footer": {
+    "copyright": "© 2025 lukkari.juh.fi"
+  }
+}

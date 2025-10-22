@@ -1,0 +1,67 @@
+{
+  "header": {
+    "title": "juh.fi/lukkari",
+    "nav": {
+      "app": "App",
+      "github": "GitHub",
+      "updates": "Updates"
+    }
+  },
+  "hero": {
+    "title": "lukkari",
+    "titleSite": ".juh.fi",
+    "subtitle": "A functional, customizable, and fast alternative schedule viewer for Turku University of Applied Sciences students. Free and ad-free.",
+    "disclaimer": "This is an unofficial application and is not approved or supported by Turku UAS.<br />Data is based on the official Lukkarikone iCal service.",
+    "cta": "Get Started"
+  },
+  "features": {
+    "colorful": {
+      "title": "Colorful",
+      "description": "The site's color scheme can be customized to your liking in the settings. Multiple presets available. You can also customize the course colors to your taste."
+    },
+    "fast": {
+      "title": "Unnecessarily Fast",
+      "description": "The application does not require login or user accounts. Schedule pages switch lightning-fast without unnecessary loading."
+    },
+    "manageable": {
+      "title": "Manageable",
+      "description": "You can hide individual lectures or courses from view according to your needs."
+    }
+  },
+  "comparison": {
+    "title": "Honest Comparison",
+    "subtitle": "lukkari.juh.fi is based on the Lukkarikone iCal service, which must be accessed through the official lukkarikone.",
+    "headers": {
+      "feature": "Feature",
+      "lukkari": "lukkari.juh.fi",
+      "official": "Lukkarikone 4"
+    },
+    "features": {
+      "extremelyFast": "Extremely fast",
+      "darkTheme": "Dark theme",
+      "customColors": "Customizable colors",
+      "openSource": "Open source",
+      "hideLectures": "Hide lectures",
+      "lectureDetails": "Lecture details",
+      "courseDetails": "Course details",
+      "calendarExport": "Calendar export",
+      "freeHourSearch": "Free hour search",
+      "officialService": "Official service",
+      "languageSupport": "Language support",
+      "dataUpdateFrequency": "Data update frequency"
+    },
+    "values": {
+      "finEng": "Fin/Eng",
+      "hourly": "~hourly",
+      "immediate": "Immediate"
+    }
+  },
+  "development": {
+    "title": "Development",
+    "description": "Suggest and participate. lukkari.juh.fi is an open-source project you can contribute to via GitHub. If you're interested in development and have free time, comment or create issues on GitHub.",
+    "cta": "Alright !!!"
+  },
+  "footer": {
+    "copyright": "© 2025 lukkari.juh.fi"
+  }
+}
