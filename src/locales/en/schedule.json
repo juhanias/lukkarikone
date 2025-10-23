@@ -28,11 +28,20 @@
   "status": {
     "updatedAt": "Updated {{time}}",
     "lastRefresh": "Last Refresh",
-    "refreshInfo": "The schedule is automatically refreshed every 15 minutes to keep your calendar up to date. Data is provided by Lukkarikone's iCal-service."
+    "refreshInfo": "The schedule is automatically refreshed every 15 minutes to keep your calendar up to date. Data is provided by Lukkarikone's iCal-service.",
+    "checkingForUpdates": "Checking for updates...",
+    "fetchingCalendar": "Loading calendar...",
+    "error": "Error updating calendar",
+    "errorTitle": "Error",
+    "errorInfo": "Failed to refresh the calendar data. Displaying an older version from {{time}} instead."
   },
   "errors": {
     "loadingFailed": "Schedule loading failed",
-    "close": "Close"
+    "close": "Close",
+    "dismiss": "Dismiss",
+    "updateFailed": "Couldn't update calendar",
+    "updateFailedDescription": "The calendar data couldn't be refreshed. Showing an older version.",
+    "errorCode": "Error Code"
   },
   "dateFormat": {
     "days": {

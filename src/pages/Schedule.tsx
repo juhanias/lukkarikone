@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useScheduleRange, useScheduleStore } from '../state/state-management'
 import useConfigStore from '../state/state-management'
-import { ChevronLeft, ChevronRight, CircleX, Calendar } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import { ScheduleDay, WeekView } from '../components/schedule'
 import { CalendarUrlModal } from '../components/CalendarUrlModal'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogPortal, DialogOverlay } from '@/components/ui/dialog'
 import { isToday } from 'date-fns'
+import { toast } from 'sonner'
 
 const VIEW_MODES = ['day', 'week'] as const
 
@@ -28,6 +29,8 @@ export default function Schedule() {
     getEventsForDate, 
     fetchSchedule, 
     isLoading, 
+    isCheckingHash,
+    isFetchingCalendar,
     error, 
     clearError,
     lastUpdated
@@ -51,6 +54,19 @@ export default function Schedule() {
   useEffect(() => {
     fetchSchedule()
   }, [fetchSchedule])
+
+  // Show toast notification on error
+  useEffect(() => {
+    if (error) {
+      toast.error(t('errors.updateFailed'), {
+        description: `${t('errors.updateFailedDescription')} ${t('errors.errorCode')}: ${error}`,
+        action: {
+          label: t('errors.dismiss'),
+          onClick: () => clearError()
+        }
+      })
+    }
+  }, [error, clearError, t])
 
   // Get events for the current date (only for day view)
   const currentEvents = viewMode === 'day' ? getEventsForDate(currentDate) : []
@@ -229,41 +245,6 @@ export default function Schedule() {
             </div>
           </motion.div>
         )}
-
-        {error && (
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="w-full max-w-7xl mx-auto px-4"
-          >
-            <div className="rounded-lg p-4 border" style={{
-              backgroundColor: 'var(--color-error-alpha-20)',
-              borderColor: 'var(--color-error-alpha-30)'
-            }}>
-              <div className="flex items-start">
-                <CircleX 
-                  className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0"
-                  style={{ color: 'var(--color-error)' }}
-                />                  
-                
-                <div className="flex-1">
-                  <p className="font-medium" style={{ color: 'var(--color-error)' }}>{t('errors.loadingFailed')}</p>
-                  <p className="text-sm mt-1 leading-relaxed" style={{ color: 'var(--color-error)' }}>{error}</p>
-                  <Button 
-                    onClick={clearError}
-                    variant="link"
-                    size="sm"
-                    className="text-sm underline mt-2 hover:opacity-80 p-0 h-auto"
-                    style={{ color: 'var(--color-accent)' }}
-                  >
-                    {t('errors.close')}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
       </AnimatePresence>
 
       {/* Navigation Buttons - Fixed at top */}
@@ -389,12 +370,18 @@ export default function Schedule() {
                 date={currentDate}
                 events={currentEvents}
                 lastUpdatedLabel={lastUpdatedDisplay}
+                isCheckingHash={isCheckingHash}
+                isFetchingCalendar={isFetchingCalendar}
+                hasError={!!error}
               />
             ) : (
               <WeekView 
                 currentDate={currentDate}
                 setViewMode={setViewMode}
                 lastUpdatedLabel={lastUpdatedDisplay}
+                isCheckingHash={isCheckingHash}
+                isFetchingCalendar={isFetchingCalendar}
+                hasError={!!error}
               />
             )}
           </div>

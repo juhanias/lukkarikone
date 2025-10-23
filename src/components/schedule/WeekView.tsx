@@ -21,9 +21,12 @@ interface WeekViewProps {
   currentDate: Date
   setViewMode: (mode: 'day' | 'week') => void
   lastUpdatedLabel?: string | null
+  isCheckingHash?: boolean
+  isFetchingCalendar?: boolean
+  hasError?: boolean
 }
 
-const WeekView = memo(({ currentDate, lastUpdatedLabel }: WeekViewProps) => {
+const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchingCalendar, hasError }: WeekViewProps) => {
   const { t } = useTranslation('schedule')
   const { t: tColor } = useTranslation('colorCustomization')
   const { getWeekStart, getWeekDates } = useScheduleRange()
@@ -138,7 +141,13 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel }: WeekViewProps) => {
           {/* Mobile Icon Button - Top Right */}
           {lastUpdatedLabel && (
             <div className="absolute right-4 top-4 md:hidden">
-              <LastUpdatedBadge lastUpdatedLabel={lastUpdatedLabel} variant="icon-only" />
+              <LastUpdatedBadge 
+                lastUpdatedLabel={lastUpdatedLabel} 
+                variant="icon-only"
+                isCheckingHash={isCheckingHash}
+                isFetchingCalendar={isFetchingCalendar}
+                hasError={hasError}
+              />
             </div>
           )}
           <div className="text-center">
@@ -151,7 +160,13 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel }: WeekViewProps) => {
           </div>
           {lastUpdatedLabel && (
             <div className="hidden md:block absolute right-0 bottom-4 mx-4">
-              <LastUpdatedBadge lastUpdatedLabel={lastUpdatedLabel} variant="full" />
+              <LastUpdatedBadge 
+                lastUpdatedLabel={lastUpdatedLabel} 
+                variant="full"
+                isCheckingHash={isCheckingHash}
+                isFetchingCalendar={isFetchingCalendar}
+                hasError={hasError}
+              />
             </div>
           )}
         </div>

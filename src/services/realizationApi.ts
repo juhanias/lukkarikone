@@ -34,7 +34,7 @@ interface RealizationApiResponse {
 }
 
 export class RealizationApiService {
-  private static baseUrl = 'https://lukkari-api.juh.fi'
+  private static baseUrl = 'http://localhost:3001'
 
   /**
    * Extracts the realization code from an event title

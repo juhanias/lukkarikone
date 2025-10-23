@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import * as ICAL from 'ical.js';
+import ICAL from 'ical.js';
 import type { ScheduleEvent } from '../types/schedule';
 import type { Font } from '../types/config';
 import { ScheduleUtils } from '../utils/schedule-utils';
@@ -220,21 +220,21 @@ const isLightTheme = (theme: Theme): boolean => {
 const getOpposingTheme = (currentThemeId: string): string => {
   const themes = getListedThemes();
   const currentTheme = themes.find(t => t.id === currentThemeId);
-  
+
   if (!currentTheme) return 'default';
-  
+
   const isCurrentLight = isLightTheme(currentTheme);
-  
+
   // Find the best opposing theme (light vs dark)
-  const opposingThemes = themes.filter(theme => 
+  const opposingThemes = themes.filter(theme =>
     theme.id !== currentThemeId && isLightTheme(theme) !== isCurrentLight
   );
-  
+
   // Return the first opposing theme, or fallback to default themes
   if (opposingThemes.length > 0) {
     return opposingThemes[0].id;
   }
-  
+
   // Fallback logic
   return isCurrentLight ? 'default' : 'ocean-breeze';
 };
@@ -315,7 +315,7 @@ const mergeConfigWithDefaults = (config?: Partial<Config>): Config => {
 const useConfigStore = create<ConfigState>()(
   persist(
     (set, get) => ({
-  config: mergeConfigWithDefaults(defaultConfig),
+      config: mergeConfigWithDefaults(defaultConfig),
       previousTheme: "default", // Initialize with default
       getThemes,
       getListedThemes,
@@ -324,7 +324,7 @@ const useConfigStore = create<ConfigState>()(
         set((state) => ({
           config: mergeConfigWithDefaults({ ...state.config, ...partial }),
         })),
-  resetConfig: () => set({ config: mergeConfigWithDefaults(), previousTheme: "default" }),
+      resetConfig: () => set({ config: mergeConfigWithDefaults(), previousTheme: "default" }),
       getCurrentTheme: () => {
         const { config } = get();
         const themes = getAllThemes();
@@ -337,7 +337,7 @@ const useConfigStore = create<ConfigState>()(
       toggleLightDarkMode: () => {
         const { config, previousTheme } = get();
         const currentThemeId = config.theme;
-        
+
         // If we have a previous theme and it's different from current, switch back to it
         if (previousTheme && previousTheme !== currentThemeId) {
           set((state) => ({
@@ -355,7 +355,7 @@ const useConfigStore = create<ConfigState>()(
       },
     }),
     {
-      name: "app-config", 
+      name: "app-config",
       version: 1,
       migrate: (persistedState) => {
         if (!persistedState) {
@@ -474,7 +474,7 @@ const useScheduleRange = create<ScheduleRangeState>()(
 // Color customization state for realization colors
 interface RealizationColorState {
   customColors: Record<string, string>; // realization code -> primary color (rgb)
-  
+
   getRealizationColor: (realizationCode: string) => string;
   setRealizationColor: (realizationCode: string, color: string) => void;
   resetRealizationColor: (realizationCode: string) => void;
@@ -487,10 +487,15 @@ interface ScheduleState {
   events: ScheduleEvent[];
   calendar: InstanceType<typeof ICAL.Component> | null;
   isLoading: boolean;
+  isCheckingHash: boolean;
+  isFetchingCalendar: boolean;
   error: string | null;
   lastFetched: Date | null;
   lastUpdated: Date | null;
-  
+  cachedCalendarData: string | null;
+  cachedCalendarHash: string | null;
+  cachedAt: Date | null;
+
   fetchSchedule: () => Promise<void>;
   getEventsForDate: (date: Date) => ScheduleEvent[];
   getEventsForWeek: (weekStart: Date) => { [key: string]: ScheduleEvent[] };
@@ -498,95 +503,206 @@ interface ScheduleState {
   clearError: () => void;
 }
 
-const useScheduleStore = create<ScheduleState>()((set, get) => ({
-  events: [],
-  calendar: null,
-  isLoading: false,
-  error: null,
-  lastFetched: null,
-  lastUpdated: null,
+const useScheduleStore = create<ScheduleState>()(
+  persist(
+    (set, get) => ({
+      events: [],
+      calendar: null,
+      isLoading: false,
+      isCheckingHash: false,
+      isFetchingCalendar: false,
+      error: null,
+      lastFetched: null,
+      lastUpdated: null,
+      cachedCalendarData: null,
+      cachedCalendarHash: null,
+      cachedAt: null,
 
-  fetchSchedule: async () => {
-    // Don't fetch if we already have data from today
-    const { lastFetched } = get();
-    if (lastFetched && new Date().toDateString() === lastFetched.toDateString()) {
-      return;
+      fetchSchedule: async () => {
+        const state = get();
+
+        // Don't fetch if we already have data from today
+        if (state.lastFetched && new Date().toDateString() === state.lastFetched.toDateString()) {
+          return;
+        }
+
+        // If we have cached calendar data but no parsed events, parse it first
+        if (state.cachedCalendarData && state.events.length === 0) {
+          try {
+            console.log('Parsing cached calendar data on startup');
+            const jcalData = ICAL.parse(state.cachedCalendarData);
+            const calendar = new ICAL.Component(jcalData);
+            const { customColors } = useRealizationColorStore.getState();
+            const vevents = calendar.getAllSubcomponents('vevent');
+            const events = vevents.map((vevent, index) =>
+              ScheduleUtils.convertToScheduleEvent(vevent, index, customColors)
+            );
+            
+            set({
+              calendar,
+              events,
+              lastUpdated: state.cachedAt ? new Date(state.cachedAt) : null
+            });
+          } catch (parseError) {
+            console.error('Error parsing cached calendar data:', parseError);
+            // Continue with normal fetch if parsing fails
+          }
+        }
+
+        // Only show blocking loader if we have no events data AND no cached calendar data at all
+        const hasExistingData = state.events.length > 0 || state.cachedCalendarData !== null;
+        set({ 
+          isLoading: !hasExistingData, 
+          isCheckingHash: true, 
+          error: null 
+        });
+
+        try {
+          // Get the calendar URL from config store
+          const { config } = useConfigStore.getState();
+
+          if (!config.calendarUrl) {
+            // No calendar URL configured - silently return without error
+            set({ 
+              isLoading: false, 
+              isCheckingHash: false, 
+              isFetchingCalendar: false 
+            });
+            return;
+          }
+
+          // Step 1: Check the hash first
+          let shouldFetchFullCalendar = true;
+
+          try {
+            const { hash: latestHash } = await ScheduleUtils.checkCalendarHash(config.calendarUrl);
+
+            // If we have a cached hash and it matches, use cached calendar data
+            if (state.cachedCalendarHash && state.cachedCalendarHash === latestHash && state.cachedCalendarData) {
+              console.log('Calendar hash matches - using cached data');
+              shouldFetchFullCalendar = false;
+
+              // Parse cached calendar data
+              const jcalData = ICAL.parse(state.cachedCalendarData);
+              const calendar = new ICAL.Component(jcalData);
+
+              // Get custom colors from realization color store
+              const { customColors } = useRealizationColorStore.getState();
+
+              // Get all events from the calendar
+              const vevents = calendar.getAllSubcomponents('vevent');
+              const events = vevents.map((vevent, index) =>
+                ScheduleUtils.convertToScheduleEvent(vevent, index, customColors)
+              );
+
+              set({
+                calendar,
+                events,
+                isLoading: false,
+                isCheckingHash: false,
+                lastFetched: new Date(),
+                lastUpdated: state.cachedAt ? new Date(state.cachedAt) : null
+              });
+              return;
+            }
+
+            console.log('Calendar hash changed or no cache - fetching full calendar');
+          } catch (hashError) {
+            console.error('Error checking calendar hash:', hashError);
+            // Continue to fetch full calendar on hash check error
+          }
+
+          set({ isCheckingHash: false, isFetchingCalendar: true });
+
+          // Step 2: Fetch full calendar if needed
+          if (shouldFetchFullCalendar) {
+            const { config } = useConfigStore.getState();
+            const { customColors } = useRealizationColorStore.getState();
+
+            const { calendar, lastUpdated, calendarData, hash } = await ScheduleUtils.retrieveScheduleFromUrl(config.calendarUrl);
+
+            // Get all events from the calendar
+            const vevents = calendar.getAllSubcomponents('vevent');
+            const events = vevents.map((vevent, index) =>
+              ScheduleUtils.convertToScheduleEvent(vevent, index, customColors)
+            );
+
+            const parsedLastUpdated = lastUpdated ? new Date(lastUpdated) : null;
+            const validLastUpdated = parsedLastUpdated && !isNaN(parsedLastUpdated.getTime()) ? parsedLastUpdated : null;
+            const now = new Date();
+
+            set({
+              calendar,
+              events,
+              isLoading: false,
+              isCheckingHash: false,
+              isFetchingCalendar: false,
+              lastFetched: now,
+              lastUpdated: validLastUpdated,
+              cachedCalendarData: calendarData,
+              cachedCalendarHash: hash,
+              cachedAt: now
+            });
+          }
+        } catch (error) {
+          set({
+            isLoading: false,
+            isCheckingHash: false,
+            isFetchingCalendar: false,
+            error: error instanceof Error ? error.message : 'Failed to fetch schedule'
+          });
+        }
+      },
+
+      getEventsForDate: (date: Date) => {
+        const { events } = get();
+        return events.filter(event => {
+          const eventDate = new Date(event.startTime);
+          return eventDate.toDateString() === date.toDateString();
+        });
+      },
+
+      getEventsForWeek: (weekStart: Date) => {
+        const { events } = get();
+        const weekEvents: { [key: string]: ScheduleEvent[] } = {};
+
+        // Create a week's worth of dates
+        for (let i = 0; i < 7; i++) {
+          const day = new Date(weekStart);
+          day.setDate(weekStart.getDate() + i);
+          const dayKey = day.toDateString();
+          weekEvents[dayKey] = events.filter(event => {
+            const eventDate = new Date(event.startTime);
+            return eventDate.toDateString() === dayKey;
+          });
+        }
+
+        return weekEvents;
+      },
+
+      refreshSchedule: async () => {
+        set({ lastFetched: null }); // Force refetch
+        await get().fetchSchedule();
+      },
+
+      clearError: () => set({ error: null }),
+    }),
+    {
+      name: 'schedule-storage',
+      partialize: (state) => ({
+        cachedCalendarData: state.cachedCalendarData,
+        cachedCalendarHash: state.cachedCalendarHash,
+        cachedAt: state.cachedAt,
+      }),
     }
-
-    set({ isLoading: true, error: null });
-    
-    try {
-      // Get the calendar URL from config store
-      const { config } = useConfigStore.getState();
-      
-      // Get custom colors from realization color store
-      const { customColors } = useRealizationColorStore.getState();
-      
-  const { calendar, lastUpdated } = await ScheduleUtils.retrieveScheduleFromUrl(config.calendarUrl);
-      
-      // Get all events from the calendar
-      const vevents = calendar.getAllSubcomponents('vevent');
-      const events = vevents.map((vevent, index) => 
-        ScheduleUtils.convertToScheduleEvent(vevent, index, customColors)
-      );
-
-      const parsedLastUpdated = lastUpdated ? new Date(lastUpdated) : null;
-      const validLastUpdated = parsedLastUpdated && !isNaN(parsedLastUpdated.getTime()) ? parsedLastUpdated : null;
-      
-      set({ 
-        calendar, 
-        events, 
-        isLoading: false, 
-        lastFetched: new Date(),
-        lastUpdated: validLastUpdated
-      });
-    } catch (error) {
-      set({ 
-        isLoading: false, 
-        error: error instanceof Error ? error.message : 'Failed to fetch schedule' 
-      });
-    }
-  },
-
-  getEventsForDate: (date: Date) => {
-    const { events } = get();
-    return events.filter(event => {
-      const eventDate = new Date(event.startTime);
-      return eventDate.toDateString() === date.toDateString();
-    });
-  },
-
-  getEventsForWeek: (weekStart: Date) => {
-    const { events } = get();
-    const weekEvents: { [key: string]: ScheduleEvent[] } = {};
-    
-    // Create a week's worth of dates
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(weekStart);
-      day.setDate(weekStart.getDate() + i);
-      const dayKey = day.toDateString();
-      weekEvents[dayKey] = events.filter(event => {
-        const eventDate = new Date(event.startTime);
-        return eventDate.toDateString() === dayKey;
-      });
-    }
-    
-    return weekEvents;
-  },
-
-  refreshSchedule: async () => {
-    set({ lastFetched: null }); // Force refetch
-    await get().fetchSchedule();
-  },
-
-  clearError: () => set({ error: null }),
-}));
+  )
+);
 
 const useRealizationColorStore = create<RealizationColorState>()(
   persist(
     (set, get) => ({
       customColors: {},
-      
+
       getRealizationColor: (realizationCode: string) => {
         const { customColors } = get();
         // Return custom color if it exists, otherwise return default generated color
@@ -596,7 +712,7 @@ const useRealizationColorStore = create<RealizationColorState>()(
         // Generate default color using the existing logic
         return ScheduleUtils.getDefaultRealizationColor(realizationCode);
       },
-      
+
       setRealizationColor: (realizationCode: string, color: string) => {
         set((state) => ({
           customColors: {
@@ -605,7 +721,7 @@ const useRealizationColorStore = create<RealizationColorState>()(
           }
         }));
       },
-      
+
       resetRealizationColor: (realizationCode: string) => {
         set((state) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -613,11 +729,11 @@ const useRealizationColorStore = create<RealizationColorState>()(
           return { customColors: rest };
         });
       },
-      
+
       clearAllCustomColors: () => {
         set({ customColors: {} });
       },
-      
+
       hasCustomColor: (realizationCode: string) => {
         const { customColors } = get();
         return realizationCode in customColors;
@@ -633,7 +749,7 @@ const useRealizationColorStore = create<RealizationColorState>()(
 // Hidden events state for managing event visibility
 interface HiddenEventsState {
   hiddenEventIds: Set<string>;
-  
+
   isEventHidden: (eventId: string) => boolean;
   hideEvent: (eventId: string) => void;
   showEvent: (eventId: string) => void;
@@ -645,18 +761,18 @@ const useHiddenEventsStore = create<HiddenEventsState>()(
   persist(
     (set, get) => ({
       hiddenEventIds: new Set<string>(),
-      
+
       isEventHidden: (eventId: string) => {
         const { hiddenEventIds } = get();
         return hiddenEventIds.has(eventId);
       },
-      
+
       hideEvent: (eventId: string) => {
         set((state) => ({
           hiddenEventIds: new Set([...state.hiddenEventIds, eventId])
         }));
       },
-      
+
       showEvent: (eventId: string) => {
         set((state) => {
           const newSet = new Set(state.hiddenEventIds);
@@ -664,7 +780,7 @@ const useHiddenEventsStore = create<HiddenEventsState>()(
           return { hiddenEventIds: newSet };
         });
       },
-      
+
       toggleEventVisibility: (eventId: string) => {
         const { isEventHidden } = get();
         if (isEventHidden(eventId)) {
@@ -673,14 +789,14 @@ const useHiddenEventsStore = create<HiddenEventsState>()(
           get().hideEvent(eventId);
         }
       },
-      
+
       clearAllHiddenEvents: () => {
         set({ hiddenEventIds: new Set<string>() });
       }
     }),
     {
       name: "hidden-events",
-      partialize: (state) => ({ 
+      partialize: (state) => ({
         hiddenEventIds: Array.from(state.hiddenEventIds) // Convert Set to Array for serialization
       }),
       // Custom storage to handle Set serialization

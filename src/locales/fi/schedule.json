@@ -28,11 +28,20 @@
   "status": {
     "updatedAt": "Päivitetty {{time}}",
     "lastRefresh": "Viimeisin päivitys",
-    "refreshInfo": "Lukujärjestys päivitetään automaattisesti 15 minuutin välein pitääkseen kalenterisi ajan tasalla. Datan lähteenä toimii Lukkarikoneen iCal-palvelu."
+    "refreshInfo": "Lukujärjestys päivitetään automaattisesti 15 minuutin välein pitääkseen kalenterisi ajan tasalla. Datan lähteenä toimii Lukkarikoneen iCal-palvelu.",
+    "checkingForUpdates": "Tarkistetaan päivityksiä...",
+    "fetchingCalendar": "Päivitetään kalenteria...",
+    "error": "Virhe päivittäessä kalenteria",
+    "errorTitle": "Virhe",
+    "errorInfo": "Kalenteritietojen päivittäminen epäonnistui. Näytetään vanhempi versio ajalta {{time}}."
   },
   "errors": {
     "loadingFailed": "Lukujärjestyksen lataus epäonnistui",
-    "close": "Sulje"
+    "close": "Sulje",
+    "dismiss": "Hylkää",
+    "updateFailed": "Kalenteria ei voitu päivittää",
+    "updateFailedDescription": "Kalenteritietoja ei voitu päivittää. Näkymässäsi on vanhempi versio.",
+    "errorCode": "Virhekoodi"
   },
   "dateFormat": {
     "days": {

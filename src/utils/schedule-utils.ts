@@ -6,6 +6,26 @@ import { RealizationApiService } from '../services/realizationApi';
 export class ScheduleUtils {
   private static readonly BACKEND_API_BASE = 'https://lukkari-api.juh.fi/api';
 
+  /**
+   * Check calendar hash to see if the calendar has been updated
+   */
+  static async checkCalendarHash(calendarUrl: string): Promise<{
+    hash: string;
+    cached: boolean;
+    cachedAt: string | null;
+  }> {
+    const apiUrl = `${this.BACKEND_API_BASE}/calendar/hash?url=${encodeURIComponent(calendarUrl)}`;
+    const response = await fetch(apiUrl);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+    
+    const { hash, cached, cachedAt } = await response.json();
+    return { hash, cached, cachedAt };
+  }
+
   private static readonly EVENT_COLORS = [
     'rgb(30, 64, 175)', // blue
     'rgb(88, 28, 135)', // purple
@@ -155,6 +175,8 @@ export class ScheduleUtils {
   static async retrieveScheduleFromUrl(calendarUrl?: string): Promise<{
     calendar: InstanceType<typeof ICAL.Component>;
     lastUpdated: string | null;
+    calendarData: string;
+    hash: string;
   }> {
     try {
       if (!calendarUrl) {
@@ -173,14 +195,32 @@ export class ScheduleUtils {
       const { data, timestamp } = await response.json();
       const jcalData = ICAL.parse(data);
       const comp = new ICAL.Component(jcalData);
+      
+      // Calculate hash of the calendar data
+      const hash = await this.calculateHash(data);
+      
       return {
         calendar: comp,
-        lastUpdated: typeof timestamp === 'string' ? timestamp : null
+        lastUpdated: typeof timestamp === 'string' ? timestamp : null,
+        calendarData: data,
+        hash
       };
     } catch (error) {
       console.error('Error fetching schedule:', error);
       throw error;
     }
+  }
+
+  /**
+   * Calculate SHA-256 hash of a string
+   */
+  private static async calculateHash(data: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const dataBuffer = encoder.encode(data);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
   }
 
   static getEventsForDate(date: Date, calendar: InstanceType<typeof ICAL.Component>): InstanceType<typeof ICAL.Component>[] {

@@ -22,9 +22,12 @@ interface ScheduleDayProps {
   date: Date
   events: ScheduleEvent[]
   lastUpdatedLabel?: string | null
+  isCheckingHash?: boolean
+  isFetchingCalendar?: boolean
+  hasError?: boolean
 }
 
-const ScheduleDay = memo(({ date, events, lastUpdatedLabel }: ScheduleDayProps) => {
+const ScheduleDay = memo(({ date, events, lastUpdatedLabel, isCheckingHash, isFetchingCalendar, hasError }: ScheduleDayProps) => {
   const { t } = useTranslation('schedule')
   const { t: tColor } = useTranslation('colorCustomization')
   
@@ -118,14 +121,26 @@ const ScheduleDay = memo(({ date, events, lastUpdatedLabel }: ScheduleDayProps) 
           {/* Mobile Icon Button - Top Right */}
           {lastUpdatedLabel && (
             <div className="absolute right-4 top-4 md:hidden">
-              <LastUpdatedBadge lastUpdatedLabel={lastUpdatedLabel} variant="icon-only" />
+              <LastUpdatedBadge 
+                lastUpdatedLabel={lastUpdatedLabel} 
+                variant="icon-only"
+                isCheckingHash={isCheckingHash}
+                isFetchingCalendar={isFetchingCalendar}
+                hasError={hasError}
+              />
             </div>
           )}
           <div className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>{dateInfo.dayWeek}</div>
           <h2 className="text-2xl font-medium" style={{ color: 'var(--color-text)' }}>{dateInfo.fullDate}</h2>
           {lastUpdatedLabel && (
             <div className="mt-3 hidden md:flex justify-center">
-              <LastUpdatedBadge lastUpdatedLabel={lastUpdatedLabel} variant="full" />
+              <LastUpdatedBadge 
+                lastUpdatedLabel={lastUpdatedLabel} 
+                variant="full"
+                isCheckingHash={isCheckingHash}
+                isFetchingCalendar={isFetchingCalendar}
+                hasError={hasError}
+              />
             </div>
           )}
         </div>

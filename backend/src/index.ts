@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import NodeCache from 'node-cache';
 import ICAL from 'ical.js';
+import crypto from 'crypto';
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -89,16 +90,6 @@ function isCacheStale(cacheKey: string): boolean {
   return Date.now() - lastFetch > STALE_AFTER_MS;
 }
 
-// Background refresh if stale
-function refreshIfStale(calendarUrl: string, cacheKey: string) {
-  if (isCacheStale(cacheKey)) {
-    // Don't await - let it refresh in background
-    fetchAndCacheCalendar(calendarUrl, cacheKey, true).catch(err => {
-      console.error('Background refresh failed:', err);
-    });
-  }
-}
-
 app.use(cors());
 app.use(express.json());
 
@@ -176,6 +167,74 @@ if (isGoatCounterEnabled) {
 
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.get('/api/calendar/hash', async (req: Request, res: Response) => {
+  try {
+    const calendarUrl = req.query.url as string;
+    
+    if (!calendarUrl) {
+      return res.status(400).json({ 
+        error: 'Calendar URL is required',
+        message: 'Please provide a calendar URL as a query parameter: ?url=your_calendar_url'
+      });
+    }
+
+    try {
+      new URL(calendarUrl);
+    } catch {
+      return res.status(400).json({ 
+        error: 'Invalid URL format',
+        message: 'Please provide a valid calendar URL'
+      });
+    }
+
+    const cacheKey = `calendar_${calendarUrl}`;
+    const cachedData = cache.get<string>(cacheKey);
+    const lastFetch = lastFetchTimes.get(cacheKey);
+    const isStale = isCacheStale(cacheKey);
+    
+    // If cache is fresh, return hash of cached data
+    if (cachedData && !isStale) {
+      const hash = crypto.createHash('sha256').update(cachedData).digest('hex');
+      console.log(`Hash check - using cached data for URL: ${calendarUrl}`);
+      return res.json({
+        hash,
+        cached: true,
+        cachedAt: lastFetch ? new Date(lastFetch).toISOString() : null,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Cache is stale or missing - fetch fresh data
+    console.log(`Hash check - fetching fresh data for URL: ${calendarUrl}${cachedData ? ' (cache stale)' : ' (no cache)'}`);
+    const calendarData = await fetchAndCacheCalendar(calendarUrl, cacheKey);
+    
+    if (!calendarData) {
+      return res.status(400).json({
+        error: 'Failed to fetch or parse calendar',
+        message: 'The provided URL does not contain valid iCalendar data',
+        url: calendarUrl
+      });
+    }
+
+    const hash = crypto.createHash('sha256').update(calendarData).digest('hex');
+    const newLastFetch = lastFetchTimes.get(cacheKey);
+    
+    res.json({
+      hash,
+      cached: false,
+      cachedAt: newLastFetch ? new Date(newLastFetch).toISOString() : null,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Calendar hash check error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: error instanceof Error ? error.message : 'Unknown error occurred'
+    });
+  }
 });
 
 app.get('/api/realization/:id', async (req: Request, res: Response) => {
@@ -267,25 +326,16 @@ app.get('/api/calendar', async (req: Request, res: Response) => {
     const cacheKey = `calendar_${calendarUrl}`;
     const cachedData = cache.get<string>(cacheKey);
     
-    // If we have cached data, serve it immediately
+    // Return cached data if available
     if (cachedData) {
-      const isStale = isCacheStale(cacheKey);
-      
-      // If stale, trigger background refresh but still serve cached data
-      if (isStale) {
-        refreshIfStale(calendarUrl, cacheKey);
-      }
-      
-      console.log(`Cache hit for URL: ${calendarUrl}${isStale ? ' (stale, refreshing in background)' : ''}`);
+      console.log(`Serving cached calendar data for URL: ${calendarUrl}`);
       return res.json({
         data: cachedData,
-        cached: true,
-        stale: isStale,
         timestamp: new Date().toISOString()
       });
     }
 
-    // No cached data - fetch it now (user has to wait. BAD 1!)
+    // Fetch and cache if not available
     const calendarData = await fetchAndCacheCalendar(calendarUrl, cacheKey);
     
     if (!calendarData) {
@@ -298,8 +348,6 @@ app.get('/api/calendar', async (req: Request, res: Response) => {
 
     res.json({
       data: calendarData,
-      cached: false,
-      stale: false,
       timestamp: new Date().toISOString()
     });
 
