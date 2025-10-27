@@ -287,6 +287,30 @@ export function useSettingsConfig(): SettingsConfig {
       })
     }
 
+    // Development tools section - hidden by default, can be revealed via Settings navigation (or visible in DEV)
+    if (import.meta.env.DEV || config.devToolsVisible) {
+      settingsConfig.push({
+        id: 'development-tools',
+        blockName: t('sections.development.title') || 'Development tools',
+        blockDescription: t('sections.development.subtitle') || 'Temporary developer tools and toggles',
+        icon: Code,
+        iconColor: '#ef4444',
+        iconBgColor: '#ef444433',
+        components: [
+          {
+            componentType: 'toggle',
+            id: 'devtools-enable-event-generator',
+            data: {
+              label: t('sections.development.enableEventGenerator') || 'Enable event generator',
+              subtitle: t('sections.development.enableEventGeneratorSubtitle') || 'Allow generating temporary debug events on the schedule',
+              checked: config.devToolsEnableEventGenerator || false,
+              onChange: (checked: boolean) => setConfig({ devToolsEnableEventGenerator: checked })
+            }
+          }
+        ]
+      })
+    }
+
     return settingsConfig
   }, [t, config, setConfig, resetConfig, listedThemes, customColors, clearAllCustomColors])
 }

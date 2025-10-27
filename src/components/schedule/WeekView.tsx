@@ -38,6 +38,41 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
   // Color customizer state
   const [colorCustomizerOpen, setColorCustomizerOpen] = useState(false)
   const [selectedEventForColor, setSelectedEventForColor] = useState<ScheduleEvent | null>(null)
+  // Temporary debug events for testing overlapping layout
+  const [debugEvents, setDebugEvents] = useState<ScheduleEvent[]>([])
+  // Generate some temporary random events for quick testing
+  const generateRandomEvents = (count = 30) => {
+    if (filteredWeekDates.length === 0) return
+    const durations = [0.5, 1, 1.5, 2]
+    const newEvents: ScheduleEvent[] = []
+    for (let i = 0; i < count; i++) {
+      const date = filteredWeekDates[Math.floor(Math.random() * filteredWeekDates.length)]
+      // random start between START_HOUR and START_HOUR+11 (half-hour steps)
+      const hourSlot = Math.floor(Math.random() * 12)
+      const half = Math.random() < 0.5 ? 0 : 0.5
+      const startHour = START_HOUR + hourSlot + half
+      const duration = durations[Math.floor(Math.random() * durations.length)]
+      const startTime = new Date(date)
+      const startHourFloor = Math.floor(startHour)
+      const startMinutes = Math.round((startHour - startHourFloor) * 60)
+      startTime.setHours(startHourFloor, startMinutes, 0, 0)
+      const endTime = new Date(startTime.getTime() + duration * 60 * 60 * 1000)
+      const id = `debug-${Date.now()}-${i}-${Math.random().toString(36).slice(2, 7)}`
+      newEvents.push({
+        id,
+        title: `Debug ${i + 1}`,
+        location: i % 3 === 0 ? `Room ${100 + (i % 10)}` : '',
+        startTime,
+        endTime,
+        duration,
+        startHour,
+        color: '',
+      })
+    }
+    setDebugEvents((prev) => [...prev, ...newEvents])
+  }
+
+  const clearDebugEvents = () => setDebugEvents([])
 
   const getDisplayTitle = (title: string) =>
     config.showCourseIdInSchedule ? title : RealizationApiService.stripRealizationCode(title)
@@ -110,9 +145,82 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
   
   const filteredDayNames = DateFormatUtils.getDayNamesShort(shouldShowWeekends)
   
-  // Calculate the time range for the week
-  const timeSlots = ScheduleLayoutUtils.generateWeekTimeSlots(filteredWeekEvents)
-  const totalEventsThisWeek = Object.values(filteredWeekEvents).reduce((sum, dayEvents) => sum + dayEvents.length, 0)
+  // Merge in any temporary debug events so they are included in time slot calculations
+  const mergedWeekEvents: Record<string, ScheduleEvent[]> = { ...filteredWeekEvents }
+  debugEvents.forEach((ev) => {
+    const dateKey = ev.startTime.toDateString()
+    if (!mergedWeekEvents[dateKey]) mergedWeekEvents[dateKey] = []
+    mergedWeekEvents[dateKey].push(ev)
+  })
+
+  // Precompute event column layout per day so overlapping events are shown side-by-side.
+  // We group events into overlapping clusters (transitive overlap), then assign columns
+  // inside each cluster with a greedy placement algorithm. Each event gets {col, cols}.
+  const eventLayoutByDate: Record<string, Record<string, { col: number; cols: number }>> = {}
+  filteredWeekDates.forEach((date) => {
+    const dateString = date.toDateString()
+    const events = (mergedWeekEvents[dateString] || []).slice() // copy
+
+    // Sort by start time (earlier start first). If equal, longer duration first
+    events.sort((a, b) => a.startHour - b.startHour || b.duration - a.duration)
+
+    const clusters: Array<typeof events> = []
+    let currentCluster: typeof events = []
+    let clusterEnd = -Infinity
+
+    events.forEach((ev) => {
+      const evEnd = ev.startHour + ev.duration
+      if (currentCluster.length === 0) {
+        currentCluster.push(ev)
+        clusterEnd = evEnd
+      } else if (ev.startHour < clusterEnd) {
+        // overlaps current cluster
+        currentCluster.push(ev)
+        clusterEnd = Math.max(clusterEnd, evEnd)
+      } else {
+        clusters.push(currentCluster)
+        currentCluster = [ev]
+        clusterEnd = evEnd
+      }
+    })
+    if (currentCluster.length) clusters.push(currentCluster)
+
+    const mapping: Record<string, { col: number; cols: number }> = {}
+
+    clusters.forEach((cluster) => {
+      // greedy column assignment for this cluster
+      const columnEnds: number[] = []
+
+      cluster.forEach((ev) => {
+        const evEnd = ev.startHour + ev.duration
+        let placed = false
+        for (let i = 0; i < columnEnds.length; i++) {
+          if (ev.startHour >= columnEnds[i]) {
+            mapping[ev.id] = { col: i, cols: 0 }
+            columnEnds[i] = evEnd
+            placed = true
+            break
+          }
+        }
+        if (!placed) {
+          const idx = columnEnds.length
+          columnEnds.push(evEnd)
+          mapping[ev.id] = { col: idx, cols: 0 }
+        }
+      })
+
+      const total = Math.max(1, columnEnds.length)
+      cluster.forEach((ev) => {
+        mapping[ev.id].cols = total
+      })
+    })
+
+    eventLayoutByDate[dateString] = mapping
+  })
+
+  // Calculate the time range for the week (include debug events)
+  const timeSlots = ScheduleLayoutUtils.generateWeekTimeSlots(mergedWeekEvents)
+  const totalEventsThisWeek = Object.values(mergedWeekEvents).reduce((sum, dayEvents) => sum + dayEvents.length, 0)
 
   // Current time indicator
   const currentTime = useCurrentTime()
@@ -167,6 +275,25 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
                 isFetchingCalendar={isFetchingCalendar}
                 hasError={hasError}
               />
+            </div>
+          )}
+          {/* Debug controls (temporary) */}
+          {config.devToolsEnableEventGenerator && (
+            <div className="hidden md:flex absolute right-4 top-4 gap-2">
+            <button
+              type="button"
+              className="px-2 py-1 text-xs border rounded"
+              onClick={() => generateRandomEvents(30)}
+            >
+              Add random events
+            </button>
+            <button
+              type="button"
+              className="px-2 py-1 text-xs border rounded"
+              onClick={clearDebugEvents}
+            >
+              Clear debug
+            </button>
             </div>
           )}
         </div>
@@ -265,8 +392,8 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
                           borderColor: 'var(--color-border-alpha-30)',
                           backgroundColor: DateFormatUtils.isToday(date) ? 'var(--color-accent-alpha-5)' : 'transparent'
                         }}>
-                          {/* Events for this time slot */}
-                          {filteredWeekEvents[date.toDateString()]?.map((event) => {
+                          {/* Events for this time slot (includes debug events) */}
+                          {mergedWeekEvents[date.toDateString()]?.map((event) => {
                             const eventStartHour = event.startHour
                             const slotHour = parseInt(time.split(':')[0])
                             const nextSlotHour = timeIndex < timeSlots.length - 1 ? parseInt(timeSlots[timeIndex + 1].split(':')[0]) : slotHour + 1
@@ -277,14 +404,20 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
                               const height = event.duration * WEEK_HOUR_HEIGHT // WEEK_HOUR_HEIGHT px per hour
                               const colorPair = ScheduleUtils.getColorPair(event.title, customColors)
                               const isHidden = isEventHidden(event.id)
+                              // Layout for overlapping events (column index & total cols)
+                              const layout = eventLayoutByDate[date.toDateString()]?.[event.id] || { col: 0, cols: 1 }
+                              const leftPercent = (layout.col / layout.cols) * 100
+                              const widthPercent = 100 / layout.cols
                               
                               return (
                                 <ContextMenu key={event.id}>
                                   <ContextMenuTrigger asChild>
                                     <div
-                                      className={`absolute left-0.5 right-0.5 rounded text-white text-xs p-1 cursor-pointer overflow-hidden hover:z-20 hover:scale-101 transition-all duration-500 schedule-event-gradient`}
+                                      className={`absolute rounded text-white text-xs p-1 cursor-pointer overflow-hidden hover:z-20 hover:scale-101 transition-all duration-500 schedule-event-gradient`}
                                       style={{
                                         top: `${topOffset}px`,
+                                        left: `${leftPercent}%`,
+                                        width: `calc(${widthPercent}% - 8px)`,
                                         height: `${Math.max(height, SCHEDULE_LAYOUT.EVENT.MIN_HEIGHT)}px`, // Minimum height
                                         zIndex: 10,
                                         background: colorPair.normal,

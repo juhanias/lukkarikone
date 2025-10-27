@@ -73,6 +73,12 @@
     "debug": {
       "title": "Konfiguraatio",
       "subtitle": "Nykyiset asetukset (kehittäjille)"
+    },
+    "development": {
+      "title": "Kehitystyökalut",
+      "subtitle": "Työkaluja kehittäjille ja testaajille",
+      "enableEventGenerator": "Ota tapahtumageneraattori käyttöön",
+      "enableEventGeneratorSubtitle": "Luo satunnaisia tapahtumia testauskäyttöön"
     }
   }
 }

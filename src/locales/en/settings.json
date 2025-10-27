@@ -73,6 +73,12 @@
     "debug": {
       "title": "Configuration",
       "subtitle": "Current settings (for developers)"
+    },
+    "development": {
+      "title": "Development Utilities",
+      "subtitle": "Tools for developers and testers",
+      "enableEventGenerator": "Enable event generator",
+      "enableEventGeneratorSubtitle": "Generate random events for testing purposes"
     }
   }
 }

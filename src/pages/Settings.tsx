@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
 import { Settings as SettingsIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useRef } from 'react'
+import useConfigStore from '../state/state-management'
 import { SettingsSection } from '../components/ui'
 import { SettingsComponentRenderer } from '../components/SettingsComponentRenderer'
 import { SettingsNavigation } from '../components/SettingsNavigation'
@@ -55,6 +57,24 @@ export default function Settings() {
     iconColor: block.iconColor
   }))
 
+  // Secret click counter: clicking the Actions icon 5 times reveals the development tools section
+  const actionsClickRef = useRef(0)
+  const { setConfig } = useConfigStore()
+
+  const handleSectionClick = (sectionId: string) => {
+    if (sectionId === 'actions') {
+      actionsClickRef.current += 1
+      if (actionsClickRef.current >= 5) {
+        setConfig({ devToolsVisible: true })
+        actionsClickRef.current = 0
+      } else {
+        // reset counter after 2 seconds of inactivity
+        setTimeout(() => { actionsClickRef.current = 0 }, 2000)
+      }
+    }
+    scrollToSection(sectionId)
+  }
+
   return (
     <div className="h-full overflow-y-auto" style={{ backgroundColor: 'var(--color-background)' }}>
       {/* Header - Full Width Gradient */}
@@ -78,10 +98,10 @@ export default function Settings() {
           {/* Sidebar Navigation - Hidden on mobile */}
           <aside className="hidden lg:block w-64 flex-shrink-0">
             <SettingsNavigation
-              sections={navigationSections}
-              activeSection={activeSection}
-              onSectionClick={scrollToSection}
-            />
+                sections={navigationSections}
+                activeSection={activeSection}
+                onSectionClick={handleSectionClick}
+              />
           </aside>
 
           {/* Main Settings Content */}

@@ -248,6 +248,8 @@ interface Config {
   showCourseIdInSchedule: boolean;
   enhancedDialogs: boolean;
   squeezeWeekOnMobile: boolean;
+  devToolsVisible?: boolean;
+  devToolsEnableEventGenerator?: boolean;
 }
 
 interface ConfigState {
@@ -272,6 +274,8 @@ const defaultConfig: Config = {
   showCourseIdInSchedule: false,
   enhancedDialogs: true,
   squeezeWeekOnMobile: false,
+  devToolsVisible: false,
+  devToolsEnableEventGenerator: false,
 };
 
 const LEGACY_PTIVIS25B_URL = "http://lukkari.turkuamk.fi/ical.php?hash=A64E5FCC3647C6FB5D7770DD86526B01FC67BD8A";
