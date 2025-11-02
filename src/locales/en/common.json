@@ -28,5 +28,19 @@
     "noData": "No data available",
     "errorLoading": "Failed to load data",
     "changes_saved": "Changes saved successfully"
+  },
+  "calendars": {
+    "title": "Calendars",
+    "description": "View multiple calendars overlayed together. Add iCal URLs to see all events in one place.",
+    "active": "Active",
+    "setActive": "Switch to this calendar",
+    "confirmDelete": "Delete this calendar?",
+    "calendarNamePlaceholder": "My calendar",
+    "icalUrls": "Calendar sources",
+    "urlPlaceholder": "http://...",
+    "noUrls": "No sources yet. Add an iCal URL to get started.",
+    "createNew": "New Calendar",
+    "empty": "Create your first calendar to get started.",
+    "quickAdd": "Popular calendars"
   }
 }

@@ -28,5 +28,19 @@
     "noData": "Ei tietoja saatavilla",
     "errorLoading": "Tietojen lataaminen epäonnistui",
     "changes_saved": "Muutokset tallennettu onnistuneesti"
+  },
+  "calendars": {
+    "title": "Kalenterit",
+    "description": "Näytä useita kalentereita päällekkäin. Lisää iCal-osoitteita nähdäksesi kaikki tapahtumat yhdessä.",
+    "active": "Aktiivinen",
+    "setActive": "Vaihda tähän kalenteriin",
+    "confirmDelete": "Poistetaanko tämä kalenteri?",
+    "calendarNamePlaceholder": "Oma kalenteri",
+    "icalUrls": "Kalenterilähteet",
+    "urlPlaceholder": "http://...",
+    "noUrls": "Ei vielä lähteitä. Lisää iCal-osoite aloittaaksesi.",
+    "createNew": "Uusi kalenteri",
+    "empty": "Luo ensimmäinen kalenterisi aloittaaksesi.",
+    "quickAdd": "Suositut kalenterit"
   }
 }

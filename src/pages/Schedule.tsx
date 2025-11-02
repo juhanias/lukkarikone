@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import useDocumentTitle from '../hooks/useDocumentTitle'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { useScheduleRange, useScheduleStore } from '../state/state-management'
+import { useScheduleRange, useScheduleStore, useCalendarStore } from '../state/state-management'
 import useConfigStore from '../state/state-management'
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import { ScheduleDay, WeekView } from '../components/schedule'
@@ -37,6 +37,8 @@ export default function Schedule() {
     lastUpdated
   } = useScheduleStore()
   const { config } = useConfigStore()
+  const { getActiveCalendar } = useCalendarStore()
+  const activeCalendar = getActiveCalendar()
   const [isTransitioning, setIsTransitioning] = useState(false)
   const rotateViewMode = useCallback((direction: 'forward' | 'backward') => {
     const currentIndex = VIEW_MODES.indexOf(viewMode)
@@ -79,25 +81,33 @@ export default function Schedule() {
       return null
     }
 
+    // Ensure lastUpdated is a Date object (it might be a string from localStorage)
+    const lastUpdatedDate = lastUpdated instanceof Date ? lastUpdated : new Date(lastUpdated)
+    
+    // Validate the date
+    if (isNaN(lastUpdatedDate.getTime())) {
+      return null
+    }
+
     try {
-      if (isToday(lastUpdated)) {
+      if (isToday(lastUpdatedDate)) {
         const timeFormatter = new Intl.DateTimeFormat(i18n.language, {
           hour: '2-digit',
           minute: '2-digit'
         })
-        return t('status.updatedAt', { time: timeFormatter.format(lastUpdated) })
+        return t('status.updatedAt', { time: timeFormatter.format(lastUpdatedDate) })
       }
 
       const dateTimeFormatter = new Intl.DateTimeFormat(i18n.language, {
         dateStyle: 'medium',
         timeStyle: 'short'
       })
-      return t('status.updatedAt', { time: dateTimeFormatter.format(lastUpdated) })
+      return t('status.updatedAt', { time: dateTimeFormatter.format(lastUpdatedDate) })
     } catch {
-      if (isToday(lastUpdated)) {
-        return t('status.updatedAt', { time: lastUpdated.toLocaleTimeString() })
+      if (isToday(lastUpdatedDate)) {
+        return t('status.updatedAt', { time: lastUpdatedDate.toLocaleTimeString() })
       }
-      return t('status.updatedAt', { time: lastUpdated.toLocaleString() })
+      return t('status.updatedAt', { time: lastUpdatedDate.toLocaleString() })
     }
   }, [lastUpdated, i18n.language, t])
 
@@ -187,8 +197,8 @@ export default function Schedule() {
 
   return (
     <div className="h-full flex flex-col" style={{ backgroundColor: 'var(--color-background)' }}>
-      {/* Calendar URL Configuration Dialog */}
-      <Dialog open={!config.calendarUrl} onOpenChange={() => {}}>
+      {/* Calendar Configuration Dialog */}
+      <Dialog open={!activeCalendar} onOpenChange={() => {}}>
         <DialogPortal>
           <DialogOverlay className="backdrop-blur-[20px]" style={{ backgroundColor: 'var(--color-background-alpha-80)' }} />
           <DialogContent showCloseButton={false} className="sm:max-w-[425px]" style={{ fontFamily: `var(--font-${config.font})` }}>

@@ -34,7 +34,12 @@
     "fetchingCalendar": "Päivitetään kalenteria...",
     "error": "Virhe päivittäessä kalenteria",
     "errorTitle": "Virhe",
-    "errorInfo": "Kalenteritietojen päivittäminen epäonnistui. Näytetään vanhempi versio ajalta {{time}}."
+    "errorInfo": "Kalenteritietojen päivittäminen epäonnistui. Näytetään vanhempi versio ajalta {{time}}.",
+    "noCalendar": "Ei kalenteria",
+    "icalSources": "iCal-lähteet",
+    "lastUpdated": "Viimeksi päivitetty",
+    "lastFetched": "Viimeksi noudettu",
+    "neverFetched": "Ei koskaan"
   },
   "errors": {
     "loadingFailed": "Lukujärjestyksen lataus epäonnistui",

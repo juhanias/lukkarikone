@@ -34,7 +34,12 @@
     "fetchingCalendar": "Loading calendar...",
     "error": "Error updating calendar",
     "errorTitle": "Error",
-    "errorInfo": "Failed to refresh the calendar data. Displaying an older version from {{time}} instead."
+    "errorInfo": "Failed to refresh the calendar data. Displaying an older version from {{time}} instead.",
+    "noCalendar": "No calendar",
+    "icalSources": "iCal Sources",
+    "lastUpdated": "Last updated",
+    "lastFetched": "Last fetched",
+    "neverFetched": "Never"
   },
   "errors": {
     "loadingFailed": "Schedule loading failed",

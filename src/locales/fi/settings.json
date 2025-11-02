@@ -52,12 +52,12 @@
       "subtitle": "Valitse haluamasi kieli"
     },
     "calendar": {
-      "title": "Kalenteriasetukset",
-      "subtitle": "Määritä kalenterisi URL-osoite",
-      "urlLabel": "Kalenterin URL",
-      "notConfigured": "Ei määritetty - kalenteri ei toimi ilman URL:ää",
-      "configured": "Määritetty: {{url}}",
-      "editLink": "Muokkaa linkkiä",
+      "title": "Kalenterien hallinta",
+      "subtitle": "Hallinnoi kalentereitasi",
+      "calendarLabel": "Aktiivinen kalenteri",
+      "notConfigured": "Ei kalenteria määritettynä",
+      "configured": "{{name}}",
+      "manageCalendars": "Hallinnoi kalentereita",
       "linkCalendar": "Linkkaa kalenteri"
     },
     "theme": {

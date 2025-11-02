@@ -14,6 +14,7 @@ import { useRealizationColorStore, useHiddenEventsStore, default as useConfigSto
 import { RealizationApiService } from '../../services/realizationApi'
 import { RealizationColorCustomizer } from '../RealizationColorCustomizer'
 import { LastUpdatedBadge } from '../LastUpdatedBadge'
+import { CalendarViewBadge } from '../CalendarViewBadge'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from '../ui/context-menu'
 import RealizationDialog from '../RealizationDialog'
 import LectureDetailsDialog from '../LectureDetailsDialog'
@@ -118,7 +119,10 @@ const ScheduleDay = memo(({ date, events, lastUpdatedLabel, isCheckingHash, isFe
         background: `linear-gradient(to bottom, var(--color-surface-alpha-40), transparent)`
       }}>
         <div className="max-w-7xl mx-auto px-4 py-6 text-center relative">
-          {/* Mobile Icon Button - Top Right */}
+          {/* Mobile Icon Buttons - Top corners */}
+          <div className="absolute left-4 top-4 md:hidden flex gap-2">
+            <CalendarViewBadge variant="icon-only" />
+          </div>
           {lastUpdatedLabel && (
             <div className="absolute right-4 top-4 md:hidden">
               <LastUpdatedBadge 
@@ -132,8 +136,9 @@ const ScheduleDay = memo(({ date, events, lastUpdatedLabel, isCheckingHash, isFe
           )}
           <div className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>{dateInfo.dayWeek}</div>
           <h2 className="text-2xl font-medium" style={{ color: 'var(--color-text)' }}>{dateInfo.fullDate}</h2>
-          {lastUpdatedLabel && (
-            <div className="mt-3 hidden md:flex justify-center">
+          {/* Desktop badges - Stacked vertically, right-aligned */}
+          <div className="hidden md:flex flex-col items-end gap-2 mt-3">
+            {lastUpdatedLabel && (
               <LastUpdatedBadge 
                 lastUpdatedLabel={lastUpdatedLabel} 
                 variant="full"
@@ -141,8 +146,9 @@ const ScheduleDay = memo(({ date, events, lastUpdatedLabel, isCheckingHash, isFe
                 isFetchingCalendar={isFetchingCalendar}
                 hasError={hasError}
               />
-            </div>
-          )}
+            )}
+            <CalendarViewBadge variant="full" />
+          </div>
         </div>
       </div>
 

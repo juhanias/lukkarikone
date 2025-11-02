@@ -13,6 +13,7 @@ import { useCurrentTime } from '../../hooks/useCurrentTime'
 import { RealizationApiService } from '../../services/realizationApi'
 import { RealizationColorCustomizer } from '../RealizationColorCustomizer'
 import { LastUpdatedBadge } from '../LastUpdatedBadge'
+import { CalendarViewBadge } from '../CalendarViewBadge'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from '../ui/context-menu'
 import RealizationDialog from '../RealizationDialog'
 import LectureDetailsDialog from '../LectureDetailsDialog'
@@ -246,7 +247,10 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
         background: `linear-gradient(to bottom, var(--color-surface-alpha-40), transparent)`
       }}>
         <div className="max-w-7xl mx-auto px-4 py-6 relative">
-          {/* Mobile Icon Button - Top Right */}
+          {/* Mobile Icon Buttons - Top corners */}
+          <div className="absolute left-4 top-4 md:hidden">
+            <CalendarViewBadge variant="icon-only" />
+          </div>
           {lastUpdatedLabel && (
             <div className="absolute right-4 top-4 md:hidden">
               <LastUpdatedBadge 
@@ -266,8 +270,9 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
               {formatWeekHeader()}
             </h2>
           </div>
-          {lastUpdatedLabel && (
-            <div className="hidden md:block absolute right-0 bottom-4 mx-4">
+          {/* Desktop badges - Stacked vertically on the right */}
+          <div className="hidden md:flex flex-col items-end gap-2 absolute right-4 bottom-4">
+            {lastUpdatedLabel && (
               <LastUpdatedBadge 
                 lastUpdatedLabel={lastUpdatedLabel} 
                 variant="full"
@@ -275,8 +280,9 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
                 isFetchingCalendar={isFetchingCalendar}
                 hasError={hasError}
               />
-            </div>
-          )}
+            )}
+            <CalendarViewBadge variant="full" />
+          </div>
           {/* Debug controls (temporary) */}
           {config.devToolsEnableEventGenerator && (
             <div className="hidden md:flex absolute right-4 top-4 gap-2">

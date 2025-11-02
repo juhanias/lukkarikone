@@ -4,6 +4,7 @@ import ICAL from 'ical.js';
 import type { ScheduleEvent } from '../types/schedule';
 import type { Font } from '../types/config';
 import { ScheduleUtils } from '../utils/schedule-utils';
+import type { Calendar, CalendarState } from '../types/calendar';
 
 // Color theme definitions
 interface Theme {
@@ -243,7 +244,6 @@ interface Config {
   font: Font;
   theme: string;
   showWeekends: boolean;
-  calendarUrl: string;
   hiddenEventOpacity: number; // Opacity for hidden events (0-100)
   showCourseIdInSchedule: boolean;
   enhancedDialogs: boolean;
@@ -269,7 +269,6 @@ const defaultConfig: Config = {
   font: "system",
   theme: "default",
   showWeekends: false,
-  calendarUrl: "",
   hiddenEventOpacity: 25,
   showCourseIdInSchedule: false,
   enhancedDialogs: true,
@@ -281,7 +280,40 @@ const defaultConfig: Config = {
 const LEGACY_PTIVIS25B_URL = "http://lukkari.turkuamk.fi/ical.php?hash=A64E5FCC3647C6FB5D7770DD86526B01FC67BD8A";
 const UPDATED_PTIVIS25B_URL = "http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8";
 
+// Preset calendar URLs for migration
+const PRESET_CALENDARS = [
+  {
+    url: 'http://lukkari.turkuamk.fi/ical.php?hash=9385A6CBC6B79C3DDCE6B2738B5C1B882A6D64CA',
+    name: 'PTIVIS25A'
+  },
+  {
+    url: 'http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8',
+    name: 'PTIVIS25B'
+  },
+  {
+    url: 'http://lukkari.turkuamk.fi/ical.php?hash=E4AC87D135AF921A83B677DD15A19E6119DDF0BB',
+    name: 'PTIVIS25C'
+  },
+  {
+    url: 'http://lukkari.turkuamk.fi/ical.php?hash=E8F13D455EA82E8A7D0990CF6983BBE61AD839A7',
+    name: 'PTIVIS25D'
+  },
+  {
+    url: 'http://lukkari.turkuamk.fi/ical.php?hash=346C225AD26BD6966FC656F8E77B5A3EA38A73B5',
+    name: 'PTIVIS25E'
+  },
+  {
+    url: 'http://lukkari.turkuamk.fi/ical.php?hash=6EAF3A6D4FC2B07836C2B742EC923629839CA0B7',
+    name: 'PTIVIS25F'
+  }
+] as const;
+
 const normalizeCalendarUrl = (url: string): string => url.trim();
+
+const getPresetCalendarName = (url: string): string | null => {
+  const preset = PRESET_CALENDARS.find(p => p.url === url);
+  return preset ? preset.name : null;
+};
 
 const migrateCalendarUrl = (url: string): string => {
   const normalizedUrl = normalizeCalendarUrl(url);
@@ -310,10 +342,7 @@ const mergeConfigWithDefaults = (config?: Partial<Config>): Config => {
     ...sanitizedConfig,
   };
 
-  return {
-    ...mergedConfig,
-    calendarUrl: migrateCalendarUrl(mergedConfig.calendarUrl),
-  };
+  return mergedConfig;
 };
 
 const useConfigStore = create<ConfigState>()(
@@ -360,27 +389,22 @@ const useConfigStore = create<ConfigState>()(
     }),
     {
       name: "app-config",
-      version: 1,
-      migrate: (persistedState) => {
-        if (!persistedState) {
-          return persistedState;
+      version: 2,
+      migrate: (persistedState: unknown, version: number) => {
+        const state = persistedState as { config?: Record<string, unknown> };
+        
+        // Migration to version 2: Remove legacy calendarUrl from config
+        if (version < 2 && state?.config?.calendarUrl) {
+          console.log('Removing legacy calendarUrl from config');
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { calendarUrl, ...configWithoutUrl } = state.config;
+          return {
+            ...state,
+            config: configWithoutUrl
+          };
         }
-
-        const typedPersisted = persistedState as Partial<ConfigState>;
-
-        if (!typedPersisted.config) {
-          return typedPersisted;
-        }
-
-        const migratedCalendarUrl = migrateCalendarUrl(typedPersisted.config.calendarUrl ?? "");
-
-        return {
-          ...typedPersisted,
-          config: {
-            ...typedPersisted.config,
-            calendarUrl: migratedCalendarUrl,
-          },
-        };
+        
+        return persistedState;
       },
       partialize: (state) => ({ config: state.config, previousTheme: state.previousTheme }),
       merge: (persistedState, currentState) => {
@@ -486,6 +510,15 @@ interface RealizationColorState {
   hasCustomColor: (realizationCode: string) => boolean;
 }
 
+// Per-URL cache entry
+interface ICalCache {
+  url: string;
+  calendarData: string;
+  hash: string;
+  lastFetched: Date;
+  lastUpdated: Date | null; // From the iCal metadata
+}
+
 // Schedule state for managing events
 interface ScheduleState {
   events: ScheduleEvent[];
@@ -495,16 +528,16 @@ interface ScheduleState {
   isFetchingCalendar: boolean;
   error: string | null;
   lastFetched: Date | null;
-  lastUpdated: Date | null;
-  cachedCalendarData: string | null;
-  cachedCalendarHash: string | null;
-  cachedAt: Date | null;
+  lastUpdated: Date | null; // Oldest update time across all cached iCals
+  icalCaches: Record<string, ICalCache>; // Cache per URL
+  lastActiveCalendarId: string | null; // Track which calendar was last fetched
 
   fetchSchedule: () => Promise<void>;
   getEventsForDate: (date: Date) => ScheduleEvent[];
   getEventsForWeek: (weekStart: Date) => { [key: string]: ScheduleEvent[] };
   refreshSchedule: () => Promise<void>;
   clearError: () => void;
+  getICalCacheInfo: () => { url: string; lastUpdated: Date | null; lastFetched: Date }[];
 }
 
 const useScheduleStore = create<ScheduleState>()(
@@ -518,43 +551,49 @@ const useScheduleStore = create<ScheduleState>()(
       error: null,
       lastFetched: null,
       lastUpdated: null,
-      cachedCalendarData: null,
-      cachedCalendarHash: null,
-      cachedAt: null,
+      icalCaches: {},
+      lastActiveCalendarId: null,
 
       fetchSchedule: async () => {
         const state = get();
 
-        // Don't fetch if we already have data from today
-        if (state.lastFetched && new Date().toDateString() === state.lastFetched.toDateString()) {
+        // Get the active calendar from calendar store
+        const { getActiveCalendar } = useCalendarStore.getState();
+        const activeCalendar = getActiveCalendar();
+        const currentCalendarId = activeCalendar?.id || null;
+
+        // Check if calendar has changed - if so, force refresh
+        const calendarChanged = state.lastActiveCalendarId !== currentCalendarId;
+
+        // Don't fetch if we already have data from today AND calendar hasn't changed
+        if (!calendarChanged && state.lastFetched && new Date().toDateString() === state.lastFetched.toDateString()) {
           return;
         }
 
-        // If we have cached calendar data but no parsed events, parse it first
-        if (state.cachedCalendarData && state.events.length === 0) {
-          try {
-            console.log('Parsing cached calendar data on startup');
-            const jcalData = ICAL.parse(state.cachedCalendarData);
-            const calendar = new ICAL.Component(jcalData);
-            const { customColors } = useRealizationColorStore.getState();
-            const vevents = calendar.getAllSubcomponents('vevent');
-            const events = vevents.map((vevent, index) =>
-              ScheduleUtils.convertToScheduleEvent(vevent, index, customColors)
-            );
-            
-            set({
-              calendar,
-              events,
-              lastUpdated: state.cachedAt ? new Date(state.cachedAt) : null
-            });
-          } catch (parseError) {
-            console.error('Error parsing cached calendar data:', parseError);
-            // Continue with normal fetch if parsing fails
-          }
+        // If calendar changed, clear events but keep URL caches
+        if (calendarChanged) {
+          console.log('Active calendar changed, refreshing...');
+          set({
+            events: [],
+            lastFetched: null
+          });
         }
 
-        // Only show blocking loader if we have no events data AND no cached calendar data at all
-        const hasExistingData = state.events.length > 0 || state.cachedCalendarData !== null;
+        // Get calendar URLs from active calendar
+        const calendarUrls = activeCalendar?.icalUrls || [];
+
+        if (calendarUrls.length === 0) {
+          // No calendar URLs configured - silently return without error
+          set({ 
+            isLoading: false, 
+            isCheckingHash: false, 
+            isFetchingCalendar: false 
+          });
+          return;
+        }
+
+        // Only show blocking loader if we have no events data
+        const hasExistingData = state.events.length > 0;
         set({ 
           isLoading: !hasExistingData, 
           isCheckingHash: true, 
@@ -562,92 +601,101 @@ const useScheduleStore = create<ScheduleState>()(
         });
 
         try {
-          // Get the calendar URL from config store
-          const { config } = useConfigStore.getState();
+          const { customColors } = useRealizationColorStore.getState();
+          const eventsByUid = new Map<string, ScheduleEvent>();
+          const newIcalCaches: Record<string, ICalCache> = { ...state.icalCaches };
+          let eventIndexCounter = 0;
+          let oldestUpdateTime: Date | null = null;
 
-          if (!config.calendarUrl) {
-            // No calendar URL configured - silently return without error
-            set({ 
-              isLoading: false, 
-              isCheckingHash: false, 
-              isFetchingCalendar: false 
-            });
-            return;
-          }
+          // Process each URL
+          for (const url of calendarUrls) {
+            try {
+              const cachedEntry = state.icalCaches[url];
+              let shouldFetch = true;
+              let calendarData = '';
+              let hash = '';
+              let icalLastUpdated: Date | null = null;
 
-          // Step 1: Check the hash first
-          let shouldFetchFullCalendar = true;
+              // Check hash first if we have a cache
+              if (cachedEntry && !calendarChanged) {
+                try {
+                  const { hash: latestHash } = await ScheduleUtils.checkCalendarHash(url);
+                  
+                  if (cachedEntry.hash === latestHash) {
+                    console.log(`Hash matches for ${url} - using cached data`);
+                    shouldFetch = false;
+                    calendarData = cachedEntry.calendarData;
+                    hash = cachedEntry.hash;
+                    icalLastUpdated = cachedEntry.lastUpdated;
+                  }
+                } catch (hashError) {
+                  console.error(`Error checking hash for ${url}:`, hashError);
+                  // Continue to fetch
+                }
+              }
 
-          try {
-            const { hash: latestHash } = await ScheduleUtils.checkCalendarHash(config.calendarUrl);
+              // Fetch if needed
+              if (shouldFetch) {
+                console.log(`Fetching calendar from ${url}`);
+                const result = await ScheduleUtils.retrieveScheduleFromUrl(url);
+                calendarData = result.calendarData;
+                hash = result.hash;
+                
+                const parsedLastUpdated = result.lastUpdated ? new Date(result.lastUpdated) : null;
+                icalLastUpdated = parsedLastUpdated && !isNaN(parsedLastUpdated.getTime()) 
+                  ? parsedLastUpdated 
+                  : null;
 
-            // If we have a cached hash and it matches, use cached calendar data
-            if (state.cachedCalendarHash && state.cachedCalendarHash === latestHash && state.cachedCalendarData) {
-              console.log('Calendar hash matches - using cached data');
-              shouldFetchFullCalendar = false;
+                // Update cache for this URL
+                newIcalCaches[url] = {
+                  url,
+                  calendarData,
+                  hash,
+                  lastFetched: new Date(),
+                  lastUpdated: icalLastUpdated
+                };
+              }
 
-              // Parse cached calendar data
-              const jcalData = ICAL.parse(state.cachedCalendarData);
+              // Parse events from this URL
+              const jcalData = ICAL.parse(calendarData);
               const calendar = new ICAL.Component(jcalData);
-
-              // Get custom colors from realization color store
-              const { customColors } = useRealizationColorStore.getState();
-
-              // Get all events from the calendar
               const vevents = calendar.getAllSubcomponents('vevent');
-              const events = vevents.map((vevent, index) =>
-                ScheduleUtils.convertToScheduleEvent(vevent, index, customColors)
-              );
 
-              set({
-                calendar,
-                events,
-                isLoading: false,
-                isCheckingHash: false,
-                lastFetched: new Date(),
-                lastUpdated: state.cachedAt ? new Date(state.cachedAt) : null
-              });
-              return;
+              for (const vevent of vevents) {
+                const event = ScheduleUtils.convertToScheduleEvent(vevent, eventIndexCounter++, customColors);
+                // Deduplicate by UID
+                if (!eventsByUid.has(event.id)) {
+                  eventsByUid.set(event.id, event);
+                }
+              }
+
+              // Track oldest update time
+              if (icalLastUpdated) {
+                if (!oldestUpdateTime || icalLastUpdated < oldestUpdateTime) {
+                  oldestUpdateTime = icalLastUpdated;
+                }
+              }
+
+            } catch (urlError) {
+              console.error(`Error fetching calendar from ${url}:`, urlError);
+              // Continue with other URLs
             }
-
-            console.log('Calendar hash changed or no cache - fetching full calendar');
-          } catch (hashError) {
-            console.error('Error checking calendar hash:', hashError);
-            // Continue to fetch full calendar on hash check error
           }
 
-          set({ isCheckingHash: false, isFetchingCalendar: true });
+          const allEvents = Array.from(eventsByUid.values());
+          const now = new Date();
 
-          // Step 2: Fetch full calendar if needed
-          if (shouldFetchFullCalendar) {
-            const { config } = useConfigStore.getState();
-            const { customColors } = useRealizationColorStore.getState();
+          set({
+            events: allEvents,
+            isLoading: false,
+            isCheckingHash: false,
+            isFetchingCalendar: false,
+            lastFetched: now,
+            lastUpdated: oldestUpdateTime,
+            icalCaches: newIcalCaches,
+            lastActiveCalendarId: currentCalendarId
+          });
 
-            const { calendar, lastUpdated, calendarData, hash } = await ScheduleUtils.retrieveScheduleFromUrl(config.calendarUrl);
-
-            // Get all events from the calendar
-            const vevents = calendar.getAllSubcomponents('vevent');
-            const events = vevents.map((vevent, index) =>
-              ScheduleUtils.convertToScheduleEvent(vevent, index, customColors)
-            );
-
-            const parsedLastUpdated = lastUpdated ? new Date(lastUpdated) : null;
-            const validLastUpdated = parsedLastUpdated && !isNaN(parsedLastUpdated.getTime()) ? parsedLastUpdated : null;
-            const now = new Date();
-
-            set({
-              calendar,
-              events,
-              isLoading: false,
-              isCheckingHash: false,
-              isFetchingCalendar: false,
-              lastFetched: now,
-              lastUpdated: validLastUpdated,
-              cachedCalendarData: calendarData,
-              cachedCalendarHash: hash,
-              cachedAt: now
-            });
-          }
         } catch (error) {
           set({
             isLoading: false,
@@ -690,14 +738,43 @@ const useScheduleStore = create<ScheduleState>()(
       },
 
       clearError: () => set({ error: null }),
+
+      getICalCacheInfo: () => {
+        const state = get();
+        return Object.values(state.icalCaches).map(cache => ({
+          url: cache.url,
+          lastUpdated: cache.lastUpdated,
+          lastFetched: cache.lastFetched
+        }));
+      },
     }),
     {
       name: 'schedule-storage',
       partialize: (state) => ({
-        cachedCalendarData: state.cachedCalendarData,
-        cachedCalendarHash: state.cachedCalendarHash,
-        cachedAt: state.cachedAt,
+        icalCaches: state.icalCaches,
+        lastActiveCalendarId: state.lastActiveCalendarId,
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<ScheduleState>;
+        
+        // Convert date strings back to Date objects in icalCaches
+        const icalCaches: Record<string, ICalCache> = {};
+        if (persisted.icalCaches) {
+          Object.entries(persisted.icalCaches).forEach(([url, cache]) => {
+            icalCaches[url] = {
+              ...cache,
+              lastFetched: cache.lastFetched ? new Date(cache.lastFetched) : new Date(),
+              lastUpdated: cache.lastUpdated ? new Date(cache.lastUpdated) : null,
+            };
+          });
+        }
+        
+        return {
+          ...currentState,
+          ...persisted,
+          icalCaches,
+        };
+      },
     }
   )
 );
@@ -833,6 +910,201 @@ const useHiddenEventsStore = create<HiddenEventsState>()(
   )
 );
 
+// Calendar management store
+const useCalendarStore = create<CalendarState>()(
+  persist(
+    (set, get) => ({
+      calendars: [],
+      activeCalendarId: null,
+
+      addCalendar: (name: string, icalUrls: string[] = []) => {
+        const id = `calendar-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+        const now = Date.now();
+        const newCalendar: Calendar = {
+          id,
+          name,
+          icalUrls,
+          createdAt: now,
+          updatedAt: now
+        };
+
+        set((state) => {
+          const calendars = [...state.calendars, newCalendar];
+          // If this is the first calendar, set it as active
+          const activeCalendarId = state.activeCalendarId || id;
+          return { calendars, activeCalendarId };
+        });
+
+        return id;
+      },
+
+      updateCalendar: (id: string, updates: Partial<Omit<Calendar, 'id' | 'createdAt'>>) => {
+        set((state) => ({
+          calendars: state.calendars.map(cal =>
+            cal.id === id
+              ? { ...cal, ...updates, updatedAt: Date.now() }
+              : cal
+          )
+        }));
+      },
+
+      deleteCalendar: (id: string) => {
+        set((state) => {
+          const calendars = state.calendars.filter(cal => cal.id !== id);
+          // If we deleted the active calendar, set a new active one
+          let activeCalendarId = state.activeCalendarId;
+          if (activeCalendarId === id) {
+            activeCalendarId = calendars.length > 0 ? calendars[0].id : null;
+          }
+          return { calendars, activeCalendarId };
+        });
+      },
+
+      getCalendar: (id: string) => {
+        return get().calendars.find(cal => cal.id === id);
+      },
+
+      getActiveCalendar: () => {
+        const { calendars, activeCalendarId } = get();
+        if (!activeCalendarId) return undefined;
+        return calendars.find(cal => cal.id === activeCalendarId);
+      },
+
+      setActiveCalendar: (id: string) => {
+        const calendar = get().getCalendar(id);
+        if (calendar) {
+          set({ activeCalendarId: id });
+          // Trigger schedule refresh when calendar changes
+          setTimeout(() => {
+            useScheduleStore.getState().refreshSchedule();
+          }, 0);
+        }
+      },
+
+      addIcalUrl: (calendarId: string, url: string) => {
+        set((state) => ({
+          calendars: state.calendars.map(cal =>
+            cal.id === calendarId
+              ? {
+                  ...cal,
+                  icalUrls: [...cal.icalUrls, url],
+                  updatedAt: Date.now()
+                }
+              : cal
+          )
+        }));
+        
+        // Refresh if we modified the active calendar
+        if (get().activeCalendarId === calendarId) {
+          setTimeout(() => {
+            useScheduleStore.getState().refreshSchedule();
+          }, 0);
+        }
+      },
+
+      removeIcalUrl: (calendarId: string, url: string) => {
+        set((state) => ({
+          calendars: state.calendars.map(cal =>
+            cal.id === calendarId
+              ? {
+                  ...cal,
+                  icalUrls: cal.icalUrls.filter(u => u !== url),
+                  updatedAt: Date.now()
+                }
+              : cal
+          )
+        }));
+        
+        // Refresh if we modified the active calendar
+        if (get().activeCalendarId === calendarId) {
+          setTimeout(() => {
+            useScheduleStore.getState().refreshSchedule();
+          }, 0);
+        }
+      },
+
+      updateIcalUrl: (calendarId: string, oldUrl: string, newUrl: string) => {
+        set((state) => ({
+          calendars: state.calendars.map(cal =>
+            cal.id === calendarId
+              ? {
+                  ...cal,
+                  icalUrls: cal.icalUrls.map(u => u === oldUrl ? newUrl : u),
+                  updatedAt: Date.now()
+                }
+              : cal
+          )
+        }));
+        
+        // Refresh if we modified the active calendar
+        if (get().activeCalendarId === calendarId) {
+          setTimeout(() => {
+            useScheduleStore.getState().refreshSchedule();
+          }, 0);
+        }
+      }
+    }),
+    {
+      name: "calendars",
+      version: 2,
+      partialize: (state) => ({
+        calendars: state.calendars,
+        activeCalendarId: state.activeCalendarId
+      }),
+      migrate: (persistedState: unknown, version: number) => {
+        // Migration from version 1 (or no version) to version 2
+        if (version < 2) {
+          const state = persistedState as Partial<CalendarState>;
+          
+          // Check if we need to migrate from legacy config.calendarUrl
+          const configState = localStorage.getItem('app-config');
+          if (configState) {
+            try {
+              const config = JSON.parse(configState);
+              const legacyUrl = config?.state?.config?.calendarUrl;
+              
+              if (legacyUrl && legacyUrl.trim() && legacyUrl !== 'MIGRATED') {
+                // Migrate the legacy URL (handle PTIVIS25B URL updates)
+                const migratedUrl = migrateCalendarUrl(legacyUrl.trim());
+                
+                // Determine calendar name - use preset name if available, otherwise 'Default'
+                const calendarName = getPresetCalendarName(migratedUrl) || 'Default';
+                
+                // Create default calendar from legacy URL
+                const now = Date.now();
+                const defaultCalendar: Calendar = {
+                  id: `calendar-${now}-migrated`,
+                  name: calendarName,
+                  icalUrls: [migratedUrl],
+                  createdAt: now,
+                  updatedAt: now
+                };
+                
+                console.log(`Migrating legacy calendar URL to calendar system - wiping existing calendars (name: ${calendarName})`);
+                
+                // Mark the legacy calendarUrl as migrated in app-config
+                config.state.config.calendarUrl = 'MIGRATED';
+                localStorage.setItem('app-config', JSON.stringify(config));
+                
+                // Wipe all existing calendars and replace with the migrated default
+                return {
+                  ...state,
+                  calendars: [defaultCalendar],
+                  activeCalendarId: defaultCalendar.id
+                };
+              }
+            } catch (e) {
+              console.error('Failed to migrate legacy calendar URL:', e);
+            }
+          }
+        }
+        
+        return persistedState;
+      }
+    }
+  )
+);
+
 export default useConfigStore;
 export type { ConfigState };
-export { useScheduleRange, useScheduleStore, useRealizationColorStore, useHiddenEventsStore };
+export { useScheduleRange, useScheduleStore, useRealizationColorStore, useHiddenEventsStore, useCalendarStore };

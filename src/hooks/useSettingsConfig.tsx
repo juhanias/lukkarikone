@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Type, RotateCcw, Code, Palette, Calendar, Link, Languages, Sparkles } from 'lucide-react'
-import useConfigStore, { useRealizationColorStore } from '../state/state-management'
+import useConfigStore, { useRealizationColorStore, useCalendarStore } from '../state/state-management'
 import { FONT_OPTIONS, type Font } from '../types/config'
 import type { SettingsConfig } from '../types/settings-config'
 
@@ -9,6 +9,8 @@ export function useSettingsConfig(): SettingsConfig {
   const { t } = useTranslation('settings')
   const { config, setConfig, resetConfig, getListedThemes } = useConfigStore()
   const { customColors, clearAllCustomColors } = useRealizationColorStore()
+  const { getActiveCalendar } = useCalendarStore()
+  const activeCalendar = getActiveCalendar()
   const listedThemes = getListedThemes()
 
   return useMemo(() => {
@@ -124,7 +126,7 @@ export function useSettingsConfig(): SettingsConfig {
         ]
       },
 
-      // Calendar URL Settings
+      // Calendar Settings
       {
         id: 'calendar-settings',
         blockName: t('sections.calendar.title'),
@@ -137,15 +139,15 @@ export function useSettingsConfig(): SettingsConfig {
             componentType: 'calendar-url',
             id: 'calendar-url',
             data: {
-              currentUrl: config.calendarUrl,
-              urlLabel: t('sections.calendar.urlLabel'),
-              configuredText: t('sections.calendar.configured', { 
-                url: config.calendarUrl && config.calendarUrl.length > 50 
-                  ? config.calendarUrl.substring(0, 47) + '...' 
-                  : config.calendarUrl
-              }),
+              currentUrl: activeCalendar?.icalUrls[0] || '',
+              urlLabel: t('sections.calendar.calendarLabel'),
+              configuredText: activeCalendar 
+                ? t('sections.calendar.configured', { 
+                    name: activeCalendar.name
+                  })
+                : '',
               notConfiguredText: t('sections.calendar.notConfigured'),
-              editLinkText: t('sections.calendar.editLink'),
+              editLinkText: t('sections.calendar.manageCalendars'),
               linkCalendarText: t('sections.calendar.linkCalendar')
             }
           }
@@ -312,5 +314,5 @@ export function useSettingsConfig(): SettingsConfig {
     }
 
     return settingsConfig
-  }, [t, config, setConfig, resetConfig, listedThemes, customColors, clearAllCustomColors])
+  }, [t, config, setConfig, resetConfig, listedThemes, customColors, clearAllCustomColors, activeCalendar])
 }

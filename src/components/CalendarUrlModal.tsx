@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Calendar, Link, AlertCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import useConfigStore, { useScheduleStore } from '@/state/state-management'
+import useConfigStore, { useScheduleStore, useCalendarStore } from '@/state/state-management'
 
 interface CalendarUrlModalProps {
   children: React.ReactNode
@@ -46,9 +46,11 @@ const QUICK_SETUP_CALENDARS = [
 export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
   const { t } = useTranslation('schedule')
   const { t: tCommon } = useTranslation('common')
-  const { config, setConfig } = useConfigStore()
+  const { config } = useConfigStore()
   const { refreshSchedule, clearError } = useScheduleStore()
-  const [inputUrl, setInputUrl] = useState(config.calendarUrl)
+  const { addCalendar, getActiveCalendar } = useCalendarStore()
+  const activeCalendar = getActiveCalendar()
+  const [inputUrl, setInputUrl] = useState(activeCalendar?.icalUrls[0] || '')
   const [isOpen, setIsOpen] = useState(false)
   const [error, setError] = useState("")
 
@@ -83,7 +85,8 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
       return
     }
 
-    setConfig({ calendarUrl: inputUrl.trim() })
+    // Create a new "Default" calendar with the provided URL
+    addCalendar('Default', [inputUrl.trim()])
     setError("")
     setIsOpen(false)
     
@@ -95,7 +98,8 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
   const handleQuickSetup = async (calendarUrl: string) => {
     const trimmedUrl = calendarUrl.trim()
 
-    setConfig({ calendarUrl: trimmedUrl })
+    // Create a new "Default" calendar with the quick setup URL
+    addCalendar('Default', [trimmedUrl])
     setInputUrl(trimmedUrl)
     setError("")
     setIsOpen(false)
@@ -106,7 +110,7 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
   }
 
   const handleCancel = () => {
-    setInputUrl(config.calendarUrl)
+    setInputUrl(activeCalendar?.icalUrls[0] || '')
     setError("")
     setIsOpen(false)
   }

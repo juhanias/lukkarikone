@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion'
+import { useState } from 'react'
 import { Toggle, RadioCard } from './ui'
 import { Slider } from './ui/Slider'
 import LanguageSelector from './LanguageSelector'
 import { ThemeSelector } from './ThemeSelector'
 import { CalendarUrlModal } from './CalendarUrlModal'
+import { CalendarManagementDialog } from './CalendarManagementDialog'
 import { Button } from './ui/button'
 import type { SettingComponent } from '../types/settings-config'
 import useConfigStore from '../state/state-management'
@@ -14,6 +16,7 @@ interface SettingsComponentRendererProps {
 
 export function SettingsComponentRenderer({ component }: SettingsComponentRendererProps) {
   const { config } = useConfigStore()
+  const [isCalendarDialogOpen, setIsCalendarDialogOpen] = useState(false)
   
   switch (component.componentType) {
     case 'toggle':
@@ -136,33 +139,59 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
 
     case 'calendar-url':
       return (
-        <div className="space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex-1 min-w-0">
-              <div className="font-medium">{component.data.urlLabel}</div>
-              <div className="text-sm opacity-70 break-words">
-                {component.data.currentUrl 
-                  ? component.data.configuredText
-                  : component.data.notConfiguredText
-                }
+        <>
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="font-medium">{component.data.urlLabel}</div>
+                <div className="text-sm opacity-70 break-words">
+                  {component.data.currentUrl 
+                    ? component.data.configuredText
+                    : component.data.notConfiguredText
+                  }
+                </div>
               </div>
+              {/* Use CalendarManagementDialog if calendar exists, CalendarUrlModal for first setup */}
+              {component.data.currentUrl ? (
+                <Button 
+                  variant="outline"
+                  className="flex-shrink-0 w-full sm:w-auto"
+                  style={{
+                    borderColor: 'var(--color-border)',
+                    color: 'var(--color-text)',
+                    backgroundColor: 'transparent',
+                    fontFamily: `var(--font-${config.font})`
+                  }}
+                  onClick={() => setIsCalendarDialogOpen(true)}
+                >
+                  {component.data.editLinkText}
+                </Button>
+              ) : (
+                <CalendarUrlModal>
+                  <Button 
+                    variant="outline"
+                    className="flex-shrink-0 w-full sm:w-auto"
+                    style={{
+                      borderColor: 'var(--color-border)',
+                      color: 'var(--color-text)',
+                      backgroundColor: 'transparent',
+                      fontFamily: `var(--font-${config.font})`
+                    }}
+                  >
+                    {component.data.linkCalendarText}
+                  </Button>
+                </CalendarUrlModal>
+              )}
             </div>
-            <CalendarUrlModal>
-              <Button 
-                variant="outline"
-                className="flex-shrink-0 w-full sm:w-auto"
-                style={{
-                  borderColor: 'var(--color-border)',
-                  color: 'var(--color-text)',
-                  backgroundColor: 'transparent',
-                  fontFamily: `var(--font-${config.font})`
-                }}
-              >
-                {component.data.currentUrl ? component.data.editLinkText : component.data.linkCalendarText}
-              </Button>
-            </CalendarUrlModal>
           </div>
-        </div>
+          
+          {component.data.currentUrl && (
+            <CalendarManagementDialog
+              open={isCalendarDialogOpen}
+              onOpenChange={setIsCalendarDialogOpen}
+            />
+          )}
+        </>
       )
 
     case 'custom':

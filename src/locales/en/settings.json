@@ -52,12 +52,12 @@
       "subtitle": "Choose your preferred language"
     },
     "calendar": {
-      "title": "Calendar Settings",
-      "subtitle": "Configure your calendar URL",
-      "urlLabel": "Calendar URL",
-      "notConfigured": "Not configured - calendar won't work without URL",
-      "configured": "Configured: {{url}}",
-      "editLink": "Edit link",
+      "title": "Calendar Management",
+      "subtitle": "Manage your calendars",
+      "calendarLabel": "Active Calendar",
+      "notConfigured": "No calendar configured",
+      "configured": "{{name}}",
+      "manageCalendars": "Manage calendars",
       "linkCalendar": "Link calendar"
     },
     "theme": {
