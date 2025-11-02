@@ -315,6 +315,83 @@ const getPresetCalendarName = (url: string): string | null => {
   return preset ? preset.name : null;
 };
 
+const extractLegacyCalendarUrlFromConfig = (configState: unknown): string | null => {
+  if (!configState || typeof configState !== 'object') {
+    return null;
+  }
+
+  const typedState = configState as { state?: { config?: { calendarUrl?: unknown } } };
+  const calendarUrl = typedState.state?.config?.calendarUrl;
+
+  if (typeof calendarUrl === 'string') {
+    const trimmed = calendarUrl.trim();
+    if (trimmed && trimmed !== 'MIGRATED') {
+      return trimmed;
+    }
+  }
+
+  return null;
+};
+
+const extractLegacyCalendarUrlFromScheduleStorage = (): string | null => {
+  try {
+    const scheduleStateRaw = localStorage.getItem('schedule-storage');
+    if (!scheduleStateRaw) {
+      return null;
+    }
+
+    const scheduleState = JSON.parse(scheduleStateRaw) as {
+      state?: {
+        icalCaches?: Record<string, { url?: unknown }>;
+      };
+    };
+
+    const caches = scheduleState.state?.icalCaches;
+    if (caches && typeof caches === 'object') {
+      const entries = Object.values(caches) as Array<{ url?: unknown }>;
+      for (const entry of entries) {
+        if (entry?.url && typeof entry.url === 'string') {
+          const trimmed = entry.url.trim();
+          if (trimmed) {
+            return trimmed;
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Failed to read legacy calendar URL from schedule storage:', error);
+  }
+
+  return null;
+};
+
+const markConfigCalendarUrlMigrated = (configState: unknown): void => {
+  if (!configState || typeof configState !== 'object') {
+    return;
+  }
+
+  const typedState = configState as { state?: { config?: Record<string, unknown> } };
+  if (!typedState.state?.config) {
+    return;
+  }
+
+  typedState.state.config = {
+    ...typedState.state.config,
+    calendarUrl: 'MIGRATED'
+  };
+
+  const versionedState = configState as { version?: number };
+  if (typeof versionedState.version === 'number' && versionedState.version < 3) {
+    versionedState.version = 3;
+  }
+
+  try {
+    localStorage.setItem('app-config', JSON.stringify(configState));
+  } catch (error) {
+    console.error('Failed to mark legacy calendar URL as migrated in config:', error);
+  }
+};
+
 const migrateCalendarUrl = (url: string): string => {
   const normalizedUrl = normalizeCalendarUrl(url);
 
@@ -389,21 +466,22 @@ const useConfigStore = create<ConfigState>()(
     }),
     {
       name: "app-config",
-      version: 2,
+      version: 3,
       migrate: (persistedState: unknown, version: number) => {
-        const state = persistedState as { config?: Record<string, unknown> };
-        
-        // Migration to version 2: Remove legacy calendarUrl from config
-        if (version < 2 && state?.config?.calendarUrl) {
-          console.log('Removing legacy calendarUrl from config');
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { calendarUrl, ...configWithoutUrl } = state.config;
-          return {
-            ...state,
-            config: configWithoutUrl
-          };
+        if (version < 3) {
+          const state = persistedState as { config?: Record<string, unknown> } | undefined;
+          const calendarUrl = state?.config?.calendarUrl;
+
+          if (calendarUrl === 'MIGRATED' && state?.config) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { calendarUrl: _calendarUrl, ...configWithoutUrl } = state.config;
+            return {
+              ...state,
+              config: configWithoutUrl
+            };
+          }
         }
-        
+
         return persistedState;
       },
       partialize: (state) => ({ config: state.config, previousTheme: state.previousTheme }),
@@ -1046,60 +1124,65 @@ const useCalendarStore = create<CalendarState>()(
     }),
     {
       name: "calendars",
-      version: 2,
+      version: 3,
       partialize: (state) => ({
         calendars: state.calendars,
         activeCalendarId: state.activeCalendarId
       }),
       migrate: (persistedState: unknown, version: number) => {
-        // Migration from version 1 (or no version) to version 2
-        if (version < 2) {
-          const state = persistedState as Partial<CalendarState>;
-          
-          // Check if we need to migrate from legacy config.calendarUrl
-          const configState = localStorage.getItem('app-config');
-          if (configState) {
-            try {
-              const config = JSON.parse(configState);
-              const legacyUrl = config?.state?.config?.calendarUrl;
-              
-              if (legacyUrl && legacyUrl.trim() && legacyUrl !== 'MIGRATED') {
-                // Migrate the legacy URL (handle PTIVIS25B URL updates)
-                const migratedUrl = migrateCalendarUrl(legacyUrl.trim());
-                
-                // Determine calendar name - use preset name if available, otherwise 'Default'
-                const calendarName = getPresetCalendarName(migratedUrl) || 'Default';
-                
-                // Create default calendar from legacy URL
-                const now = Date.now();
-                const defaultCalendar: Calendar = {
-                  id: `calendar-${now}-migrated`,
-                  name: calendarName,
-                  icalUrls: [migratedUrl],
-                  createdAt: now,
-                  updatedAt: now
-                };
-                
-                console.log(`Migrating legacy calendar URL to calendar system - wiping existing calendars (name: ${calendarName})`);
-                
-                // Mark the legacy calendarUrl as migrated in app-config
-                config.state.config.calendarUrl = 'MIGRATED';
-                localStorage.setItem('app-config', JSON.stringify(config));
-                
-                // Wipe all existing calendars and replace with the migrated default
-                return {
-                  ...state,
-                  calendars: [defaultCalendar],
-                  activeCalendarId: defaultCalendar.id
-                };
-              }
-            } catch (e) {
-              console.error('Failed to migrate legacy calendar URL:', e);
-            }
-          }
+        if (version >= 3) {
+          return persistedState;
         }
-        
-        return persistedState;
+
+        const state = persistedState as Partial<CalendarState> | undefined;
+
+        if (state?.calendars && state.calendars.length > 0) {
+          return persistedState;
+        }
+
+        let parsedConfig: unknown;
+        let legacyUrl: string | null = null;
+
+        try {
+          const configStateRaw = localStorage.getItem('app-config');
+          if (configStateRaw) {
+            parsedConfig = JSON.parse(configStateRaw);
+            legacyUrl = extractLegacyCalendarUrlFromConfig(parsedConfig);
+          }
+        } catch (error) {
+          console.error('Failed to parse app-config during calendar migration:', error);
+        }
+
+        if (!legacyUrl) {
+          legacyUrl = extractLegacyCalendarUrlFromScheduleStorage();
+        }
+
+        if (!legacyUrl) {
+          return persistedState;
+        }
+
+        const migratedUrl = migrateCalendarUrl(legacyUrl);
+        const calendarName = getPresetCalendarName(migratedUrl) || 'Default';
+        const now = Date.now();
+        const defaultCalendar: Calendar = {
+          id: `calendar-${now}-migrated`,
+          name: calendarName,
+          icalUrls: [migratedUrl],
+          createdAt: now,
+          updatedAt: now
+        };
+
+        console.log(`Migrating legacy calendar URL to calendar system - wiping existing calendars (name: ${calendarName})`);
+
+        if (parsedConfig) {
+          markConfigCalendarUrlMigrated(parsedConfig);
+        }
+
+        return {
+          ...state,
+          calendars: [defaultCalendar],
+          activeCalendarId: defaultCalendar.id
+        };
       }
     }
   )
