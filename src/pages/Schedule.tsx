@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import useDocumentTitle from '../hooks/useDocumentTitle'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useScheduleRange, useScheduleStore } from '../state/state-management'
@@ -54,6 +55,8 @@ export default function Schedule() {
   useEffect(() => {
     fetchSchedule()
   }, [fetchSchedule])
+
+  useDocumentTitle(`${t('title')} — lukkari.juh.fi`)
 
   // Show toast notification on error
   useEffect(() => {

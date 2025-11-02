@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Button } from '../components/ui/button'
 import { Check, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import useDocumentTitle from '../hooks/useDocumentTitle'
 
 // Blue theme colors as inline styles
 const blueTheme = {
@@ -73,6 +74,7 @@ const renderComparisonValue = (value: boolean | string, t: (key: string) => stri
 
 export default function Landing() {
   const { t } = useTranslation('landing');
+  useDocumentTitle(t('title'))
   return (
     <div 
       className="w-full min-h-screen flex flex-col"

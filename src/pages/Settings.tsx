@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Settings as SettingsIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import useDocumentTitle from '../hooks/useDocumentTitle'
 import { useRef } from 'react'
 import useConfigStore from '../state/state-management'
 import { SettingsSection } from '../components/ui'
@@ -41,6 +42,8 @@ const motionProps = prefersReducedMotion
 export default function Settings() {
   const { t } = useTranslation('settings')
   const settingsConfig = useSettingsConfig()
+
+  useDocumentTitle(`${t('title')} — lukkari.juh.fi`)
   
   // Filter visible blocks
   const visibleBlocks = settingsConfig.filter(block => !block.condition || block.condition())

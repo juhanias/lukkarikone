@@ -1,5 +1,7 @@
 import { useRouteError, Link } from 'react-router-dom'
 import { Button } from '../components/ui/button'
+import { useTranslation } from 'react-i18next'
+import useDocumentTitle from '../hooks/useDocumentTitle'
 
 interface RouteError {
   statusText?: string
@@ -9,6 +11,9 @@ interface RouteError {
 
 export default function ErrorPage() {
   const error = useRouteError() as RouteError
+  const { t } = useTranslation('common')
+
+  useDocumentTitle(`${t('labels.error')} — lukkari.juh.fi`)
   
   return (
     <div className='w-full h-full bg-slate-800 text-white flex items-center justify-center'>

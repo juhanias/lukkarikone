@@ -17,6 +17,7 @@
     "week": "Viikko",
     "today": "Tänään"
   },
+  "title": "Lukujärjestys",
   "calendar": {
     "urlMissing": "Laitetaan kalenteri pystyyn!",
     "urlMissingDescription": "Et ole vielä yhdistänyt lukujärjestystäsi näkymään. Tämä on nopea prosessi!",

@@ -17,6 +17,7 @@
     "week": "Week", 
     "today": "Today"
   },
+  "title": "Schedule",
   "calendar": {
     "urlMissing": "Let's configure your schedule!",
     "urlMissingDescription": "You've not linked your schedule to the page yet. This is a quick process!",
