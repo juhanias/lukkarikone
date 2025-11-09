@@ -59,8 +59,6 @@ export const CalendarManagementDialog = ({ open, onOpenChange }: CalendarManagem
     updateIcalUrl
   } = useCalendarStore()
 
-  const [isCreating, setIsCreating] = useState(false)
-  const [newCalendarName, setNewCalendarName] = useState('')
   const [editingCalendarId, setEditingCalendarId] = useState<string | null>(null)
   const [editingCalendarName, setEditingCalendarName] = useState('')
   const [editingUrlState, setEditingUrlState] = useState<{
@@ -72,16 +70,19 @@ export const CalendarManagementDialog = ({ open, onOpenChange }: CalendarManagem
     calendarId: string
     url: string
   } | null>(null)
+  const [newlyCreatedId, setNewlyCreatedId] = useState<string | null>(null)
 
   const handleCreateCalendar = () => {
-    if (newCalendarName.trim()) {
-      const id = addCalendar(newCalendarName.trim())
-      setNewCalendarName('')
-      setIsCreating(false)
-      // Optionally set as active
-      if (calendars.length === 0) {
-        setActiveCalendar(id)
-      }
+    // Generate a default name based on the current number of calendars
+    const calendarIndex = calendars.length + 1
+    const defaultName = `Calendar ${calendarIndex}`
+    const id = addCalendar(defaultName)
+    setNewlyCreatedId(id)
+    // Remove the highlight after animation completes
+    setTimeout(() => setNewlyCreatedId(null), 1000)
+    // Optionally set as active
+    if (calendars.length === 0) {
+      setActiveCalendar(id)
     }
   }
 
@@ -148,12 +149,23 @@ export const CalendarManagementDialog = ({ open, onOpenChange }: CalendarManagem
           {calendars.map((calendar) => (
             <div
               key={calendar.id}
-              className="border rounded-lg p-4 space-y-3"
+              className={`border rounded-lg p-4 space-y-3 transition-all duration-500 ${
+                calendar.id === newlyCreatedId 
+                  ? 'animate-in slide-in-from-top-2 scale-in-95' 
+                  : ''
+              }`}
               style={{
-                borderColor: 'var(--color-border)',
+                borderColor: calendar.id === newlyCreatedId 
+                  ? 'var(--color-accent)' 
+                  : 'var(--color-border)',
                 backgroundColor: calendar.id === activeCalendarId 
                   ? 'var(--color-accent-alpha-10)' 
-                  : 'transparent'
+                  : calendar.id === newlyCreatedId
+                  ? 'var(--color-accent-alpha-20)'
+                  : 'transparent',
+                boxShadow: calendar.id === newlyCreatedId 
+                  ? '0 4px 12px rgba(var(--color-accent-rgb, 99, 102, 241), 0.2)' 
+                  : 'none'
               }}
             >
               {/* Calendar Header */}
@@ -428,61 +440,19 @@ export const CalendarManagementDialog = ({ open, onOpenChange }: CalendarManagem
           ))}
 
           {/* Create New Calendar */}
-          {isCreating ? (
-            <div className="border rounded-lg p-4" style={{ borderColor: 'var(--color-border)' }}>
-              <div className="flex items-center gap-2">
-                <Input
-                  value={newCalendarName}
-                  onChange={(e) => setNewCalendarName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleCreateCalendar()
-                    if (e.key === 'Escape') {
-                      setIsCreating(false)
-                      setNewCalendarName('')
-                    }
-                  }}
-                  placeholder={t('calendars.calendarNamePlaceholder') || 'Calendar name'}
-                  autoFocus
-                  style={{
-                    backgroundColor: 'var(--color-surface-secondary)',
-                    borderColor: 'var(--color-border)',
-                    color: 'var(--color-text)'
-                  }}
-                />
-                <Button
-                  onClick={handleCreateCalendar}
-                  variant="ghost"
-                  size="sm"
-                >
-                  <Check className="h-4 w-4" />
-                </Button>
-                <Button
-                  onClick={() => {
-                    setIsCreating(false)
-                    setNewCalendarName('')
-                  }}
-                  variant="ghost"
-                  size="sm"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <button
-              onClick={() => setIsCreating(true)}
-              className="w-full border-2 border-dashed rounded-lg p-4 flex items-center justify-center gap-2 hover:opacity-80 transition-opacity"
-              style={{
-                borderColor: 'var(--color-border)',
-                color: 'var(--color-text-secondary)'
-              }}
-            >
-              <Plus className="h-5 w-5" />
-              <span className="font-medium">{t('calendars.createNew') || 'Create New Calendar'}</span>
-            </button>
-          )}
+          <button
+            onClick={handleCreateCalendar}
+            className="w-full border-2 border-dashed rounded-lg p-4 flex items-center justify-center gap-2 hover:opacity-80 transition-opacity"
+            style={{
+              borderColor: 'var(--color-border)',
+              color: 'var(--color-text-secondary)'
+            }}
+          >
+            <Plus className="h-5 w-5" />
+            <span className="font-medium">{t('calendars.createNew') || 'Create New Calendar'}</span>
+          </button>
 
-          {calendars.length === 0 && !isCreating && (
+          {calendars.length === 0 && (
             <div className="text-center py-8">
               <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" style={{ color: 'var(--color-text-secondary)' }} />
               <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
