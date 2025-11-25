@@ -2,9 +2,10 @@ import ICAL from 'ical.js';
 import { format, isSameDay } from 'date-fns';
 import type { TurkuAmkScheduleEntry, ScheduleEvent } from '../types/schedule';
 import { RealizationApiService } from '../services/realizationApi';
+import { API_CONFIG } from '../config/api';
 
 export class ScheduleUtils {
-  private static readonly BACKEND_API_BASE = 'https://lukkari-api.juh.fi/api';
+  private static readonly BACKEND_API_BASE = API_CONFIG.BASE_URL;
 
   /**
    * Check calendar hash to see if the calendar has been updated

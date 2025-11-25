@@ -93,78 +93,6 @@ function isCacheStale(cacheKey: string): boolean {
 app.use(cors());
 app.use(express.json());
 
-type GoatCounterPayload = {
-  path: string;
-}
-
-// GoatCounter integration - read from environment variables
-const GOATCOUNTER_SERVICE_URL = process.env.GOATCOUNTER_SERVICE_URL;
-const GOATCOUNTER_API_KEY = process.env.GOATCOUNTER_API_KEY;
-
-// Check if GoatCounter is enabled
-const isGoatCounterEnabled = GOATCOUNTER_SERVICE_URL && GOATCOUNTER_API_KEY;
-
-if (isGoatCounterEnabled) {
-  console.log('GoatCounter logging enabled');
-} else {
-  console.log('GoatCounter logging disabled - GOATCOUNTER_SERVICE_URL and/or GOATCOUNTER_API_KEY not set');
-}
-
-let GOATCOUNTER_PAYLOADS: GoatCounterPayload[] = [];
-
-if (isGoatCounterEnabled) {
-  setInterval(() => {
-    if (GOATCOUNTER_PAYLOADS.length > 0) {
-      fetch(`${GOATCOUNTER_SERVICE_URL}/api/v0/count`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${GOATCOUNTER_API_KEY}`
-        },
-        body: JSON.stringify({
-          no_sessions: true,
-          hits: GOATCOUNTER_PAYLOADS
-        })
-      })
-      .then(response => {
-        if (!response.ok) {
-          console.error('GoatCounter logging failed:', response.statusText);
-        }
-
-        GOATCOUNTER_PAYLOADS = [];
-      })
-    }
-  }, 10000);
-}
-
-// this middleware captures the matched route for GoatCounter logging
-if (isGoatCounterEnabled) {
-  app.use((req, res, next) => {
-    // Store original end function
-    const originalEnd = res.end.bind(res);
-    
-    // Override end to capture the matched route
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    res.end = function(this: any, ...args: any[]): any {
-      // Get the route path after matching
-      let routePath = req.originalUrl;
-      
-      if (req.route && req.route.path) {
-        // Construct the full route template
-        routePath = req.baseUrl + req.route.path;
-      }
-      
-      console.log(`Logging route: ${routePath}`);
-      GOATCOUNTER_PAYLOADS.push({ path: routePath });
-      
-      // Call original end function
-      return originalEnd(...args);
-    };
-    
-    next();
-  });
-}
-
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -197,7 +125,6 @@ app.get('/api/calendar/hash', async (req: Request, res: Response) => {
     // If cache is fresh, return hash of cached data
     if (cachedData && !isStale) {
       const hash = crypto.createHash('sha256').update(cachedData).digest('hex');
-      console.log(`Hash check - using cached data for URL: ${calendarUrl}`);
       return res.json({
         hash,
         cached: true,
@@ -206,8 +133,7 @@ app.get('/api/calendar/hash', async (req: Request, res: Response) => {
       });
     }
 
-    // Cache is stale or missing - fetch fresh data
-    console.log(`Hash check - fetching fresh data for URL: ${calendarUrl}${cachedData ? ' (cache stale)' : ' (no cache)'}`);
+    console.log(`Fetching fresh data for URL: ${calendarUrl}${cachedData ? ' (cache stale)' : ' (no cache)'}`);
     const calendarData = await fetchAndCacheCalendar(calendarUrl, cacheKey);
     
     if (!calendarData) {

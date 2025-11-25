@@ -4,12 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "bun run dev:full",
     "dev:backend": "cd backend && bun run dev",
-    "dev:full": "concurrently \"bun run dev:backend\" \"bun run dev\" --names \"backend,frontend\" --prefix-colors \"blue,green\"",
+    "dev:frontend": "vite",
+    "dev:full": "concurrently \"bun run dev:backend\" \"bun run dev:frontend\" --names \"backend,frontend\" --prefix-colors \"blue,green\"",
     "build": "tsc -b && vite build",
     "build:backend": "cd backend && bun run build",
     "build:full": "bun run build:backend && bun run build",
+    "setup": "cd backend && bun install && cd .. && bun install",
     "lint": "eslint .",
     "preview": "vite preview"
   },

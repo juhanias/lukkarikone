@@ -1,3 +1,5 @@
+import { API_CONFIG } from '../config/api';
+
 interface RealizationApiResponse {
   data: {
     name: string
@@ -34,7 +36,7 @@ interface RealizationApiResponse {
 }
 
 export class RealizationApiService {
-  private static baseUrl = 'https://lukkari-api.juh.fi';
+  private static readonly baseUrl = API_CONFIG.REALIZATION_BASE_URL;
 
   /**
    * Extracts the realization code from an event title
