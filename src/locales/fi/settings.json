@@ -49,6 +49,10 @@
       "enhancedDialogs": {
         "label": "'Frosted Glass'-dialogit",
         "subtitle": "Tekee dialogien taustoista sumeampia ja kiinnostavampia. Mikäli tämä vaikuttaa negatiivisesti suorituskykyyn, voit poistaa sen käytöstä."
+      },
+      "compactViewToggle": {
+        "label": "Kompakti näkymävalitsin työpöydällä",
+        "subtitle": "Näytä päivä/viikko-valitsin päivämäärän otsikossa erillisen palkin sijaan. Poista käytöstä alkuperäiseen asetteluun."
       }
     },
     "language": {

@@ -249,6 +249,7 @@ interface Config {
   showTotalHours: boolean; // Show total non-hidden hours in day/week headers
   enhancedDialogs: boolean;
   squeezeWeekOnMobile: boolean;
+  compactViewToggle: boolean; // Show day/week toggle in header on desktop instead of full-width bar
   enableCommitNotifications?: boolean; // Technical: Show toast notifications for new commits
   devToolsVisible?: boolean;
   devToolsEnableEventGenerator?: boolean;
@@ -276,6 +277,7 @@ const defaultConfig: Config = {
   showTotalHours: true,
   enhancedDialogs: true,
   squeezeWeekOnMobile: false,
+  compactViewToggle: true,
   enableCommitNotifications: false,
   devToolsVisible: false,
   devToolsEnableEventGenerator: false,

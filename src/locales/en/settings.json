@@ -49,6 +49,10 @@
       "enhancedDialogs": {
         "label": "Use frosted glass dialogs",
         "subtitle": "Enable gradient backgrounds and blur for dialogs to make them more visually appealing. If this negatively impacts performance, you can disable it."
+      },
+      "compactViewToggle": {
+        "label": "Compact view toggle on desktop",
+        "subtitle": "Show day/week toggle in the date header instead of a full-width bar. Disable for the original layout."
       }
     },
     "language": {

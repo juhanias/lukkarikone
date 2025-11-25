@@ -183,6 +183,16 @@ export function useSettingsConfig(): SettingsConfig {
               checked: config.enhancedDialogs,
               onChange: (checked) => setConfig({ enhancedDialogs: checked })
             }
+          },
+          {
+            componentType: 'toggle',
+            id: 'compact-view-toggle',
+            data: {
+              label: t('sections.styling.compactViewToggle.label'),
+              subtitle: t('sections.styling.compactViewToggle.subtitle'),
+              checked: config.compactViewToggle,
+              onChange: (checked) => setConfig({ compactViewToggle: checked })
+            }
           }
         ]
       },

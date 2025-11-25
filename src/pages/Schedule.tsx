@@ -266,13 +266,13 @@ export default function Schedule() {
         borderColor: 'var(--color-border-alpha-30)'
       }}>
         {/* View Tabs */}
-        <div className="w-full max-w-7xl mx-auto px-4 pt-4">
+        <div className={`w-full max-w-7xl mx-auto px-4 pt-4 ${config.compactViewToggle ? 'md:hidden' : ''}`}>
           <div className="flex rounded-lg p-1" style={{ backgroundColor: 'var(--color-surface-secondary-alpha-30)' }}>
             <Button
               onClick={() => setViewMode('day')}
               variant={viewMode === 'day' ? 'default' : 'ghost'}
               size="sm"
-              className="flex-1"
+              className="flex-1 pr-2"
             >
               {t('navigation.day')}
             </Button>
@@ -288,7 +288,7 @@ export default function Schedule() {
         </div>
 
         {/* Navigation Controls */}
-        <div className="flex justify-between items-center p-4">
+        <div className={`flex justify-between items-center p-4 ${config.compactViewToggle ? 'md:hidden' : ''}`}>
           <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -386,6 +386,22 @@ export default function Schedule() {
                 isCheckingHash={isCheckingHash}
                 isFetchingCalendar={isFetchingCalendar}
                 hasError={!!error}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+                onPrevious={() => handleSwipe('right')}
+                onNext={() => handleSwipe('left')}
+                onToday={() => {
+                  const today = new Date()
+                  today.setHours(0, 0, 0, 0)
+                  if (currentDate.getTime() !== today.getTime()) {
+                    setIsTransitioning(true)
+                    setTimeout(() => {
+                      useScheduleRange.getState().goToToday()
+                      setIsTransitioning(false)
+                    }, 2)
+                  }
+                }}
+                isTransitioning={isTransitioning}
               />
             ) : (
               <WeekView 
@@ -395,6 +411,21 @@ export default function Schedule() {
                 isCheckingHash={isCheckingHash}
                 isFetchingCalendar={isFetchingCalendar}
                 hasError={!!error}
+                viewMode={viewMode}
+                onPrevious={() => handleSwipe('right')}
+                onNext={() => handleSwipe('left')}
+                onToday={() => {
+                  const today = new Date()
+                  today.setHours(0, 0, 0, 0)
+                  if (currentDate.getTime() !== today.getTime()) {
+                    setIsTransitioning(true)
+                    setTimeout(() => {
+                      useScheduleRange.getState().goToToday()
+                      setIsTransitioning(false)
+                    }, 2)
+                  }
+                }}
+                isTransitioning={isTransitioning}
               />
             )}
           </div>

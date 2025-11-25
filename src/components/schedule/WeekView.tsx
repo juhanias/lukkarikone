@@ -6,7 +6,7 @@ import { ScheduleLayoutUtils } from '../../utils/schedule-layout-utils'
 import { ScheduleUtils } from '../../utils/schedule-utils'
 import { DateFormatUtils } from '../../utils/date-format-utils'
 import { WEEK_HOUR_HEIGHT, SCHEDULE_LAYOUT, START_HOUR } from '../../constants/schedule-layout-constants'
-import { Calendar, Clock, Palette, Eye, EyeOff } from 'lucide-react'
+import { Calendar, Clock, Palette, Eye, EyeOff, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRealizationDialog } from '../../hooks/useRealizationDialog'
 import { useLectureDetailsDialog } from '../../hooks/useLectureDetailsDialog'
 import { useCurrentTime } from '../../hooks/useCurrentTime'
@@ -14,10 +14,10 @@ import { RealizationApiService } from '../../services/realizationApi'
 import { RealizationColorCustomizer } from '../RealizationColorCustomizer'
 import { LastUpdatedBadge } from '../LastUpdatedBadge'
 import { CalendarViewBadge } from '../CalendarViewBadge'
+import { Button } from '../ui/button'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from '../ui/context-menu'
 import RealizationDialog from '../RealizationDialog'
 import LectureDetailsDialog from '../LectureDetailsDialog'
-
 interface WeekViewProps {
   currentDate: Date
   setViewMode: (mode: 'day' | 'week') => void
@@ -25,9 +25,14 @@ interface WeekViewProps {
   isCheckingHash?: boolean
   isFetchingCalendar?: boolean
   hasError?: boolean
+  viewMode?: 'day' | 'week'
+  onPrevious?: () => void
+  onNext?: () => void
+  onToday?: () => void
+  isTransitioning?: boolean
 }
 
-const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchingCalendar, hasError }: WeekViewProps) => {
+const WeekView = memo(({ currentDate, setViewMode, lastUpdatedLabel, isCheckingHash, isFetchingCalendar, hasError, viewMode, onPrevious, onNext, onToday, isTransitioning }: WeekViewProps) => {
   const { t } = useTranslation('schedule')
   const { t: tColor } = useTranslation('colorCustomization')
   const { getWeekStart, getWeekDates } = useScheduleRange()
@@ -273,7 +278,92 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
               />
             </div>
           )}
-          <div className="text-center">
+          {/* Desktop - View Toggle + Today button on left (only when compactViewToggle is enabled) */}
+          {config.compactViewToggle && viewMode && setViewMode && (
+            <div className="hidden md:flex items-center gap-2 absolute left-4 bottom-4">
+              <div className="flex rounded-lg p-1" style={{ backgroundColor: 'var(--color-surface-secondary-alpha-30)' }}>
+                <Button
+                  onClick={() => setViewMode('day')}
+                  variant={viewMode === 'day' ? 'default' : 'ghost'}
+                  size="sm"
+                >
+                  {t('navigation.day')}
+                </Button>
+                <Button
+                  onClick={() => setViewMode('week')}
+                  variant={viewMode === 'week' ? 'default' : 'ghost'}
+                  size="sm"
+                >
+                  {t('navigation.week')}
+                </Button>
+              </div>
+              {onToday && (
+                <Button
+                  onClick={onToday}
+                  size="sm"
+                  className="rounded-full text-sm font-medium"
+                  style={{
+                    backgroundColor: 'var(--color-accent-alpha-20)',
+                    color: 'var(--color-accent)'
+                  }}
+                >
+                  {t('navigation.today')}
+                </Button>
+              )}
+            </div>
+          )}
+          {/* Desktop - Navigation arrows around date (only when compactViewToggle is enabled) */}
+          {config.compactViewToggle && onPrevious && onNext ? (
+            <div className="hidden md:flex items-center justify-center gap-10">
+              <Button
+                onClick={onPrevious}
+                disabled={isTransitioning}
+                variant="outline"
+                size="icon"
+                className="rounded-full disabled:opacity-50"
+                style={{
+                  backgroundColor: 'var(--color-surface)',
+                  color: 'var(--color-text)',
+                  borderColor: 'var(--color-border)'
+                }}
+              >
+                <ChevronLeft size={20} />
+              </Button>
+              <div className="text-center">
+                <div className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>
+                  {t('weekView.week')} {formatWeekIndicator()}
+                </div>
+                <h2 className="text-2xl font-medium" style={{ color: 'var(--color-text)' }}>
+                  {formatWeekHeader()}
+                </h2>
+              </div>
+              <Button
+                onClick={onNext}
+                disabled={isTransitioning}
+                variant="outline"
+                size="icon"
+                className="rounded-full disabled:opacity-50"
+                style={{
+                  backgroundColor: 'var(--color-surface)',
+                  color: 'var(--color-text)',
+                  borderColor: 'var(--color-border)'
+                }}
+              >
+                <ChevronRight size={20} />
+              </Button>
+            </div>
+          ) : (
+            <div className="hidden md:block text-center">
+              <div className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>
+                {t('weekView.week')} {formatWeekIndicator()}
+              </div>
+              <h2 className="text-2xl font-medium" style={{ color: 'var(--color-text)' }}>
+                {formatWeekHeader()}
+              </h2>
+            </div>
+          )}
+          {/* Mobile date display */}
+          <div className="md:hidden text-center">
             <div className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>
               {t('weekView.week')} {formatWeekIndicator()}
             </div>
@@ -281,7 +371,7 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
               {formatWeekHeader()}
             </h2>
           </div>
-          {/* Desktop badges - Stacked vertically on the right */}
+          {/* Desktop - Badges on right */}
           <div className="hidden md:flex flex-col items-end gap-2 absolute right-4 bottom-4">
             {lastUpdatedLabel && (
               <LastUpdatedBadge 
