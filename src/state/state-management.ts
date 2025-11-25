@@ -246,8 +246,10 @@ interface Config {
   showWeekends: boolean;
   hiddenEventOpacity: number; // Opacity for hidden events (0-100)
   showCourseIdInSchedule: boolean;
+  showTotalHours: boolean; // Show total non-hidden hours in day/week headers
   enhancedDialogs: boolean;
   squeezeWeekOnMobile: boolean;
+  enableCommitNotifications?: boolean; // Technical: Show toast notifications for new commits
   devToolsVisible?: boolean;
   devToolsEnableEventGenerator?: boolean;
 }
@@ -271,8 +273,10 @@ const defaultConfig: Config = {
   showWeekends: false,
   hiddenEventOpacity: 25,
   showCourseIdInSchedule: false,
+  showTotalHours: true,
   enhancedDialogs: true,
   squeezeWeekOnMobile: false,
+  enableCommitNotifications: false,
   devToolsVisible: false,
   devToolsEnableEventGenerator: false,
 };
@@ -1102,6 +1106,46 @@ const useCalendarStore = create<CalendarState>()(
 
         return persistedState;
       }
+    }
+  )
+);
+
+// Seen commits store - tracks which commits the user has seen for commit notifications
+interface SeenCommitsState {
+  seenCommits: string[]; // Array of commit SHAs that user has seen
+  addSeenCommit: (sha: string) => void;
+  addSeenCommits: (shas: string[]) => void;
+  hasSeenCommit: (sha: string) => boolean;
+  clearSeenCommits: () => void;
+}
+
+export const useSeenCommitsStore = create<SeenCommitsState>()(
+  persist(
+    (set, get) => ({
+      seenCommits: [],
+      addSeenCommit: (sha: string) => {
+        const { seenCommits } = get();
+        if (!seenCommits.includes(sha)) {
+          set({ seenCommits: [...seenCommits, sha] });
+        }
+      },
+      addSeenCommits: (shas: string[]) => {
+        const { seenCommits } = get();
+        const newShas = shas.filter(sha => !seenCommits.includes(sha));
+        if (newShas.length > 0) {
+          set({ seenCommits: [...seenCommits, ...newShas] });
+        }
+      },
+      hasSeenCommit: (sha: string) => {
+        return get().seenCommits.includes(sha);
+      },
+      clearSeenCommits: () => {
+        set({ seenCommits: [] });
+      }
+    }),
+    {
+      name: 'seen-commits',
+      version: 1,
     }
   )
 );

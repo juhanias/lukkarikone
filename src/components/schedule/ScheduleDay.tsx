@@ -95,14 +95,14 @@ const ScheduleDay = memo(({ date, events, lastUpdatedLabel, isCheckingHash, isFe
     return ScheduleLayoutUtils.generateTimeSlots(events)
   }
 
-  const formatDate = (date: Date) => {
-    return DateFormatUtils.formatDayViewDate(date)
+  const formatDate = (date: Date, events: ScheduleEvent[]) => {
+    return DateFormatUtils.formatDayViewDate(date, events, isEventHidden, config.showTotalHours)
   }
 
   const positionedEvents = calculateEventPositions(events)
   const gapPeriods = calculateGapPeriods(events)
   const timeSlots = generateTimeSlots(events)
-  const dateInfo = formatDate(date)
+  const dateInfo = formatDate(date, events)
 
   // Current time indicator
   const currentTime = useCurrentTime()

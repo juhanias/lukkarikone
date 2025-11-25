@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Settings as SettingsIcon } from 'lucide-react'
+import { Settings as SettingsIcon, GitBranch } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import useDocumentTitle from '../hooks/useDocumentTitle'
 import { useRef } from 'react'
@@ -133,6 +133,27 @@ export default function Settings() {
                   </SettingsSection>
                 </motion.div>
               ))}
+
+              {/* Mobile-only author credit and version info */}
+              <div className="lg:hidden text-center py-6 space-y-1">
+                <p className="text-xs" style={{ color: 'var(--color-text-secondary)', opacity: 0.6 }}>
+                  Open Lukkarikone by Juhani Astikainen
+                </p>
+                <div className="flex items-center justify-center gap-1.5 text-xs" style={{ color: 'var(--color-text-secondary)', opacity: 0.5 }}>
+                  <GitBranch size={12} />
+                  <span>{__GIT_BRANCH__}</span>
+                  <span>•</span>
+                  <a 
+                    href={`https://github.com/juhanias/lukkarikone/commit/${__GIT_COMMIT_HASH__}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                    style={{ color: 'inherit' }}
+                  >
+                    {__GIT_COMMIT_HASH__}
+                  </a>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>

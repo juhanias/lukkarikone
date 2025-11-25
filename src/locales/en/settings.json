@@ -37,6 +37,10 @@
       "squeezeWeekOnMobile": {
         "label": "Squeeze week view on mobile",
         "subtitle": "Fit the entire week into the screen width on mobile devices without horizontal scrolling. NOTE! This may make the view cramped on small screens. Not recommended for general users."
+      },
+      "showTotalHours": {
+        "label": "Show total hours",
+        "subtitle": "Display the sum of non-hidden lecture hours in day and week headers"
       }
     },
     "styling": {
@@ -74,11 +78,19 @@
       "title": "Configuration",
       "subtitle": "Current settings (for developers)"
     },
+    "technical": {
+      "title": "Technical",
+      "subtitle": "Settings for power users and developers",
+      "enableCommitNotifications": "Enable commit notifications",
+      "enableCommitNotificationsSubtitle": "Show toast notifications when new commits are pushed to the repository"
+    },
     "development": {
       "title": "Development Utilities",
       "subtitle": "Tools for developers and testers",
       "enableEventGenerator": "Enable event generator",
-      "enableEventGeneratorSubtitle": "Generate random events for testing purposes"
+      "enableEventGeneratorSubtitle": "Generate random events for testing purposes",
+      "resetCommitCache": "Reset commit cache",
+      "resetCommitCacheSubtitle": "Clear the list of seen commits to receive notifications again"
     }
   }
 }

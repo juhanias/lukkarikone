@@ -1,6 +1,25 @@
 import i18n from '../i18n'
+import type { ScheduleEvent } from '../types/schedule'
 
 export class DateFormatUtils {
+  /**
+   * Calculate total non-hidden hours for a list of events
+   */
+  static calculateNonHiddenHours(events: ScheduleEvent[], isEventHidden: (eventId: string) => boolean): number {
+    return events.reduce((total, event) => {
+      return isEventHidden(event.id) ? total : total + event.duration
+    }, 0)
+  }
+
+  /**
+   * Formats hours for display, avoiding unnecessary decimals
+   */
+  static formatHoursDisplay(hours: number, showTotalHours: boolean = true): string {
+    if (!showTotalHours || hours <= 0) return ''
+    const formatted = Number.isInteger(hours) ? hours.toString() : hours.toFixed(1)
+    return ` (${formatted}h)`
+  }
+
   /**
    * Get localized day names from i18n
    */
@@ -64,7 +83,7 @@ export class DateFormatUtils {
   /**
    * Formats a date for the day view header
    */
-  static formatDayViewDate(date: Date): { dayWeek: string; fullDate: string } {
+  static formatDayViewDate(date: Date, events: ScheduleEvent[] = [], isEventHidden: (eventId: string) => boolean = () => false, showTotalHours: boolean = true): { dayWeek: string; fullDate: string } {
     const t = i18n.getFixedT(i18n.language, 'schedule')
     
     // Convert Sunday (0) to be day 6, Monday (1) to be day 0, etc.
@@ -79,26 +98,35 @@ export class DateFormatUtils {
     const year = date.getFullYear()
 
     const week = this.getWeekNumber(date)
+    const nonHiddenHours = this.calculateNonHiddenHours(events, isEventHidden)
+    const hoursDisplay = this.formatHoursDisplay(nonHiddenHours, showTotalHours)
 
     return {
-      dayWeek: `${dayCapitalized} - ${t('weekView.weekShort')} ${week}`,
+      dayWeek: `${dayCapitalized} - ${t('weekView.weekShort')} ${week}${hoursDisplay}`,
       fullDate: `${day}. ${month} ${year}`
     }
   }
 
   /**
-   * Formats the week header for week view
+   * Formats the week header for week view (date range only)
    */
   static formatWeekHeader(startDate: Date, endDate: Date): string {
     const locale = this.getCurrentLocale()
     const startMonth = startDate.toLocaleString(locale, { month: 'short' })
     const endMonth = endDate.toLocaleString(locale, { month: 'short' })
     
-    if (startMonth === endMonth) {
-      return `${startDate.getDate()}. - ${endDate.getDate()}. ${startMonth}`
-    } else {
-      return `${startDate.getDate()}. ${startMonth} - ${endDate.getDate()}. ${endMonth}`
-    }
+    return startMonth === endMonth
+      ? `${startDate.getDate()}. - ${endDate.getDate()}. ${startMonth}`
+      : `${startDate.getDate()}. ${startMonth} - ${endDate.getDate()}. ${endMonth}`
+  }
+
+  /**
+   * Formats the week indicator with optional hours for week view
+   */
+  static formatWeekIndicator(weekNumber: number, weekEvents: ScheduleEvent[] = [], isEventHidden: (eventId: string) => boolean = () => false, showTotalHours: boolean = true): string {
+    const nonHiddenHours = this.calculateNonHiddenHours(weekEvents, isEventHidden)
+    const hoursDisplay = this.formatHoursDisplay(nonHiddenHours, showTotalHours)
+    return `${weekNumber}${hoursDisplay}`
   }
 
   /**

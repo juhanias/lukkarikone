@@ -4,6 +4,7 @@ import { toast, Toaster } from "../ui/sonner"
 import useConfigStore from "../../state/state-management"
 import { getActiveNotifications, useNotificationStore } from "../../state/notification-store"
 import type { LocalizedTextMap, NotificationDismissalMode } from "../../types/notifications"
+import { useCommitNotifications } from "../../hooks/useCommitNotifications"
 
 interface NotificationProviderProps {
   children: ReactNode
@@ -48,6 +49,9 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
   const statuses = useNotificationStore((state) => state.statuses)
   const ensureStatuses = useNotificationStore((state) => state.ensureStatuses)
   const recordSeen = useNotificationStore((state) => state.recordSeen)
+
+  // Enable commit notifications feature (when enabled in dev settings)
+  useCommitNotifications()
   const markDismissed = useNotificationStore((state) => state.markDismissed)
 
   useEffect(() => {

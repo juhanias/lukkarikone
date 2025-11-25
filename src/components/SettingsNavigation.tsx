@@ -1,6 +1,21 @@
 import { motion } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
+import { GitBranch } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+
+// Format commit date to a readable short format
+function formatCommitDate(dateString: string): string {
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleDateString(undefined, { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    })
+  } catch {
+    return dateString
+  }
+}
 
 interface SettingsNavigationProps {
   sections: Array<{
@@ -79,6 +94,30 @@ export function SettingsNavigation({ sections, activeSection, onSectionClick }: 
           )
         })}
       </nav>
+
+      {/* Author credit and version info */}
+      <div className="px-3 mt-4 space-y-1">
+        <p className="text-xs" style={{ color: 'var(--color-text-secondary)', opacity: 0.6 }}>
+          Open Lukkarikone by Juhani Astikainen
+        </p>
+        <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--color-text-secondary)', opacity: 0.5 }}>
+          <GitBranch size={12} />
+          <span>{__GIT_BRANCH__}</span>
+          <span>•</span>
+          <a 
+            href={`https://github.com/juhanias/lukkarikone/commit/${__GIT_COMMIT_HASH__}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+            style={{ color: 'inherit' }}
+          >
+            {__GIT_COMMIT_HASH__}
+          </a>
+        </div>
+        <p className="text-xs" style={{ color: 'var(--color-text-secondary)', opacity: 0.4 }}>
+          {formatCommitDate(__GIT_COMMIT_DATE__)}
+        </p>
+      </div>
 
       {/* Decorative gradient fade at bottom */}
       <div 

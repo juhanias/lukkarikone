@@ -37,6 +37,10 @@
       "squeezeWeekOnMobile": {
         "label": "Sovita viikkonäkymä mobiilissa",
         "subtitle": "Sovita koko viikko näytön leveyteen mobiililaitteilla ilman vaakasuuntaista vieritystä. HUOM! Tämä voi tehdä näkymästä tukalan pienillä näytöillä. Ei suositella peruskäyttäjälle."
+      },
+      "showTotalHours": {
+        "label": "Näytä kokonaistunnit",
+        "subtitle": "Näytä piilottamattomien luentotuntien summa päivä- ja viikkonäkymän otsikoissa"
       }
     },
     "styling": {
@@ -74,11 +78,19 @@
       "title": "Konfiguraatio",
       "subtitle": "Nykyiset asetukset (kehittäjille)"
     },
+    "technical": {
+      "title": "Tekninen",
+      "subtitle": "Asetukset tehokäyttäjille ja kehittäjille",
+      "enableCommitNotifications": "Ota commit-ilmoitukset käyttöön",
+      "enableCommitNotificationsSubtitle": "Näytä ilmoituksia kun uusia committeja työnnetään repositorioon"
+    },
     "development": {
       "title": "Kehitystyökalut",
       "subtitle": "Työkaluja kehittäjille ja testaajille",
       "enableEventGenerator": "Ota tapahtumageneraattori käyttöön",
-      "enableEventGeneratorSubtitle": "Luo satunnaisia tapahtumia testauskäyttöön"
+      "enableEventGeneratorSubtitle": "Luo satunnaisia tapahtumia testaustarkoituksiin",
+      "resetCommitCache": "Tyhjennä commit-välimuisti",
+      "resetCommitCacheSubtitle": "Tyhjennä nähtyjen committien lista saadaksesi ilmoitukset uudelleen"
     }
   }
 }

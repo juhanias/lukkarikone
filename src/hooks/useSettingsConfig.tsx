@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Type, RotateCcw, Code, Palette, Calendar, Link, Languages, Sparkles } from 'lucide-react'
-import useConfigStore, { useRealizationColorStore, useCalendarStore } from '../state/state-management'
+import { Type, RotateCcw, Code, Palette, Calendar, Link, Languages, Sparkles, Terminal } from 'lucide-react'
+import useConfigStore, { useRealizationColorStore, useCalendarStore, useSeenCommitsStore } from '../state/state-management'
 import { FONT_OPTIONS, type Font } from '../types/config'
 import type { SettingsConfig } from '../types/settings-config'
 
@@ -10,6 +10,7 @@ export function useSettingsConfig(): SettingsConfig {
   const { config, setConfig, resetConfig, getListedThemes } = useConfigStore()
   const { customColors, clearAllCustomColors } = useRealizationColorStore()
   const { getActiveCalendar } = useCalendarStore()
+  const { clearSeenCommits, seenCommits } = useSeenCommitsStore()
   const activeCalendar = getActiveCalendar()
   const listedThemes = getListedThemes()
 
@@ -104,6 +105,16 @@ export function useSettingsConfig(): SettingsConfig {
               subtitle: t('sections.view.squeezeWeekOnMobile.subtitle'),
               checked: config.squeezeWeekOnMobile,
               onChange: (checked) => setConfig({ squeezeWeekOnMobile: checked })
+            }
+          },
+          {
+            componentType: 'toggle',
+            id: 'show-total-hours',
+            data: {
+              label: t('sections.view.showTotalHours.label'),
+              subtitle: t('sections.view.showTotalHours.subtitle'),
+              checked: config.showTotalHours,
+              onChange: (checked) => setConfig({ showTotalHours: checked })
             }
           }
         ]
@@ -289,6 +300,28 @@ export function useSettingsConfig(): SettingsConfig {
       })
     }
 
+    // Technical section - for power users
+    settingsConfig.push({
+      id: 'technical-settings',
+      blockName: t('sections.technical.title') || 'Technical',
+      blockDescription: t('sections.technical.subtitle') || 'Settings for power users and developers',
+      icon: Terminal,
+      iconColor: '#8b5cf6',
+      iconBgColor: '#8b5cf633',
+      components: [
+        {
+          componentType: 'toggle',
+          id: 'enable-commit-notifications',
+          data: {
+            label: t('sections.technical.enableCommitNotifications') || 'Enable commit notifications',
+            subtitle: t('sections.technical.enableCommitNotificationsSubtitle') || 'Show toast notifications when new commits are pushed',
+            checked: config.enableCommitNotifications || false,
+            onChange: (checked: boolean) => setConfig({ enableCommitNotifications: checked })
+          }
+        }
+      ]
+    })
+
     // Development tools section - hidden by default, can be revealed via Settings navigation (or visible in DEV)
     if (import.meta.env.DEV || config.devToolsVisible) {
       settingsConfig.push({
@@ -308,11 +341,40 @@ export function useSettingsConfig(): SettingsConfig {
               checked: config.devToolsEnableEventGenerator || false,
               onChange: (checked: boolean) => setConfig({ devToolsEnableEventGenerator: checked })
             }
+          },
+          {
+            componentType: 'custom',
+            id: 'reset-commit-cache',
+            data: {
+              render: () => (
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                      {t('sections.development.resetCommitCache') || 'Reset commit cache'}
+                    </p>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-secondary)' }}>
+                      {t('sections.development.resetCommitCacheSubtitle') || 'Clear seen commits list'} ({seenCommits.length} commits)
+                    </p>
+                  </div>
+                  <button
+                    onClick={clearSeenCommits}
+                    className="px-3 py-1.5 text-sm rounded transition-colors"
+                    style={{
+                      backgroundColor: 'var(--color-surface-secondary-alpha-30)',
+                      color: 'var(--color-text)',
+                      border: '1px solid var(--color-border-alpha-30)'
+                    }}
+                  >
+                    Reset
+                  </button>
+                </div>
+              )
+            }
           }
         ]
       })
     }
 
     return settingsConfig
-  }, [t, config, setConfig, resetConfig, listedThemes, customColors, clearAllCustomColors, activeCalendar])
+  }, [t, config, setConfig, resetConfig, listedThemes, customColors, clearAllCustomColors, activeCalendar, seenCommits, clearSeenCommits])
 }

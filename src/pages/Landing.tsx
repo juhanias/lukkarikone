@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Button } from '../components/ui/button'
-import { Check, X } from 'lucide-react'
+import { Check, X, GitBranch } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import useDocumentTitle from '../hooks/useDocumentTitle'
 
@@ -517,10 +517,27 @@ export default function Landing() {
         viewport={{ once: true, amount: 0.5 }}
         transition={{ duration: 0.6, ease: easeOutExpo }}
       >
-        <div className="max-w-6xl mx-auto text-center">
+        <div className="max-w-6xl mx-auto text-center space-y-2">
           <p style={{ color: blueTheme.textSecondary }} className="text-sm">
             {t('footer.copyright')}
           </p>
+          <p style={{ color: blueTheme.textSecondary, opacity: 0.6 }} className="text-xs">
+            {t('footer.author')}
+          </p>
+          <div className="flex items-center justify-center gap-1.5 text-xs" style={{ color: blueTheme.textSecondary, opacity: 0.4 }}>
+            <GitBranch size={12} />
+            <span>{__GIT_BRANCH__}</span>
+            <span>•</span>
+            <a 
+              href={`https://github.com/juhanias/lukkarikone/commit/${__GIT_COMMIT_HASH__}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+              style={{ color: 'inherit' }}
+            >
+              {__GIT_COMMIT_HASH__}
+            </a>
+          </div>
         </div>
       </motion.footer>
     </div>

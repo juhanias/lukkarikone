@@ -240,6 +240,17 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
     return DateFormatUtils.formatWeekHeader(startDate, endDate)
   }
 
+  // Format week indicator with hours
+  const formatWeekIndicator = () => {
+    const allWeekEvents = Object.values(mergedWeekEvents).flat()
+    return DateFormatUtils.formatWeekIndicator(
+      DateFormatUtils.getWeekNumber(currentDate),
+      allWeekEvents,
+      isEventHidden,
+      config.showTotalHours
+    )
+  }
+
   return (
     <div className="w-full h-full flex flex-col">
       {/* Week Header */}
@@ -264,7 +275,7 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
           )}
           <div className="text-center">
             <div className="text-sm mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-              {t('weekView.week')} {DateFormatUtils.getWeekNumber(currentDate)}
+              {t('weekView.week')} {formatWeekIndicator()}
             </div>
             <h2 className="text-2xl font-medium" style={{ color: 'var(--color-text)' }}>
               {formatWeekHeader()}
