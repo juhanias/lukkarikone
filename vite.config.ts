@@ -8,13 +8,22 @@ import { execSync } from 'child_process'
 function getGitInfo() {
   try {
     const commitHash = execSync('git rev-parse --short HEAD').toString().trim()
-    const branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim()
     const commitDate = execSync('git log -1 --format=%ci').toString().trim()
+    
+    // Try to get branch name from git
+    let branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim()
+    
+    // In Cloudflare Pages (and other CI), git is in detached HEAD state
+    // thankfully cloudflare has a bailout!
+    if (branch === 'HEAD') {
+      branch = process.env.CF_PAGES_BRANCH || 'main'
+    }
+    
     return { commitHash, branch, commitDate }
   } catch {
     return { 
       commitHash: 'unknown', 
-      branch: 'unknown', 
+      branch: process.env.CF_PAGES_BRANCH || 'main', 
       commitDate: new Date().toISOString() 
     }
   }
