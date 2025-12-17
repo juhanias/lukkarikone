@@ -45,7 +45,7 @@ export class RealizationApiService {
   static extractRealizationCode(eventTitle: string): string | null {
     // Match pattern: TE followed by alphanumerics, optional hyphen and more numbers
     // Handles surrounding punctuation like parentheses, dots, etc.
-    const match = eventTitle.match(/\b(TE[A-Z0-9]+-?\d+)/gi)
+    const match = eventTitle.match(/\b([A-Z]{2}[A-Z0-9]+-?\d+)/gi)
     
     if (match && match.length > 0) {
       // Return the last match in lowercase
@@ -65,7 +65,7 @@ export class RealizationApiService {
 
     // Remove the realization code and surrounding whitespace
     let result = eventTitle
-      .replace(/\s*\(?TE[A-Z0-9]+-?\d+\)?[.,;:!?]*\s*/gi, ' ')
+      .replace(/\s*\(?[A-Z]{2}[A-Z0-9]+-?\d+\)?[.,;:!?]*\s*/gi, ' ')
       .trim()
     
     // Clean up multiple consecutive spaces
