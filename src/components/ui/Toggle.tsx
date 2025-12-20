@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { Switch } from './switch'
 
 interface ToggleProps {
@@ -22,15 +21,10 @@ export function Toggle({ checked, onChange, label, subtitle, disabled = false }:
   }
 
   return (
-    <motion.div
-      className="w-full flex items-center justify-between p-4 rounded-lg transition-all cursor-pointer mt-4"
-      style={{
-        backgroundColor: 'var(--color-surface-secondary-alpha-30)',
-        border: '1px solid var(--color-border-alpha-30)'
-      }}
-      whileHover={{ scale: disabled ? 1 : 1.02 }}
-      whileTap={{ scale: disabled ? 1 : 0.98 }}
+    <div
+      className="w-full flex items-center justify-between p-4 rounded-lg cursor-pointer mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]"
       onClick={handleContainerClick}
+      style={{ opacity: disabled ? 0.7 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
     >
       <div className="flex-1 min-w-0 mr-4">
         <span className="font-medium" style={{ color: 'var(--color-text)' }}>{label}</span>
@@ -48,6 +42,6 @@ export function Toggle({ checked, onChange, label, subtitle, disabled = false }:
           aria-label={label}
         />
       </div>
-    </motion.div>
+    </div>
   )
 }

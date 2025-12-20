@@ -1,5 +1,4 @@
 import { memo, useState } from 'react'
-import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import type { ScheduleEvent, GapPeriod } from '../../types/schedule'
 import { ScheduleUtils } from '../../utils/schedule-utils'
@@ -250,8 +249,8 @@ const ScheduleDay = memo(({ date, events, lastUpdatedLabel, isCheckingHash, isFe
                   return (
                     <ContextMenu key={event.id}>
                       <ContextMenuTrigger asChild>
-                        <motion.div
-                          className={`absolute rounded-lg text-white shadow-lg cursor-pointer overflow-hidden hover:scale-101 transition-all duration-500 schedule-event-gradient`}
+                        <div
+                          className={`absolute rounded-lg text-white shadow-lg cursor-pointer overflow-hidden transition-colors duration-200 schedule-event-gradient`}
                           style={{
                             top: `${(event.startHour - START_HOUR) * DAY_HOUR_HEIGHT}px`,
                             height: `${event.duration * DAY_HOUR_HEIGHT}px`,
@@ -265,8 +264,6 @@ const ScheduleDay = memo(({ date, events, lastUpdatedLabel, isCheckingHash, isFe
                             '--normal-gradient': colorPair.normal,
                             '--hover-gradient': colorPair.flipped,
                           } as React.CSSProperties & { '--normal-gradient': string; '--hover-gradient': string }}
-                          whileHover={{ scale: 1.01 }}
-                          whileTap={{ scale: 0.995 }}
                           onClick={() => {
                             // Open lecture details dialog for this event
                             openLectureDetailsDialog(event)
@@ -299,7 +296,7 @@ const ScheduleDay = memo(({ date, events, lastUpdatedLabel, isCheckingHash, isFe
                               </p>
                             )}
                           </div>
-                        </motion.div>
+                        </div>
                       </ContextMenuTrigger>
                       <ContextMenuContent style={{
                         backgroundColor: 'var(--color-surface)',

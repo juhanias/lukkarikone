@@ -54,7 +54,7 @@ export default function Layout() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105"
+                className="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150"
                 style={{
                   backgroundColor: location.pathname === '/' 
                     ? 'var(--color-header-accent)' 
@@ -74,7 +74,7 @@ export default function Layout() {
               onClick={handleSettingsClick}
               variant="ghost"
               size="sm"
-              className="px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105"
+              className="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150"
               style={{
                 backgroundColor: location.pathname === '/settings' 
                   ? 'var(--color-header-accent)' 
@@ -95,7 +95,7 @@ export default function Layout() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:scale-105"
+                  className="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150"
                   style={{
                     backgroundColor: isPopoverOpen ? 'var(--color-header-accent)' : 'transparent',
                     color: isPopoverOpen ? 'white' : 'var(--color-header-text)',

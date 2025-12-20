@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import useDocumentTitle from '../hooks/useDocumentTitle'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useScheduleRange, useScheduleStore, useCalendarStore } from '../state/state-management'
 import useConfigStore from '../state/state-management'
@@ -75,6 +75,8 @@ export default function Schedule() {
 
   // Get events for the current date (only for day view)
   const currentEvents = viewMode === 'day' ? getEventsForDate(currentDate) : []
+  const isWeekView = viewMode === 'week'
+  const viewKey = isWeekView ? getWeekStart(currentDate).toDateString() : currentDate.toDateString()
 
   const lastUpdatedDisplay = useMemo(() => {
     if (!lastUpdated) {
@@ -147,6 +149,12 @@ export default function Schedule() {
         handleSwipe('left')
       }
     }
+  }
+
+  const viewTransition = {
+    initial: { opacity: 0.96, scale: 0.99 },
+    animate: { opacity: 1, scale: 1 },
+    transition: { duration: 0.18, ease: 'easeOut' as const },
   }
 
   // Keyboard navigation
@@ -240,25 +248,20 @@ export default function Schedule() {
       </Dialog>
 
       {/* Loading and Error States */}
-      <AnimatePresence>
-        {isLoading && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 backdrop-blur-sm flex items-center justify-center"
-            style={{ backgroundColor: 'var(--color-background-alpha-60)' }}
-          >
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-2 border-t-transparent mx-auto" style={{
-                borderColor: 'var(--color-accent)',
-                borderTopColor: 'transparent'
-              }}></div>
-              <p className="mt-4" style={{ color: 'var(--color-text-secondary)' }}>{t('loading.schedule')}</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {isLoading && (
+        <div
+          className="absolute inset-0 z-50 backdrop-blur-sm flex items-center justify-center"
+          style={{ backgroundColor: 'var(--color-background-alpha-60)' }}
+        >
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-t-transparent mx-auto" style={{
+              borderColor: 'var(--color-accent)',
+              borderTopColor: 'transparent'
+            }}></div>
+            <p className="mt-4" style={{ color: 'var(--color-text-secondary)' }}>{t('loading.schedule')}</p>
+          </div>
+        </div>
+      )}
 
       {/* Navigation Buttons - Fixed at top */}
       <div className="flex flex-col border-b" style={{
@@ -290,72 +293,57 @@ export default function Schedule() {
         {/* Navigation Controls */}
         <div className="flex justify-between items-center p-4">
           <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <Button 
+              onClick={() => handleSwipe('right')}
+              disabled={isTransitioning}
+              variant="outline"
+              size="icon"
+              className="p-3 rounded-full disabled:opacity-50 transition-colors"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-text)',
+                borderColor: 'var(--color-border)'
+              }}
             >
-              <Button 
-                onClick={() => handleSwipe('right')}
-                disabled={isTransitioning}
-                variant="outline"
-                size="icon"
-                className="p-3 rounded-full disabled:opacity-50"
-                style={{
-                  backgroundColor: 'var(--color-surface)',
-                  color: 'var(--color-text)',
-                  borderColor: 'var(--color-border)'
-                }}
-              >
-                <ChevronLeft size={20} />
-              </Button>
-            </motion.div>
+              <ChevronLeft size={20} />
+            </Button>
             
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <Button
+              onClick={() => {
+                const today = new Date()
+                today.setHours(0, 0, 0, 0)
+                if (currentDate.getTime() !== today.getTime()) {
+                  setIsTransitioning(true)
+                  setTimeout(() => {
+                    useScheduleRange.getState().goToToday()
+                    setIsTransitioning(false)
+                  }, 2)
+                }
+              }}
+              size="sm"
+              className="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+              style={{
+                backgroundColor: 'var(--color-accent-alpha-20)',
+                color: 'var(--color-accent)'
+              }}
             >
-              <Button
-                onClick={() => {
-                  const today = new Date()
-                  today.setHours(0, 0, 0, 0)
-                  if (currentDate.getTime() !== today.getTime()) {
-                    setIsTransitioning(true)
-                    setTimeout(() => {
-                      useScheduleRange.getState().goToToday()
-                      setIsTransitioning(false)
-                    }, 2)
-                  }
-                }}
-                size="sm"
-                className="px-4 py-2 rounded-full text-sm font-medium"
-                style={{
-                  backgroundColor: 'var(--color-accent-alpha-20)',
-                  color: 'var(--color-accent)'
-                }}
-              >
-                {t('navigation.today')}
-              </Button>
-            </motion.div>
+              {t('navigation.today')}
+            </Button>
             
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <Button 
+              onClick={() => handleSwipe('left')}
+              disabled={isTransitioning}
+              variant="outline"
+              size="icon"
+              className="p-3 rounded-full disabled:opacity-50 transition-colors"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-text)',
+                borderColor: 'var(--color-border)'
+              }}
             >
-              <Button 
-                onClick={() => handleSwipe('left')}
-                disabled={isTransitioning}
-                variant="outline"
-                size="icon"
-                className="p-3 rounded-full disabled:opacity-50"
-                style={{
-                  backgroundColor: 'var(--color-surface)',
-                  color: 'var(--color-text)',
-                  borderColor: 'var(--color-border)'
-                }}
-              >
-                <ChevronRight size={20} />
-              </Button>
-            </motion.div>
+              <ChevronRight size={20} />
+            </Button>
           </div>
         </div>
       </div>
@@ -363,19 +351,15 @@ export default function Schedule() {
       {/* Swipeable Schedule Container */}
       <div className="flex-1 relative">
         <motion.div
-          key={viewMode === 'day' ? currentDate.toDateString() : getWeekStart(currentDate).toDateString()} // Key ensures re-render on date/view change
+          key={viewKey} // Key ensures re-render on date/view change
           className="absolute inset-0"
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.1}
           onDragEnd={handlePanEnd}
-          initial={{ opacity: 0.8, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 30,
-          }}
+          initial={viewTransition.initial}
+          animate={viewTransition.animate}
+          transition={viewTransition.transition}
         >
           <div className="h-full overflow-y-auto">
             {viewMode === 'day' ? (

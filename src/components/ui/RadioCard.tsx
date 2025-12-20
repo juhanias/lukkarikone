@@ -1,5 +1,3 @@
-import { motion } from 'framer-motion'
-
 interface RadioCardProps {
   name: string
   value: string
@@ -20,16 +18,22 @@ export function RadioCard({
   disabled = false 
 }: RadioCardProps) {
   return (
-    <motion.label 
-      className="flex items-center p-4 rounded-lg cursor-pointer transition-all"
+    <label 
+      className="flex items-center p-4 rounded-lg cursor-pointer transition-colors border"
       style={{
         backgroundColor: 'var(--color-surface-secondary-alpha-30)',
-        border: '1px solid var(--color-border-alpha-30)',
+        borderColor: 'var(--color-border-alpha-30)',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.6 : 1
       }}
-      whileHover={{ scale: disabled ? 1 : 1.02 }}
-      whileTap={{ scale: disabled ? 1 : 0.98 }}
+      onMouseEnter={(e) => {
+        if (!disabled) {
+          (e.currentTarget as HTMLLabelElement).style.backgroundColor = 'var(--color-surface-secondary-alpha-40)'
+        }
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLLabelElement).style.backgroundColor = 'var(--color-surface-secondary-alpha-30)'
+      }}
     >
       <input
         type="radio"
@@ -53,6 +57,6 @@ export function RadioCard({
       {checked && (
         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-accent)' }} />
       )}
-    </motion.label>
+    </label>
   )
 }

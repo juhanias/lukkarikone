@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import useConfigStore from '../state/state-management';
 
@@ -42,16 +41,14 @@ export function ThemeSelector({ themes, selectedThemeId, onThemeSelect }: ThemeS
         const borderColor = theme.colors.accentSecondary || theme.colors.accent;
         
         return (
-          <motion.button
+          <button
             key={theme.id}
-            className="relative cursor-pointer"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+            className="relative cursor-pointer focus:outline-none"
             onClick={() => onThemeSelect(theme.id)}
             aria-label={`Select ${theme.id} theme`}
           >
             <div 
-              className="w-12 h-12 rounded-full relative overflow-hidden border-2 transition-all duration-200"
+              className="w-12 h-12 rounded-full relative overflow-hidden border-2 transition-colors duration-150"
               style={{
                 borderColor: selectedThemeId === theme.id 
                   ? currentTheme.colors.accentSecondary
@@ -71,11 +68,9 @@ export function ThemeSelector({ themes, selectedThemeId, onThemeSelect }: ThemeS
               
               {/* Checkmark for selected theme */}
               {selectedThemeId === theme.id && (
-                <motion.div
+                <div
                   className="absolute inset-0 flex items-center justify-center"
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: "spring", bounce: 0.5 }}
+                  style={{ transition: 'opacity 0.12s ease' }}
                 >
                   <div 
                     className="w-6 h-6 rounded-full flex items-center justify-center"
@@ -83,10 +78,10 @@ export function ThemeSelector({ themes, selectedThemeId, onThemeSelect }: ThemeS
                   >
                     <Check className="w-4 h-4 text-white" strokeWidth={3} />
                   </div>
-                </motion.div>
+                </div>
               )}
             </div>
-          </motion.button>
+          </button>
         );
       })}
     </div>

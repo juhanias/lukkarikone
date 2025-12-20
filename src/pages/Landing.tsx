@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { Button } from '../components/ui/button'
 import { Check, X, GitBranch } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import useDocumentTitle from '../hooks/useDocumentTitle'
+import { motion } from 'framer-motion'
 
 // Blue theme colors as inline styles
 const blueTheme = {
@@ -14,34 +14,33 @@ const blueTheme = {
   accent: "rgb(59, 130, 246)",
 };
 
-// Shared motion variants keep the landing page reveal cohesive.
-const easeOutExpo = [0.16, 1, 0.3, 1] as const;
-const easeInOut = [0.42, 0, 0.58, 1] as const;
+// Shared motion variants to give the landing page some entrance animation without affecting the app shell.
+const easeOutExpo = [0.16, 1, 0.3, 1] as const
 
 const fadeInUp = {
-  hidden: { opacity: 0, y: 32 },
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: easeOutExpo },
+    transition: { duration: 0.5, ease: easeOutExpo },
   },
-};
+}
 
 const fadeIn = {
-  hidden: { opacity: 0, scale: 0.95 },
+  hidden: { opacity: 0, scale: 0.98 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.6, ease: easeOutExpo },
+    transition: { duration: 0.5, ease: easeOutExpo },
   },
-};
+}
 
 const staggerContainer = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.12 },
+    transition: { staggerChildren: 0.08 },
   },
-};
+}
 
 // Comparison data
 const comparisonFeatures = [
@@ -86,9 +85,9 @@ export default function Landing() {
     >
       {/* Header */}
       <motion.header 
-        initial={{ opacity: 0, y: -16 }}
+        initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: easeOutExpo }}
+        transition={{ duration: 0.5, ease: easeOutExpo }}
         className="p-4 flex justify-between items-center flex-shrink-0 absolute top-0 left-0 right-0 z-10"
         style={{
           backgroundColor: 'transparent',
@@ -148,10 +147,8 @@ export default function Landing() {
           <motion.div className="w-full mx-auto" variants={fadeIn}>
             {/* Desktop Layout */}
             <div className="hidden lg:flex items-center justify-center gap-4">
-              <motion.div
+              <div
                 className="w-1/4 opacity-40 hover:opacity-60 transition-opacity"
-                variants={fadeInUp}
-                whileHover={{ opacity: 0.7 }}
               >
                 <img 
                   src="/landing/showcase-2.webp" 
@@ -164,17 +161,13 @@ export default function Landing() {
                     boxShadow: `0 10px 25px -5px rgba(0, 0, 0, 0.2)`
                   }}
                 />
-              </motion.div>
+              </div>
               
-              <motion.div
+              <div
                 className="w-1/2"
-                variants={fadeInUp}
               >
-                <motion.div
-                  animate={{ y: [0, -12, 0] }}
-                  transition={{ duration: 8, ease: easeInOut, repeat: Infinity, repeatType: 'mirror' }}
-                >
-                  <motion.img 
+                <div>
+                  <img 
                     src="/landing/showcase.webp" 
                     alt="Lukkari app showcase" 
                     className="w-full h-auto rounded-lg shadow-2xl"
@@ -183,18 +176,12 @@ export default function Landing() {
                     style={{
                       boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.3)`
                     }}
-                    initial={{ opacity: 0, scale: 0.94 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.8, ease: easeOutExpo, delay: 0.2 }}
-                    whileHover={{ scale: 1.02 }}
                   />
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
               
-              <motion.div
+              <div
                 className="w-1/4 opacity-40 hover:opacity-60 transition-opacity"
-                variants={fadeInUp}
-                whileHover={{ opacity: 0.7 }}
               >
                 <img 
                   src="/landing/showcase-3.webp" 
@@ -207,12 +194,11 @@ export default function Landing() {
                     boxShadow: `0 10px 25px -5px rgba(0, 0, 0, 0.2)`
                   }}
                 />
-              </motion.div>
+              </div>
             </div>
             
-            <motion.div
+            <div
               className="lg:hidden w-full md:w-3/4 mx-auto"
-              variants={fadeInUp}
             >
               <motion.img 
                 src="/landing/showcase.webp" 
@@ -223,12 +209,12 @@ export default function Landing() {
                 style={{
                   boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.3)`
                 }}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.6, ease: easeOutExpo }}
+                variants={fadeIn}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.4 }}
               />
-            </motion.div>
+            </div>
           </motion.div>
 
           {/* Hero Text */}
@@ -260,26 +246,20 @@ export default function Landing() {
 
           {/* cta */}
           <motion.div className="flex gap-4 justify-center pt-4" variants={fadeInUp}>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+            <Button 
+              asChild
+              size="default"
+              className="text-base px-6 py-3 h-auto rounded-full transition-colors transition-transform duration-200 hover:scale-105"
+              style={{
+                background: `linear-gradient(135deg, ${blueTheme.accent} 0%, rgb(37, 99, 235) 100%)`,
+                color: 'white',
+                boxShadow: '0 4px 14px 0 rgba(59, 130, 246, 0.39)',
+              }}
             >
-              <Button 
-                asChild
-                size="default"
-                className="text-base px-6 py-3 h-auto rounded-full"
-                style={{
-                  background: `linear-gradient(135deg, ${blueTheme.accent} 0%, rgb(37, 99, 235) 100%)`,
-                  color: 'white',
-                  boxShadow: '0 4px 14px 0 rgba(59, 130, 246, 0.39)',
-                }}
-              >
-                <Link to="/app">
-                  {t('hero.cta')}
-                </Link>
-              </Button>
-            </motion.div>
+              <Link to="/app">
+                {t('hero.cta')}
+              </Link>
+            </Button>
           </motion.div>
         </motion.div>
       </motion.main>
@@ -290,16 +270,15 @@ export default function Landing() {
         variants={staggerContainer}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
+        viewport={{ once: true, amount: 0.18 }}
       >
         <div className="max-w-6xl mx-auto">
           <motion.div className="grid md:grid-cols-2 gap-12 items-center mb-32" variants={staggerContainer}>
-            <motion.div className="order-2 md:order-1" variants={fadeInUp}>
+            <div className="order-2 md:order-1">
               <motion.div
-                className="w-full rounded-lg overflow-hidden shadow-xl"
+                className="w-full rounded-lg overflow-hidden shadow-xl transition-transform duration-200 hover:-translate-y-1"
                 style={{ boxShadow: `0 20px 40px -10px rgba(0, 0, 0, 0.25)` }}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: 'spring', stiffness: 230, damping: 20 }}
+                variants={fadeIn}
               >
                 <img 
                   src="/landing/showcase-colorful.webp" 
@@ -310,7 +289,7 @@ export default function Landing() {
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
                 />
               </motion.div>
-            </motion.div>
+            </div>
             <motion.div className="order-1 md:order-2 space-y-4" variants={fadeInUp}>
               <h2 
                 className="text-3xl md:text-4xl font-bold"
@@ -342,12 +321,11 @@ export default function Landing() {
                 {t('features.fast.description')}
               </p>
             </motion.div>
-            <motion.div variants={fadeInUp}>
+            <div>
               <motion.div
-                className="w-full rounded-lg overflow-hidden shadow-xl"
+                className="w-full rounded-lg overflow-hidden shadow-xl transition-transform duration-200 hover:-translate-y-1"
                 style={{ boxShadow: `0 20px 40px -10px rgba(0, 0, 0, 0.25)` }}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: 'spring', stiffness: 230, damping: 20 }}
+                variants={fadeIn}
               >
                 <video 
                   autoPlay
@@ -361,16 +339,15 @@ export default function Landing() {
                   <source src="/landing/showcase-speed.mp4" type="video/mp4" />
                 </video>
               </motion.div>
-            </motion.div>
+            </div>
           </motion.div>
 
           <motion.div className="grid md:grid-cols-2 gap-12 items-center mb-32" variants={staggerContainer}>
-            <motion.div className="order-2 md:order-1" variants={fadeInUp}>
+            <div className="order-2 md:order-1">
               <motion.div
-                className="w-full rounded-lg overflow-hidden shadow-xl"
+                className="w-full rounded-lg overflow-hidden shadow-xl transition-transform duration-200 hover:-translate-y-1"
                 style={{ boxShadow: `0 20px 40px -10px rgba(0, 0, 0, 0.25)` }}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: 'spring', stiffness: 230, damping: 20 }}
+                variants={fadeIn}
               >
                 <video 
                   autoPlay
@@ -384,7 +361,7 @@ export default function Landing() {
                   <source src="/landing/showcase-hide.mp4" type="video/mp4" />
                 </video>
               </motion.div>
-            </motion.div>
+            </div>
             <motion.div className="order-1 md:order-2 space-y-4" variants={fadeInUp}>
               <h2 
                 className="text-3xl md:text-4xl font-bold"
@@ -441,7 +418,6 @@ export default function Landing() {
                         borderBottomColor: `rgba(148, 163, 184, 0.15)`, 
                         borderBottomWidth: '1px'
                       }}
-                      transition={{ duration: 0.4, ease: easeOutExpo }}
                     >
                       <td 
                         className="py-4 px-4 font-medium"
@@ -465,13 +441,12 @@ export default function Landing() {
 
           <motion.div className="max-w-4xl mx-auto mb-20" variants={fadeInUp}>
             <motion.div 
-              className="rounded-lg p-8 md:p-12 shadow-2xl"
+              className="rounded-lg p-8 md:p-12 shadow-2xl transition-transform duration-200 hover:-translate-y-1"
               style={{ 
                 backgroundColor: blueTheme.background,
                 boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.3)`
               }}
-              whileHover={{ scale: 1.01 }}
-              transition={{ duration: 0.5, ease: easeOutExpo }}
+              variants={fadeIn}
             >
               <h2 
                 className="text-3xl md:text-4xl font-bold text-center mb-6"
@@ -489,19 +464,13 @@ export default function Landing() {
                 {t('development.description')}
               </p>
               <div className="flex justify-center">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ type: 'spring', stiffness: 240, damping: 18 }}
+                <Button 
+                  asChild
+                  variant="outline"
+                  size="lg"
                 >
-                  <Button 
-                    asChild
-                    variant="outline"
-                    size="lg"
-                  >
-                    <Link to="https://github.com/juhanias/lukkarikone">{t('development.cta')}</Link>
-                  </Button>
-                </motion.div>
+                  <Link to="https://github.com/juhanias/lukkarikone">{t('development.cta')}</Link>
+                </Button>
               </div>
             </motion.div>
           </motion.div>
@@ -512,10 +481,10 @@ export default function Landing() {
       <motion.footer
         className="w-full py-8 px-4 border-t"
         style={{ borderColor: `rgba(148, 163, 184, 0.2)` }}
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.5 }}
-        transition={{ duration: 0.6, ease: easeOutExpo }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ duration: 0.4, ease: easeOutExpo }}
       >
         <div className="max-w-6xl mx-auto text-center space-y-2">
           <p style={{ color: blueTheme.textSecondary }} className="text-sm">

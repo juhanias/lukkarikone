@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import { GitBranch } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -45,28 +44,31 @@ export function SettingsNavigation({ sections, activeSection, onSectionClick }: 
           const Icon = section.icon
 
           return (
-            <motion.button
+            <button
               key={section.id}
               onClick={() => onSectionClick(section.id)}
-              className="w-full text-left px-3 py-2 rounded-lg relative group cursor-pointer"
-              animate={{
+              className="w-full text-left px-3 py-2 rounded-lg relative group cursor-pointer transition-colors"
+              style={{
                 backgroundColor: isActive 
                   ? 'var(--color-surface-secondary-alpha-30)' 
                   : 'transparent',
                 color: isActive ? 'var(--color-text)' : 'var(--color-text-secondary)'
               }}
-              whileHover={{ 
-                backgroundColor: isActive 
-                  ? 'var(--color-surface-secondary-alpha-30)'
-                  : 'var(--color-surface-secondary-alpha-20)',
-                x: 2
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--color-surface-secondary-alpha-20)'
+                }
               }}
-              transition={{ duration: 0.15 }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = isActive
+                  ? 'var(--color-surface-secondary-alpha-30)'
+                  : 'transparent'
+              }}
             >
               <div className="flex items-center gap-3">
-                <motion.div 
-                  className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-md"
-                    animate={{
+                <div 
+                  className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-md transition-colors"
+                  style={{
                     backgroundColor: isActive && section.iconColor
                       ? `${section.iconColor}33`
                       : 'var(--color-surface-secondary-alpha-30)',
@@ -74,10 +76,9 @@ export function SettingsNavigation({ sections, activeSection, onSectionClick }: 
                       ? section.iconColor
                       : 'var(--color-text-secondary)'
                   }}
-                  transition={{ duration: 0.15 }}
                 >
                   <Icon className="w-4 h-4" size={16} />
-                </motion.div>
+                </div>
                 <span className="text-sm font-medium truncate">
                   {section.name}
                 </span>
@@ -90,7 +91,7 @@ export function SettingsNavigation({ sections, activeSection, onSectionClick }: 
                   style={{ backgroundColor: section.iconColor || 'var(--color-accent)' }}
                 />
               )}
-            </motion.button>
+            </button>
           )
         })}
       </nav>

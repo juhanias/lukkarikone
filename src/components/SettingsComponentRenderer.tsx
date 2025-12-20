@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Toggle, RadioCard } from './ui'
 import { Slider } from './ui/Slider'
@@ -49,14 +48,8 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
 
     case 'slider':
       return (
-        <motion.div 
-          className="p-4 rounded-lg transition-all mt-4"
-          style={{
-            backgroundColor: 'var(--color-surface-secondary-alpha-30)',
-            border: '1px solid var(--color-border-alpha-30)'
-          }}
-          whileHover={{ scale: 1.01 }}
-          transition={{ duration: 0.2 }}
+        <div 
+          className="p-4 rounded-lg mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="flex-1 min-w-0 mr-4">
@@ -68,12 +61,7 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
               </p>
             </div>
             <div 
-              className="font-mono text-sm px-2 py-1 rounded"
-              style={{ 
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-text)',
-                border: '1px solid var(--color-border-alpha-30)'
-              }}
+              className="font-mono text-sm px-2 py-1 rounded border bg-[var(--color-surface)] border-[var(--color-border-alpha-30)] text-[var(--color-text)]"
             >
               {component.data.value}{component.data.unit || ''}
             </div>
@@ -88,23 +76,17 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
               className="w-full opacity-slider-themed"
             />
           </div>
-        </motion.div>
+        </div>
       )
 
     case 'button': {
       return (
-        <motion.div
-          className="w-full flex items-center p-4 rounded-lg cursor-pointer transition-all"
-          style={{
-            backgroundColor: component.data.variant === 'danger'
-              ? 'rgba(239, 68, 68, 0.15)'
-              : 'var(--color-surface-secondary-alpha-30)',
-            border: component.data.variant === 'danger'
-              ? '1px solid rgba(239, 68, 68, 0.4)'
-              : '1px solid var(--color-border-alpha-30)'
-          }}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <div
+          className={
+            component.data.variant === 'danger'
+              ? 'w-full flex items-center p-4 rounded-lg cursor-pointer transition-colors bg-[rgba(239,68,68,0.15)] border border-[rgba(239,68,68,0.4)] hover:bg-[rgba(239,68,68,0.22)]'
+              : 'w-full flex items-center p-4 rounded-lg cursor-pointer transition-colors bg-[var(--color-surface-secondary-alpha-30)] border border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]'
+          }
           onClick={component.data.onClick}
           role="button"
           tabIndex={0}
@@ -121,7 +103,7 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
               </p>
             )}
           </div>
-        </motion.div>
+        </div>
       )
     }
 
