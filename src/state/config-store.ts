@@ -185,25 +185,6 @@ const isLightTheme = (theme: Theme): boolean => {
   return false;
 };
 
-const getOpposingTheme = (currentThemeId: string): string => {
-  const themes = getListedThemes();
-  const currentTheme = themes.find(t => t.id === currentThemeId);
-
-  if (!currentTheme) return 'default';
-
-  const isCurrentLight = isLightTheme(currentTheme);
-
-  const opposingThemes = themes.filter(theme =>
-    theme.id !== currentThemeId && isLightTheme(theme) !== isCurrentLight
-  );
-
-  if (opposingThemes.length > 0) {
-    return opposingThemes[0].id;
-  }
-
-  return themes[0]?.id || 'default';
-};
-
 interface Config {
   font: Font;
   theme: string;
