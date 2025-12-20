@@ -1,19 +1,12 @@
-import { Calendar, Settings, Sun, Moon, Ellipsis } from 'lucide-react'
-import { useState } from 'react'
+import { Calendar, Settings } from 'lucide-react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import useConfigStore from '../state/state-management'
 import { Button } from './ui/button'
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from './ui/popover'
 
 export default function Layout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { config, isCurrentThemeLight, toggleLightDarkMode } = useConfigStore()
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+  const { config, isCurrentThemeLight } = useConfigStore()
 
   const handleSettingsClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -89,61 +82,6 @@ export default function Layout() {
             >
               <Settings size={18} />
             </Button>
-            {/* Theme toggle menu */}
-            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150"
-                  style={{
-                    backgroundColor: isPopoverOpen ? 'var(--color-header-accent)' : 'transparent',
-                    color: isPopoverOpen ? 'white' : 'var(--color-header-text)',
-                    border: '1px solid',
-                    borderColor: isPopoverOpen ? 'var(--color-header-accent)' : 'var(--color-border-alpha-30)'
-                  }}
-                  aria-label="Theme options"
-                  title="Theme options"
-                >
-                  <Ellipsis size={18} />
-                </Button>
-              </PopoverTrigger>
-
-              <PopoverContent 
-                align="end" 
-                className="w-auto p-2"
-                style={{
-                  backgroundColor: 'var(--color-surface)',
-                  borderColor: 'var(--color-border-alpha-30)',
-                  color: 'var(--color-text)'
-                }}
-              >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start gap-2 px-3 py-2 text-sm hover:bg-opacity-10"
-                  onClick={() => {
-                    toggleLightDarkMode()
-                    setIsPopoverOpen(false)
-                  }}
-                  style={{
-                    color: 'var(--color-text)'
-                  }}
-                >
-                  {isCurrentThemeLight() ? (
-                    <>
-                      <Moon size={16} />
-                      Switch to dark mode
-                    </>
-                  ) : (
-                    <>
-                      <Sun size={16} />
-                      Switch to light mode
-                    </>
-                  )}
-                </Button>
-              </PopoverContent>
-            </Popover>
           </nav>
         </div>
       </header>

@@ -3,7 +3,6 @@ import { persist } from "zustand/middleware";
 import ICAL from 'ical.js';
 import type { ScheduleEvent } from '../types/schedule';
 import { ScheduleUtils } from '../utils/schedule-utils';
-import type { Calendar, CalendarState } from '../types/calendar';
 import { useRealizationColorStore } from './realization-color-store';
 import useCalendarStore from './calendar-store';
 

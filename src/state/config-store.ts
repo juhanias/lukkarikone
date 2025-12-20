@@ -97,28 +97,6 @@ const getThemes = (): Theme[] => [
     }
   },
   {
-    id: "light",
-    nameKey: "sections.theme.themes.light.name",
-    descriptionKey: "sections.theme.themes.light.description",
-    colors: {
-      background: "rgb(243, 244, 246)",
-      surface: "rgb(255, 255, 255)",
-      surfaceSecondary: "rgb(229, 231, 235)",
-      border: "rgb(209, 213, 219)",
-      text: "rgb(17, 24, 39)",
-      textSecondary: "rgb(75, 85, 99)",
-      accent: "rgb(37, 99, 235)",
-      accentSecondary: "rgb(29, 78, 216)",
-      success: "rgb(34, 197, 94)",
-      warning: "rgb(245, 158, 11)",
-      error: "rgb(239, 68, 68)",
-      headerAccent: "rgb(37, 99, 235)",
-      headerAccentSecondary: "rgb(29, 78, 216)",
-      headerText: "rgb(255, 255, 255)",
-      headerBackground: "rgb(37, 99, 235)",
-    }
-  },
-  {
     id: "boring",
     nameKey: "sections.theme.themes.boring.name",
     descriptionKey: "sections.theme.themes.boring.description",
@@ -189,6 +167,14 @@ const getThemes = (): Theme[] => [
 export const getListedThemes = (): Theme[] => getThemes().filter(theme => !theme.delisted);
 export const getAllThemes = (): Theme[] => getThemes();
 
+const sanitizeThemeId = (themeId?: string): string => {
+  const availableIds = new Set(getAllThemes().map(theme => theme.id));
+  if (!themeId || !availableIds.has(themeId)) {
+    return "default";
+  }
+  return themeId;
+};
+
 const isLightTheme = (theme: Theme): boolean => {
   const match = theme.colors.background.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
   if (match) {
@@ -215,7 +201,7 @@ const getOpposingTheme = (currentThemeId: string): string => {
     return opposingThemes[0].id;
   }
 
-  return isCurrentLight ? 'default' : 'ocean-breeze';
+  return themes[0]?.id || 'default';
 };
 
 interface Config {
@@ -323,6 +309,8 @@ const mergeConfigWithDefaults = (config?: Partial<Config>): Config => {
     ...sanitizedConfig,
   };
 
+  mergedConfig.theme = sanitizeThemeId(mergedConfig.theme);
+
   return mergedConfig;
 };
 
@@ -349,21 +337,10 @@ const useConfigStore = create<ConfigState>()(
         return isLightTheme(currentTheme);
       },
       toggleLightDarkMode: () => {
-        const { config, previousTheme } = get();
-        const currentThemeId = config.theme;
-
-        if (previousTheme && previousTheme !== currentThemeId) {
-          set((state) => ({
-            config: { ...state.config, theme: previousTheme },
-            previousTheme: currentThemeId
-          }));
-        } else {
-          const newTheme = getOpposingTheme(currentThemeId);
-          set((state) => ({
-            config: { ...state.config, theme: newTheme },
-            previousTheme: currentThemeId
-          }));
-        }
+        set((state) => ({
+          config: { ...state.config, theme: "default" },
+          previousTheme: "default"
+        }));
       },
     }),
     {
