@@ -33,6 +33,7 @@
     "ical.js": "^2.2.1",
     "lucide": "^0.542.0",
     "lucide-react": "^0.544.0",
+    "nuqs": "^2.8.6",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-i18next": "^15.7.3",

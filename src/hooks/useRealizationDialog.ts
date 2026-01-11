@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { RealizationApiService } from '../services/realizationApi'
+import { useRealizationDialogParam } from './useDialogParams'
 
 interface RealizationData {
   name: string
@@ -33,41 +34,55 @@ interface RealizationData {
 }
 
 export const useRealizationDialog = () => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [realizationCode, setRealizationCode] = useRealizationDialogParam()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [realizationData, setRealizationData] = useState<RealizationData | null>(null)
 
-  const openDialog = useCallback(async (eventTitle: string) => {
-    const realizationCode = RealizationApiService.extractRealizationCode(eventTitle)
-    
-    if (!realizationCode) {
-      setError('Tapahtumasta ei löytynyt toteutuskoodia')
-      setIsOpen(true)
+  const isOpen = Boolean(realizationCode)
+
+  // Fetch data when realizationCode changes
+  useEffect(() => {
+    if (!realizationCode || realizationCode === 'error') {
+      setRealizationData(null)
+      setError(null)
+      setIsLoading(false)
       return
     }
 
-    setIsOpen(true)
-    setIsLoading(true)
-    setError(null)
-    setRealizationData(null)
+    const fetchData = async () => {
+      setIsLoading(true)
+      setError(null)
+      setRealizationData(null)
 
-    try {
-      const response = await RealizationApiService.fetchRealizationData(realizationCode)
-      setRealizationData(response.data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Virhe haettaessa toteutustietoja')
-    } finally {
-      setIsLoading(false)
+      try {
+        const response = await RealizationApiService.fetchRealizationData(realizationCode)
+        setRealizationData(response.data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Virhe haettaessa toteutustietoja')
+      } finally {
+        setIsLoading(false)
+      }
     }
-  }, [])
+
+    fetchData()
+  }, [realizationCode])
+
+  const openDialog = useCallback(async (eventTitle: string) => {
+    const code = RealizationApiService.extractRealizationCode(eventTitle)
+    
+    if (!code) {
+      // Don't open dialog if there's no realization code
+      console.warn('No realization code found in event title:', eventTitle)
+      return
+    }
+
+    setRealizationCode(code)
+  }, [setRealizationCode])
 
   const closeDialog = useCallback(() => {
-    setIsOpen(false)
-    setError(null)
-    setRealizationData(null)
-    setIsLoading(false)
-  }, [])
+    setRealizationCode(null)
+  }, [setRealizationCode])
 
   const handleEventClick = useCallback((eventTitle: string) => {
     // Check if this event has a realization code

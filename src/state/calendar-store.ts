@@ -10,7 +10,17 @@ const useCalendarStore = create<CalendarState>()(
       activeCalendarId: null,
 
       addCalendar: (name: string, icalUrls: string[] = []) => {
-        const id = `calendar-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+        const state = get();
+        // Find next available index
+        const existingIndices = state.calendars
+          .map(cal => {
+            const match = cal.id.match(/^cal-(\d+)$/);
+            return match ? parseInt(match[1]) : 0;
+          })
+          .filter(n => n > 0);
+        const nextIndex = existingIndices.length > 0 ? Math.max(...existingIndices) + 1 : 1;
+        const id = `cal-${nextIndex}`;
+        
         const now = Date.now();
         const newCalendar: Calendar = {
           id,
@@ -132,15 +142,46 @@ const useCalendarStore = create<CalendarState>()(
     }),
     {
       name: "calendars",
-      version: 2,
+      version: 3,
       partialize: (state) => ({
         calendars: state.calendars,
         activeCalendarId: state.activeCalendarId
       }),
       migrate: (persistedState: unknown, version: number) => {
+        const state = persistedState as Partial<CalendarState>;
+        
+        // Version 3: Convert old calendar IDs to index-based format
+        if (version < 3 && state.calendars) {
+          const calendarsWithOldIds = state.calendars.filter(
+            cal => !cal.id.match(/^cal-\d+$/)
+          );
+          
+          if (calendarsWithOldIds.length > 0) {
+            console.log('Migrating calendar IDs to index-based format');
+            
+            // Map old IDs to new IDs
+            const idMap = new Map<string, string>();
+            const newCalendars = state.calendars.map((cal, index) => {
+              const newId = `cal-${index + 1}`;
+              idMap.set(cal.id, newId);
+              return { ...cal, id: newId };
+            });
+            
+            // Update active calendar ID if it changed
+            const newActiveCalendarId = state.activeCalendarId
+              ? idMap.get(state.activeCalendarId) || state.activeCalendarId
+              : null;
+            
+            return {
+              ...state,
+              calendars: newCalendars,
+              activeCalendarId: newActiveCalendarId
+            };
+          }
+        }
+        
+        // Version 2: Migrate from legacy single URL config
         if (version < 2) {
-          const state = persistedState as Partial<CalendarState>;
-
           const configState = localStorage.getItem('app-config');
           if (configState) {
             try {
@@ -152,7 +193,7 @@ const useCalendarStore = create<CalendarState>()(
                 const calendarName = getPresetCalendarName(migratedUrl) || 'Default';
                 const now = Date.now();
                 const defaultCalendar: Calendar = {
-                  id: `calendar-${now}-migrated`,
+                  id: 'cal-1',
                   name: calendarName,
                   icalUrls: [migratedUrl],
                   createdAt: now,

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog'
 import { Calendar, Plus, Trash2, Edit2, Link as LinkIcon, Check, X } from 'lucide-react'
 import { useCalendarStore } from '../state/state-management'
@@ -47,6 +48,7 @@ interface CalendarManagementDialogProps {
 
 export const CalendarManagementDialog = ({ open, onOpenChange }: CalendarManagementDialogProps) => {
   const { t } = useTranslation('common')
+  const navigate = useNavigate()
   const {
     calendars,
     activeCalendarId,
@@ -83,6 +85,7 @@ export const CalendarManagementDialog = ({ open, onOpenChange }: CalendarManagem
     // Optionally set as active
     if (calendars.length === 0) {
       setActiveCalendar(id)
+      navigate(`/app/${id}`)
     }
   }
 
@@ -232,7 +235,10 @@ export const CalendarManagementDialog = ({ open, onOpenChange }: CalendarManagem
                   <div className="flex items-center gap-1">
                     {calendar.id !== activeCalendarId && (
                       <Button
-                        onClick={() => setActiveCalendar(calendar.id)}
+                        onClick={() => {
+                          setActiveCalendar(calendar.id)
+                          navigate(`/app/${calendar.id}`)
+                        }}
                         variant="ghost"
                         size="sm"
                         title={t('calendars.setActive') || 'Set as active'}

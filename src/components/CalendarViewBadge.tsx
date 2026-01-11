@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import { Calendar } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useCalendarStore } from '../state/state-management'
 import { CalendarManagementDialog } from './CalendarManagementDialog'
+import { useCalendarsDialogParam } from '../hooks/useDialogParams'
 
 interface CalendarViewBadgeProps {
   variant?: 'full' | 'icon-only'
@@ -15,7 +15,9 @@ export const CalendarViewBadge = ({
 }: CalendarViewBadgeProps) => {
   const { t } = useTranslation('schedule')
   const { getActiveCalendar } = useCalendarStore()
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [calendarsParam, setCalendarsParam] = useCalendarsDialogParam()
+  
+  const isDialogOpen = calendarsParam === 'true'
 
   const activeCalendar = getActiveCalendar()
   const displayText = activeCalendar?.name || t('status.noCalendar', 'No calendar')
@@ -29,7 +31,7 @@ export const CalendarViewBadge = ({
           backgroundColor: 'var(--color-surface-secondary-alpha-30)',
           color: 'var(--color-text-secondary)'
         }}
-        onClick={() => setIsDialogOpen(true)}
+        onClick={() => setCalendarsParam('true')}
       >
         <Calendar className="h-3.5 w-3.5" style={{ color: 'var(--color-accent)' }} />
         {variant === 'full' && <span>{displayText}</span>}
@@ -37,7 +39,7 @@ export const CalendarViewBadge = ({
 
       <CalendarManagementDialog
         open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        onOpenChange={(open) => setCalendarsParam(open ? 'true' : null)}
       />
     </>
   )

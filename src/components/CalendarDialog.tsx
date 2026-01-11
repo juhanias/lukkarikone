@@ -1,16 +1,18 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CalendarManagementDialog } from './CalendarManagementDialog'
 import { Calendar, ChevronDown } from 'lucide-react'
+import { useCalendarsDialogParam } from '../hooks/useDialogParams'
 
 export function CalendarDialog() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [calendarsParam, setCalendarsParam] = useCalendarsDialogParam()
   const { t } = useTranslation('settings')
+
+  const isOpen = calendarsParam === 'true'
 
   return (
     <>
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => setCalendarsParam('true')}
         className="flex items-center justify-between gap-2 h-9 px-3 rounded-md border transition-colors w-full sm:w-auto sm:min-w-[180px] cursor-pointer hover:opacity-90"
         style={{
           borderColor: 'var(--color-border)',
@@ -27,7 +29,7 @@ export function CalendarDialog() {
 
       <CalendarManagementDialog
         open={isOpen}
-        onOpenChange={setIsOpen}
+        onOpenChange={(open) => setCalendarsParam(open ? 'true' : null)}
       />
     </>
   )

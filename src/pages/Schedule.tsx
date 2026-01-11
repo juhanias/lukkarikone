@@ -2,30 +2,39 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import useDocumentTitle from '../hooks/useDocumentTitle'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { useScheduleRange, useScheduleStore, useCalendarStore } from '../state/state-management'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useScheduleStore, useCalendarStore } from '../state/state-management'
 import useConfigStore from '../state/state-management'
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import { ScheduleDay, WeekView } from '../components/schedule'
 import { CalendarUrlModal } from '../components/CalendarUrlModal'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogPortal, DialogOverlay } from '@/components/ui/dialog'
-import { isToday } from 'date-fns'
+import { isToday, addDays, addWeeks, subDays, subWeeks, startOfWeek } from 'date-fns'
 import { toast } from 'sonner'
+import { useDateParam, useViewModeParam } from '../hooks/useScheduleParams'
 
 const VIEW_MODES = ['day', 'week'] as const
 
 export default function Schedule() {
   const { t, i18n } = useTranslation('schedule')
-  const { 
-    currentDate, 
-    viewMode,
-    setViewMode,
-    goToPreviousDay, 
-    goToNextDay,
-    goToPreviousWeek,
-    goToNextWeek,
-    getWeekStart
-  } = useScheduleRange()
+  const { calendarId } = useParams<{ calendarId: string }>()
+  const navigate = useNavigate()
+  const { getCalendar, getActiveCalendar, setActiveCalendar } = useCalendarStore()
+  
+  // URL-based state
+  const [dateParam, setDateParam] = useDateParam()
+  const [viewMode, setViewMode] = useViewModeParam()
+  
+  // Parse date from URL or use today
+  const currentDate = useMemo(() => {
+    if (dateParam) {
+      const parsed = new Date(dateParam)
+      return isNaN(parsed.getTime()) ? new Date() : parsed
+    }
+    return new Date()
+  }, [dateParam])
+  
   const { 
     getEventsForDate, 
     fetchSchedule, 
@@ -37,9 +46,55 @@ export default function Schedule() {
     lastUpdated
   } = useScheduleStore()
   const { config } = useConfigStore()
-  const { getActiveCalendar } = useCalendarStore()
-  const activeCalendar = getActiveCalendar()
   const [isTransitioning, setIsTransitioning] = useState(false)
+  
+  // Validate and set active calendar from URL
+  useEffect(() => {
+    if (!calendarId) return
+    
+    const calendar = getCalendar(calendarId)
+    const activeCalendar = getActiveCalendar()
+    
+    // If calendar not found, redirect to active calendar or default
+    if (!calendar) {
+      if (activeCalendar) {
+        navigate(`/app/${activeCalendar.id}`, { replace: true })
+      }
+      return
+    }
+    
+    // Set as active calendar if it's not already
+    if (activeCalendar?.id !== calendarId) {
+      setActiveCalendar(calendarId)
+    }
+  }, [calendarId, getCalendar, getActiveCalendar, setActiveCalendar, navigate])
+  
+  const activeCalendar = getActiveCalendar()
+  
+  const getWeekStart = useCallback((date: Date) => {
+    return startOfWeek(date, { weekStartsOn: 1 }) // Monday
+  }, [])
+  
+  const goToNextDay = useCallback(() => {
+    const nextDate = addDays(currentDate, 1)
+    setDateParam(nextDate.toISOString().split('T')[0])
+  }, [currentDate, setDateParam])
+  
+  const goToPreviousDay = useCallback(() => {
+    const prevDate = subDays(currentDate, 1)
+    setDateParam(prevDate.toISOString().split('T')[0])
+  }, [currentDate, setDateParam])
+  
+  const goToNextWeek = useCallback(() => {
+    const nextWeek = addWeeks(currentDate, 1)
+    setDateParam(nextWeek.toISOString().split('T')[0])
+  }, [currentDate, setDateParam])
+  
+  const goToPreviousWeek = useCallback(() => {
+    const prevWeek = subWeeks(currentDate, 1)
+    setDateParam(prevWeek.toISOString().split('T')[0])
+  }, [currentDate, setDateParam])
+  
   const rotateViewMode = useCallback((direction: 'forward' | 'backward') => {
     const currentIndex = VIEW_MODES.indexOf(viewMode)
 
@@ -315,7 +370,7 @@ export default function Schedule() {
                 if (currentDate.getTime() !== today.getTime()) {
                   setIsTransitioning(true)
                   setTimeout(() => {
-                    useScheduleRange.getState().goToToday()
+                    setDateParam(null) // null means use today
                     setIsTransitioning(false)
                   }, 2)
                 }

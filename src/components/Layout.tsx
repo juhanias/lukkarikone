@@ -1,17 +1,24 @@
 import { Calendar, Settings } from 'lucide-react'
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
-import useConfigStore from '../state/state-management'
+import { Outlet, Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import useConfigStore, { useCalendarStore } from '../state/state-management'
 import { Button } from './ui/button'
 
 export default function Layout() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { calendarId } = useParams<{ calendarId: string }>()
+  const { getActiveCalendar } = useCalendarStore()
   const { config, isCurrentThemeLight } = useConfigStore()
+  
+  const activeCalendar = getActiveCalendar()
+  const calendarPath = calendarId || activeCalendar?.id || ''
 
   const handleSettingsClick = (e: React.MouseEvent) => {
     e.preventDefault()
     if (location.pathname === '/app/settings') {
-      navigate('/app')
+      if (calendarPath) {
+        navigate(`/app/${calendarPath}`)
+      }
     } else {
       navigate('/app/settings')
     }
@@ -43,39 +50,41 @@ export default function Layout() {
           </Link>
           <nav className='flex gap-4 items-center'>
             {/* Calendar and Settings buttons (menu placed last) */}
-            <Link to="/app">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150"
-                style={{
-                  backgroundColor: location.pathname === '/' 
-                    ? 'var(--color-header-accent)' 
-                    : 'transparent',
-                  color: location.pathname === '/' 
-                    ? 'white'
-                    : 'var(--color-header-text)',
-                  border: location.pathname === '/' 
-                    ? 'none'
-                    : '1px solid var(--color-border-alpha-30)'
-                }}
-              >
-                <Calendar size={18} />
-              </Button>
-            </Link>
+            {calendarPath && (
+              <Link to={`/app/${calendarPath}`}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150"
+                  style={{
+                    backgroundColor: location.pathname.startsWith('/app/') && location.pathname !== '/app/settings'
+                      ? 'var(--color-header-accent)' 
+                      : 'transparent',
+                    color: location.pathname.startsWith('/app/') && location.pathname !== '/app/settings'
+                      ? 'white'
+                      : 'var(--color-header-text)',
+                    border: location.pathname.startsWith('/app/') && location.pathname !== '/app/settings'
+                      ? 'none'
+                      : '1px solid var(--color-border-alpha-30)'
+                  }}
+                >
+                  <Calendar size={18} />
+                </Button>
+              </Link>
+            )}
             <Button 
               onClick={handleSettingsClick}
               variant="ghost"
               size="sm"
               className="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150"
               style={{
-                backgroundColor: location.pathname === '/settings' 
+                backgroundColor: location.pathname === '/app/settings'
                   ? 'var(--color-header-accent)' 
                   : 'transparent',
-                color: location.pathname === '/settings' 
+                color: location.pathname === '/app/settings'
                   ? 'white'
                   : 'var(--color-header-text)',
-                border: location.pathname === '/settings' 
+                border: location.pathname === '/app/settings'
                   ? 'none'
                   : '1px solid var(--color-border-alpha-30)'
               }}

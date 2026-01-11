@@ -286,7 +286,7 @@ const RealizationDialog = ({
                         {getLocationString(event.location) && (
                           <span>📍 {getLocationString(event.location)}</span>
                         )}
-                        {event.reserved_for.length > 0 && (
+                        {event.reserved_for && event.reserved_for.length > 0 && (
                           <span className="ml-2">👨‍🏫 {event.reserved_for.join(', ')}</span>
                         )}
                       </div>

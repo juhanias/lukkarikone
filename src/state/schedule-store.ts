@@ -29,6 +29,7 @@ interface ScheduleState {
   fetchSchedule: () => Promise<void>;
   getEventsForDate: (date: Date) => ScheduleEvent[];
   getEventsForWeek: (weekStart: Date) => { [key: string]: ScheduleEvent[] };
+  getEventById: (id: string) => ScheduleEvent | null;
   refreshSchedule: () => Promise<void>;
   clearError: () => void;
   getICalCacheInfo: () => { url: string; lastUpdated: Date | null; lastFetched: Date }[];
@@ -206,6 +207,11 @@ export const useScheduleStore = create<ScheduleState>()(
         }
 
         return weekEvents;
+      },
+
+      getEventById: (id: string) => {
+        const { events } = get();
+        return events.find(event => event.id === id) || null;
       },
 
       refreshSchedule: async () => {

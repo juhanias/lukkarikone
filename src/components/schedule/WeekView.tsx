@@ -1,7 +1,8 @@
 import { memo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { startOfWeek, addDays } from 'date-fns'
 import type { ScheduleEvent } from '../../types/schedule'
-import { useScheduleRange, useScheduleStore, useRealizationColorStore, useHiddenEventsStore, default as useConfigStore } from '../../state/state-management'
+import { useScheduleStore, useRealizationColorStore, useHiddenEventsStore, default as useConfigStore } from '../../state/state-management'
 import { ScheduleLayoutUtils } from '../../utils/schedule-layout-utils'
 import { ScheduleUtils } from '../../utils/schedule-utils'
 import { DateFormatUtils } from '../../utils/date-format-utils'
@@ -30,7 +31,16 @@ interface WeekViewProps {
 const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchingCalendar, hasError }: WeekViewProps) => {
   const { t } = useTranslation('schedule')
   const { t: tColor } = useTranslation('colorCustomization')
-  const { getWeekStart, getWeekDates } = useScheduleRange()
+  
+  const getWeekStart = (date: Date) => {
+    return startOfWeek(date, { weekStartsOn: 1 }) // Monday
+  }
+  
+  const getWeekDates = (date: Date) => {
+    const weekStart = getWeekStart(date)
+    return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+  }
+  
   const { getEventsForWeek } = useScheduleStore()
   const { config, isCurrentThemeLight } = useConfigStore()
   const { customColors } = useRealizationColorStore()
@@ -41,8 +51,10 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
   const [selectedEventForColor, setSelectedEventForColor] = useState<ScheduleEvent | null>(null)
   // Temporary debug events for testing overlapping layout
   const [debugEvents, setDebugEvents] = useState<ScheduleEvent[]>([])
+  
   // Generate some temporary random events for quick testing
-  const generateRandomEvents = (count = 30) => {
+  const generateRandomEvents = (count = 30, weekDates: Date[]) => {
+    const filteredWeekDates = weekDates
     if (filteredWeekDates.length === 0) return
     const durations = [0.5, 1, 1.5, 2]
     const newEvents: ScheduleEvent[] = []
@@ -300,7 +312,7 @@ const WeekView = memo(({ currentDate, lastUpdatedLabel, isCheckingHash, isFetchi
             <button
               type="button"
               className="px-2 py-1 text-xs border rounded"
-              onClick={() => generateRandomEvents(30)}
+              onClick={() => generateRandomEvents(30, weekDates)}
             >
               Add random events
             </button>

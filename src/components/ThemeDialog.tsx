@@ -1,15 +1,17 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog'
 import { ThemeSelector } from './ThemeSelector'
 import useConfigStore from '../state/state-management'
 import { Palette, ChevronDown } from 'lucide-react'
+import { useThemeDialogParam } from '../hooks/useDialogParams'
 
 export function ThemeDialog() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [themeParam, setThemeParam] = useThemeDialogParam()
   const { t } = useTranslation('settings')
   const { config, setConfig, getListedThemes } = useConfigStore()
   const listedThemes = getListedThemes()
+
+  const isOpen = themeParam === 'true'
 
   const transformedThemes = listedThemes.map(theme => ({
     id: theme.id,
@@ -27,7 +29,7 @@ export function ThemeDialog() {
   return (
     <>
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => setThemeParam('true')}
         className="flex items-center justify-between gap-2 h-9 px-3 rounded-md border transition-colors w-full sm:w-auto sm:min-w-[180px] cursor-pointer hover:opacity-90"
         style={{
           borderColor: 'var(--color-border)',
@@ -42,7 +44,7 @@ export function ThemeDialog() {
         <ChevronDown className="w-4 h-4 opacity-50" />
       </button>
 
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={isOpen} onOpenChange={(open) => setThemeParam(open ? 'true' : null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>{t('sections.styling.themeDialog.title')}</DialogTitle>
@@ -56,7 +58,7 @@ export function ThemeDialog() {
               selectedThemeId={config.theme}
               onThemeSelect={(themeId) => {
                 setConfig({ theme: themeId })
-                setIsOpen(false)
+                setThemeParam(null)
               }}
             />
           </div>
