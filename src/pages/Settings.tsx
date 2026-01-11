@@ -122,23 +122,8 @@ export default function Settings() {
 
   return (
     <div className="h-full overflow-y-auto" style={{ backgroundColor: 'var(--color-background)' }}>
-      {/* Header - Full Width Gradient */}
-      <div className="w-full" style={{ 
-        background: `linear-gradient(to bottom, var(--color-surface-alpha-40), transparent)` 
-      }}>
-        <div className="max-w-7xl mx-auto px-4 py-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style={{
-            backgroundColor: 'var(--color-accent-alpha-20)'
-          }}>
-            <SettingsIcon className="w-8 h-8" style={{ color: 'var(--color-accent)' }} aria-hidden="true" />
-          </div>
-          <h1 className="text-3xl font-light mb-2" style={{ color: 'var(--color-text)' }}>{t('title')}</h1>
-          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{t('subtitle')}</p>
-        </div>
-      </div>
-
       {/* Content with Sidebar */}
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 pt-6">
         <div className="flex gap-8 pb-6">
           {/* Sidebar Navigation - Hidden on mobile */}
           <aside className="hidden lg:block w-64 flex-shrink-0">
