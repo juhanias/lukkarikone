@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Settings as SettingsIcon, GitBranch, ChevronDown } from 'lucide-react'
+import { GitBranch, ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import useDocumentTitle from '../hooks/useDocumentTitle'
 import { useRef, useState } from 'react'
