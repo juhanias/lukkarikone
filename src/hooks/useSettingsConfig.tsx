@@ -1,68 +1,64 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Type, RotateCcw, Code, Palette, Calendar, Link, Languages, Sparkles, Terminal } from 'lucide-react'
-import useConfigStore, { useRealizationColorStore, useCalendarStore, useSeenCommitsStore } from '../state/state-management'
+import { RotateCcw, Code, Sparkles, Settings } from 'lucide-react'
+import useConfigStore, { useRealizationColorStore, useSeenCommitsStore } from '../state/state-management'
 import { FONT_OPTIONS, type Font } from '../types/config'
 import type { SettingsConfig } from '../types/settings-config'
+import { ThemeDialog } from '../components/ThemeDialog'
+import { CalendarDialog } from '../components/CalendarDialog'
 
 export function useSettingsConfig(): SettingsConfig {
-  const { t } = useTranslation('settings')
-  const { config, setConfig, resetConfig, getListedThemes } = useConfigStore()
+  const { t, i18n } = useTranslation('settings')
+  const { config, setConfig, resetConfig } = useConfigStore()
   const { customColors, clearAllCustomColors } = useRealizationColorStore()
-  const { getActiveCalendar } = useCalendarStore()
   const { clearSeenCommits, seenCommits } = useSeenCommitsStore()
-  const activeCalendar = getActiveCalendar()
-  const listedThemes = getListedThemes()
 
   return useMemo(() => {
-    const transformedThemes = listedThemes.map(theme => ({
-      id: theme.id,
-      name: theme.nameKey ? t(theme.nameKey) : theme.name || theme.id,
-      description: theme.descriptionKey ? t(theme.descriptionKey) : theme.description || '',
-      colors: {
-        background: theme.colors.background,
-        surface: theme.colors.surface,
-        accent: theme.colors.accent,
-        accentSecondary: theme.colors.accentSecondary,
-        text: theme.colors.text
-      }
-    }))
+
     const settingsConfig: SettingsConfig = [
-      // Font Settings
       {
-        id: 'font-settings',
-        blockName: t('sections.font.title'),
-        blockDescription: t('sections.font.subtitle'),
-        icon: Type,
+        id: 'general-settings',
+        blockName: t('sections.general.title'),
+        blockDescription: t('sections.general.subtitle'),
+        icon: Settings,
         iconColor: '#3b82f6',
         iconBgColor: '#3b82f633',
         components: [
           {
-            componentType: 'radio',
-            id: 'font-selector',
+            componentType: 'custom',
+            id: 'calendar-management',
             data: {
-              name: 'font',
-              options: FONT_OPTIONS.map((option) => ({
-                value: option.value,
-                label: t(`sections.font.options.${option.value}.label`),
-                subtitle: t(`sections.font.options.${option.value}.subtitle`),
-                checked: config.font === option.value
-              })),
-              onChange: (value) => setConfig({ font: value as Font })
+              render: () => (
+                <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]">
+                  <div className="flex-1 min-w-0">
+                    <label className="text-sm font-medium text-[var(--color-text)] block">
+                      {t('sections.calendar.title')}
+                    </label>
+                    <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
+                      {t('sections.calendar.subtitle')}
+                    </p>
+                  </div>
+                  <CalendarDialog />
+                </div>
+              )
             }
-          }
-        ]
-      },
-      
-      // View Settings
-      {
-        id: 'view-settings',
-        blockName: t('sections.view.title'),
-        blockDescription: t('sections.view.subtitle'),
-        icon: Calendar,
-        iconColor: '#3b82f6',
-        iconBgColor: '#3b82f633',
-        components: [
+          },
+          {
+            componentType: 'select',
+            id: 'language-selector',
+            data: {
+              label: t('sections.general.language.label'),
+              subtitle: t('sections.general.language.subtitle'),
+              value: i18n.language,
+              options: [
+                { value: 'en', label: 'English' },
+                { value: 'fi', label: 'Suomi' }
+              ],
+              onChange: (value: string) => {
+                i18n.changeLanguage(value)
+              }
+            }
+          },
           {
             componentType: 'toggle',
             id: 'show-weekends',
@@ -99,16 +95,6 @@ export function useSettingsConfig(): SettingsConfig {
           },
           {
             componentType: 'toggle',
-            id: 'squeeze-week-on-mobile',
-            data: {
-              label: t('sections.view.squeezeWeekOnMobile.label'),
-              subtitle: t('sections.view.squeezeWeekOnMobile.subtitle'),
-              checked: config.squeezeWeekOnMobile,
-              onChange: (checked) => setConfig({ squeezeWeekOnMobile: checked })
-            }
-          },
-          {
-            componentType: 'toggle',
             id: 'show-total-hours',
             data: {
               label: t('sections.view.showTotalHours.label'),
@@ -117,55 +103,38 @@ export function useSettingsConfig(): SettingsConfig {
               onChange: (checked) => setConfig({ showTotalHours: checked })
             }
           }
-        ]
-      },
-
-      // Language Settings
-      {
-        id: 'language-settings',
-        blockName: t('sections.language.title'),
-        blockDescription: t('sections.language.subtitle'),
-        icon: Languages,
-        iconColor: '#f59e0b',
-        iconBgColor: '#f59e0b33',
-        components: [
+        ],
+        groups: [
           {
-            componentType: 'language-selector',
-            id: 'language-selector',
-            data: {}
+            groupName: t('sections.general.advancedGroup.title'),
+            groupDescription: t('sections.general.advancedGroup.subtitle'),
+            defaultExpanded: false,
+            components: [
+              {
+                componentType: 'toggle',
+                id: 'squeeze-week-on-mobile',
+                data: {
+                  label: t('sections.view.squeezeWeekOnMobile.label'),
+                  subtitle: t('sections.view.squeezeWeekOnMobile.subtitle'),
+                  checked: config.squeezeWeekOnMobile,
+                  onChange: (checked) => setConfig({ squeezeWeekOnMobile: checked })
+                }
+              },
+              {
+                componentType: 'toggle',
+                id: 'enable-commit-notifications',
+                data: {
+                  label: t('sections.technical.enableCommitNotifications') || 'Enable commit notifications',
+                  subtitle: t('sections.technical.enableCommitNotificationsSubtitle') || 'Show toast notifications when new commits are pushed',
+                  checked: config.enableCommitNotifications || false,
+                  onChange: (checked: boolean) => setConfig({ enableCommitNotifications: checked })
+                }
+              }
+            ]
           }
         ]
       },
 
-      // Calendar Settings
-      {
-        id: 'calendar-settings',
-        blockName: t('sections.calendar.title'),
-        blockDescription: t('sections.calendar.subtitle'),
-        icon: Link,
-        iconColor: '#10b981',
-        iconBgColor: '#10b98133',
-        components: [
-          {
-            componentType: 'calendar-url',
-            id: 'calendar-url',
-            data: {
-              currentUrl: activeCalendar?.icalUrls[0] || '',
-              urlLabel: t('sections.calendar.calendarLabel'),
-              configuredText: activeCalendar 
-                ? t('sections.calendar.configured', { 
-                    name: activeCalendar.name
-                  })
-                : '',
-              notConfiguredText: t('sections.calendar.notConfigured'),
-              editLinkText: t('sections.calendar.manageCalendars'),
-              linkCalendarText: t('sections.calendar.linkCalendar')
-            }
-          }
-        ]
-      },
-
-      // Styling Settings
       {
         id: 'styling-settings',
         blockName: t('sections.styling.title'),
@@ -175,6 +144,39 @@ export function useSettingsConfig(): SettingsConfig {
         iconBgColor: '#a855f733',
         components: [
           {
+            componentType: 'select',
+            id: 'font-selector',
+            data: {
+              label: t('sections.styling.font.label'),
+              subtitle: t('sections.styling.font.subtitle'),
+              value: config.font,
+              options: FONT_OPTIONS.map((option) => ({
+                value: option.value,
+                label: t(`sections.font.options.${option.value}.label`)
+              })),
+              onChange: (value) => setConfig({ font: value as Font })
+            }
+          },
+          {
+            componentType: 'custom',
+            id: 'theme-dialog',
+            data: {
+              render: () => (
+                <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]">
+                  <div className="flex-1 min-w-0">
+                    <label className="text-sm font-medium text-[var(--color-text)] block">
+                      {t('sections.styling.theme.label')}
+                    </label>
+                    <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
+                      {t('sections.styling.theme.subtitle')}
+                    </p>
+                  </div>
+                  <ThemeDialog />
+                </div>
+              )
+            }
+          },
+          {
             componentType: 'toggle',
             id: 'enhanced-dialogs',
             data: {
@@ -183,39 +185,7 @@ export function useSettingsConfig(): SettingsConfig {
               checked: config.enhancedDialogs,
               onChange: (checked) => setConfig({ enhancedDialogs: checked })
             }
-          }
-        ]
-      },
-
-      // Theme Settings
-      {
-        id: 'theme-settings',
-        blockName: t('sections.theme.title'),
-        blockDescription: t('sections.theme.subtitle'),
-        icon: Palette,
-        iconColor: '#9333ea',
-        iconBgColor: '#9333ea33',
-        components: [
-          {
-            componentType: 'theme-selector',
-            id: 'theme-selector',
-            data: {
-              themes: transformedThemes,
-              selectedThemeId: config.theme,
-              onThemeSelect: (themeId) => setConfig({ theme: themeId })
-            }
-          }
-        ]
-      },
-
-      // Actions
-      {
-        id: 'actions',
-        blockName: t('sections.actions.title'),
-        blockDescription: t('sections.actions.subtitle'),
-        icon: RotateCcw,
-        variant: 'danger',
-        components: [
+          },
           {
             componentType: 'button',
             id: 'reset-config',
@@ -223,7 +193,8 @@ export function useSettingsConfig(): SettingsConfig {
               label: t('sections.actions.resetButton'),
               subtitle: t('sections.actions.resetSubtitle'),
               onClick: resetConfig,
-              variant: 'danger'
+              variant: 'danger',
+              icon: RotateCcw
             }
           }
         ]
@@ -300,28 +271,6 @@ export function useSettingsConfig(): SettingsConfig {
       })
     }
 
-    // Technical section - for power users
-    settingsConfig.push({
-      id: 'technical-settings',
-      blockName: t('sections.technical.title') || 'Technical',
-      blockDescription: t('sections.technical.subtitle') || 'Settings for power users and developers',
-      icon: Terminal,
-      iconColor: '#8b5cf6',
-      iconBgColor: '#8b5cf633',
-      components: [
-        {
-          componentType: 'toggle',
-          id: 'enable-commit-notifications',
-          data: {
-            label: t('sections.technical.enableCommitNotifications') || 'Enable commit notifications',
-            subtitle: t('sections.technical.enableCommitNotificationsSubtitle') || 'Show toast notifications when new commits are pushed',
-            checked: config.enableCommitNotifications || false,
-            onChange: (checked: boolean) => setConfig({ enableCommitNotifications: checked })
-          }
-        }
-      ]
-    })
-
     // Development tools section - hidden by default, can be revealed via Settings navigation (or visible in DEV)
     if (import.meta.env.DEV || config.devToolsVisible) {
       settingsConfig.push({
@@ -376,5 +325,5 @@ export function useSettingsConfig(): SettingsConfig {
     }
 
     return settingsConfig
-  }, [t, config, setConfig, resetConfig, listedThemes, customColors, clearAllCustomColors, activeCalendar, seenCommits, clearSeenCommits])
+  }, [t, i18n, config, setConfig, resetConfig, customColors, clearAllCustomColors, seenCommits, clearSeenCommits])
 }

@@ -7,9 +7,8 @@ export type SettingComponentType =
   | 'slider'
   | 'button'
   | 'custom'
-  | 'language-selector'
   | 'theme-selector'
-  | 'calendar-url'
+  | 'select'
 
 export interface BaseComponentConfig {
   componentType: SettingComponentType
@@ -54,6 +53,20 @@ export interface SliderComponentConfig extends BaseComponentConfig {
   }
 }
 
+export interface SelectComponentConfig extends BaseComponentConfig {
+  componentType: 'select'
+  data: {
+    label: string
+    subtitle?: string
+    value: string
+    options: Array<{
+      value: string
+      label: string
+    }>
+    onChange: (value: string) => void
+  }
+}
+
 export interface ButtonComponentConfig extends BaseComponentConfig {
   componentType: 'button'
   data: {
@@ -70,11 +83,6 @@ export interface CustomComponentConfig extends BaseComponentConfig {
   data: {
     render: () => React.ReactNode
   }
-}
-
-export interface LanguageSelectorConfig extends BaseComponentConfig {
-  componentType: 'language-selector'
-  data: Record<string, never> // No additional data needed
 }
 
 export interface ThemeSelectorConfig extends BaseComponentConfig {
@@ -97,27 +105,21 @@ export interface ThemeSelectorConfig extends BaseComponentConfig {
   }
 }
 
-export interface CalendarUrlConfig extends BaseComponentConfig {
-  componentType: 'calendar-url'
-  data: {
-    currentUrl?: string
-    urlLabel: string
-    configuredText: string
-    notConfiguredText: string
-    editLinkText: string
-    linkCalendarText: string
-  }
-}
-
 export type SettingComponent = 
   | ToggleComponentConfig
   | RadioComponentConfig
   | SliderComponentConfig
+  | SelectComponentConfig
   | ButtonComponentConfig
   | CustomComponentConfig
-  | LanguageSelectorConfig
   | ThemeSelectorConfig
-  | CalendarUrlConfig
+
+export interface SettingComponentGroup {
+  groupName: string
+  groupDescription?: string
+  defaultExpanded?: boolean
+  components: SettingComponent[]
+}
 
 export interface SettingsBlock {
   id: string
@@ -127,7 +129,8 @@ export interface SettingsBlock {
   iconColor?: string
   iconBgColor?: string
   variant?: 'default' | 'danger'
-  components: SettingComponent[]
+  components?: SettingComponent[]
+  groups?: SettingComponentGroup[]
   condition?: () => boolean // Optional condition to show/hide the block
 }
 

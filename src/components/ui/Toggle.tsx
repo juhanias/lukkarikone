@@ -27,7 +27,7 @@ export function Toggle({ checked, onChange, label, subtitle, disabled = false }:
       style={{ opacity: disabled ? 0.7 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
     >
       <div className="flex-1 min-w-0 mr-4">
-        <span className="font-medium" style={{ color: 'var(--color-text)' }}>{label}</span>
+        <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{label}</span>
         {subtitle && (
           <p className="text-xs mt-1 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
             {subtitle}

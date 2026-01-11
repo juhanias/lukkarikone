@@ -1,0 +1,67 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog'
+import { ThemeSelector } from './ThemeSelector'
+import useConfigStore from '../state/state-management'
+import { Palette, ChevronDown } from 'lucide-react'
+
+export function ThemeDialog() {
+  const [isOpen, setIsOpen] = useState(false)
+  const { t } = useTranslation('settings')
+  const { config, setConfig, getListedThemes } = useConfigStore()
+  const listedThemes = getListedThemes()
+
+  const transformedThemes = listedThemes.map(theme => ({
+    id: theme.id,
+    name: theme.nameKey ? t(theme.nameKey) : theme.name || theme.id,
+    description: theme.descriptionKey ? t(theme.descriptionKey) : theme.description || '',
+    colors: {
+      background: theme.colors.background,
+      surface: theme.colors.surface,
+      accent: theme.colors.accent,
+      accentSecondary: theme.colors.accentSecondary,
+      text: theme.colors.text
+    }
+  }))
+
+  return (
+    <>
+      <button
+        onClick={() => setIsOpen(true)}
+        className="flex items-center justify-between gap-2 h-9 px-3 rounded-md border transition-colors w-full sm:w-auto sm:min-w-[180px] cursor-pointer hover:opacity-90"
+        style={{
+          borderColor: 'var(--color-border)',
+          color: 'var(--color-text)',
+          backgroundColor: 'var(--color-surface)'
+        }}
+      >
+        <span className="flex items-center gap-2 text-sm whitespace-nowrap">
+          <Palette className="w-4 h-4" />
+          {t('sections.styling.theme.customize')}
+        </span>
+        <ChevronDown className="w-4 h-4 opacity-50" />
+      </button>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t('sections.styling.themeDialog.title')}</DialogTitle>
+            <DialogDescription>
+              {t('sections.styling.themeDialog.description')}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            <ThemeSelector
+              themes={transformedThemes}
+              selectedThemeId={config.theme}
+              onThemeSelect={(themeId) => {
+                setConfig({ theme: themeId })
+                setIsOpen(false)
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}

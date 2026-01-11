@@ -1,21 +1,14 @@
-import { useState } from 'react'
 import { Toggle, RadioCard } from './ui'
 import { Slider } from './ui/Slider'
-import LanguageSelector from './LanguageSelector'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { ThemeSelector } from './ThemeSelector'
-import { CalendarUrlModal } from './CalendarUrlModal'
-import { CalendarManagementDialog } from './CalendarManagementDialog'
-import { Button } from './ui/button'
 import type { SettingComponent } from '../types/settings-config'
-import useConfigStore from '../state/state-management'
 
 interface SettingsComponentRendererProps {
   component: SettingComponent
 }
 
 export function SettingsComponentRenderer({ component }: SettingsComponentRendererProps) {
-  const { config } = useConfigStore()
-  const [isCalendarDialogOpen, setIsCalendarDialogOpen] = useState(false)
   
   switch (component.componentType) {
     case 'toggle':
@@ -53,7 +46,7 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
         >
           <div className="flex items-center justify-between mb-3">
             <div className="flex-1 min-w-0 mr-4">
-              <label className="font-medium" style={{ color: 'var(--color-text)' }}>
+              <label className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
                 {component.data.label}
               </label>
               <p className="text-xs mt-1 opacity-75 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
@@ -79,36 +72,65 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
         </div>
       )
 
-    case 'button': {
+    case 'select':
       return (
-        <div
-          className={
-            component.data.variant === 'danger'
-              ? 'w-full flex items-center p-4 rounded-lg cursor-pointer transition-colors bg-[rgba(239,68,68,0.15)] border border-[rgba(239,68,68,0.4)] hover:bg-[rgba(239,68,68,0.22)]'
-              : 'w-full flex items-center p-4 rounded-lg cursor-pointer transition-colors bg-[var(--color-surface-secondary-alpha-30)] border border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]'
-          }
-          onClick={component.data.onClick}
-          role="button"
-          tabIndex={0}
-        >
-          <div className="flex-1">
-            <span className="font-medium block" style={{ 
-              color: component.data.variant === 'danger' ? '#ef4444' : 'var(--color-text)'
-            }}>
+        <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]">
+          <div className="flex-1 min-w-0">
+            <label className="text-sm font-medium text-[var(--color-text)] block">
               {component.data.label}
-            </span>
+            </label>
             {component.data.subtitle && (
-              <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+              <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
                 {component.data.subtitle}
               </p>
             )}
           </div>
+          <Select value={component.data.value} onValueChange={component.data.onChange}>
+            <SelectTrigger className="w-full sm:w-auto sm:min-w-[180px] cursor-pointer">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {component.data.options.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )
+
+    case 'button': {
+      const isDanger = component.data.variant === 'danger'
+      const Icon = component.data.icon
+      
+      return (
+        <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]">
+          <div className="flex-1 min-w-0">
+            <label className="text-sm font-medium block" style={{ color: 'var(--color-text)' }}>
+              {component.data.label}
+            </label>
+            {component.data.subtitle && (
+              <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
+                {component.data.subtitle}
+              </p>
+            )}
+          </div>
+          <button
+            onClick={component.data.onClick}
+            className="flex items-center justify-center gap-2 h-9 px-3 rounded-md border transition-colors w-full sm:w-auto sm:min-w-[180px] cursor-pointer hover:opacity-90"
+            style={{
+              borderColor: isDanger ? '#ef4444' : 'var(--color-border)',
+              color: isDanger ? '#ef4444' : 'var(--color-text)',
+              backgroundColor: isDanger ? 'rgba(239,68,68,0.15)' : 'var(--color-surface)'
+            }}
+          >
+            {Icon && <Icon className="w-4 h-4" />}
+            <span className="text-sm whitespace-nowrap">{component.data.label}</span>
+          </button>
         </div>
       )
     }
-
-    case 'language-selector':
-      return <LanguageSelector />
 
     case 'theme-selector':
       return (
@@ -117,63 +139,6 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
           selectedThemeId={component.data.selectedThemeId}
           onThemeSelect={component.data.onThemeSelect}
         />
-      )
-
-    case 'calendar-url':
-      return (
-        <>
-          <div className="space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="font-medium">{component.data.urlLabel}</div>
-                <div className="text-sm opacity-70 break-words">
-                  {component.data.currentUrl 
-                    ? component.data.configuredText
-                    : component.data.notConfiguredText
-                  }
-                </div>
-              </div>
-              {/* Use CalendarManagementDialog if calendar exists, CalendarUrlModal for first setup */}
-              {component.data.currentUrl ? (
-                <Button 
-                  variant="outline"
-                  className="flex-shrink-0 w-full sm:w-auto"
-                  style={{
-                    borderColor: 'var(--color-border)',
-                    color: 'var(--color-text)',
-                    backgroundColor: 'transparent',
-                    fontFamily: `var(--font-${config.font})`
-                  }}
-                  onClick={() => setIsCalendarDialogOpen(true)}
-                >
-                  {component.data.editLinkText}
-                </Button>
-              ) : (
-                <CalendarUrlModal>
-                  <Button 
-                    variant="outline"
-                    className="flex-shrink-0 w-full sm:w-auto"
-                    style={{
-                      borderColor: 'var(--color-border)',
-                      color: 'var(--color-text)',
-                      backgroundColor: 'transparent',
-                      fontFamily: `var(--font-${config.font})`
-                    }}
-                  >
-                    {component.data.linkCalendarText}
-                  </Button>
-                </CalendarUrlModal>
-              )}
-            </div>
-          </div>
-          
-          {component.data.currentUrl && (
-            <CalendarManagementDialog
-              open={isCalendarDialogOpen}
-              onOpenChange={setIsCalendarDialogOpen}
-            />
-          )}
-        </>
       )
 
     case 'custom':

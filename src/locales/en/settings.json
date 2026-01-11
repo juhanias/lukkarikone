@@ -5,6 +5,18 @@
     "contents": "Contents"
   },
   "sections": {
+    "general": {
+      "title": "General Settings",
+      "subtitle": "Language and view configuration",
+      "language": {
+        "label": "Application Language",
+        "subtitle": "Choose your preferred language"
+      },
+      "advancedGroup": {
+        "title": "Advanced & Technical",
+        "subtitle": "Settings for power users and developers"
+      }
+    },
     "font": {
       "title": "Font Settings",
       "subtitle": "Choose application font",
@@ -46,6 +58,19 @@
     "styling": {
       "title": "Styling",
       "subtitle": "Control design elements and page aesthetics",
+      "font": {
+        "label": "Application Font",
+        "subtitle": "Choose the font used throughout the application"
+      },
+      "theme": {
+        "label": "Color Theme",
+        "subtitle": "Choose your preferred color scheme",
+        "customize": "Customize"
+      },
+      "themeDialog": {
+        "title": "Choose Color Theme",
+        "description": "Select a color theme that suits your style"
+      },
       "enhancedDialogs": {
         "label": "Use frosted glass dialogs",
         "subtitle": "Enable gradient backgrounds and blur for dialogs to make them more visually appealing. If this negatively impacts performance, you can disable it."
@@ -58,6 +83,7 @@
     "calendar": {
       "title": "Calendar Management",
       "subtitle": "Manage your calendars",
+      "manage": "Manage",
       "calendarLabel": "Active Calendar",
       "notConfigured": "No calendar configured",
       "configured": "{{name}}",

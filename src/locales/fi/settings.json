@@ -5,6 +5,18 @@
     "contents": "Sisältö"
   },
   "sections": {
+    "general": {
+      "title": "Yleiset asetukset",
+      "subtitle": "Kieli- ja näkymäasetukset",
+      "language": {
+        "label": "Sovelluksen kieli",
+        "subtitle": "Valitse haluamasi kieli"
+      },
+      "advancedGroup": {
+        "title": "Edistyneet & tekniset",
+        "subtitle": "Asetukset tehokäyttäjille ja kehittäjille"
+      }
+    },
     "font": {
       "title": "Fonttiasetukset",
       "subtitle": "Valitse sovelluksen fontti",
@@ -46,6 +58,19 @@
     "styling": {
       "title": "Tyylitys",
       "subtitle": "Hallitse visuaalisia elementtejä ja sivusuunnittelua",
+      "font": {
+        "label": "Sovelluksen fontti",
+        "subtitle": "Valitse sovelluksessa käytettävä fontti"
+      },
+      "theme": {
+        "label": "Väriteema",
+        "subtitle": "Valitse haluamasi väriteema",
+        "customize": "Mukauta"
+      },
+      "themeDialog": {
+        "title": "Valitse väriteema",
+        "description": "Valitse tyyliisi sopiva väriteema"
+      },
       "enhancedDialogs": {
         "label": "'Frosted Glass'-dialogit",
         "subtitle": "Tekee dialogien taustoista sumeampia ja kiinnostavampia. Mikäli tämä vaikuttaa negatiivisesti suorituskykyyn, voit poistaa sen käytöstä."
@@ -57,8 +82,7 @@
     },
     "calendar": {
       "title": "Kalenterien hallinta",
-      "subtitle": "Hallinnoi kalentereitasi",
-      "calendarLabel": "Aktiivinen kalenteri",
+      "subtitle": "Hallinnoi kalentereitasi",      "manage": "Hallitse",      "calendarLabel": "Aktiivinen kalenteri",
       "notConfigured": "Ei kalenteria määritettynä",
       "configured": "{{name}}",
       "manageCalendars": "Hallinnoi kalentereita",
