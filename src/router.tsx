@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import Schedule from './pages/Schedule'
 import Settings from './pages/Settings'
@@ -17,6 +17,10 @@ export const router = createBrowserRouter(
       element: <Layout />,
       errorElement: <ErrorPage />,
       children: [
+        {
+          index: true,
+          element: <Navigate to="/app/cal-1" replace />,
+        },
         {
           path: ":calendarId",
           element: <Schedule />,
