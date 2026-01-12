@@ -104,7 +104,7 @@ export default function Landing() {
           
           <nav className='flex gap-6 items-center'>
             <Link 
-              to="/app"
+              to="/app/cal-1"
               className='text-sm font-medium transition-colors hover:opacity-80'
               style={{ color: blueTheme.textSecondary }}
             >
@@ -256,7 +256,7 @@ export default function Landing() {
                 boxShadow: '0 4px 14px 0 rgba(59, 130, 246, 0.39)',
               }}
             >
-              <Link to="/app">
+              <Link to="/app/cal-1">
                 {t('hero.cta')}
               </Link>
             </Button>
