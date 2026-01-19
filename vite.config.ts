@@ -1,43 +1,40 @@
-import { defineConfig, loadEnv } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import path from 'path'
-import { execSync } from 'child_process'
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { execSync } from "child_process";
+import path from "path";
+import { defineConfig, loadEnv } from "vite";
 
 // Get git information at build time
 function getGitInfo() {
   try {
-    const commitHash = execSync('git rev-parse --short HEAD').toString().trim()
-    const commitDate = execSync('git log -1 --format=%ci').toString().trim()
-    
+    const commitHash = execSync("git rev-parse --short HEAD").toString().trim();
+    const commitDate = execSync("git log -1 --format=%ci").toString().trim();
+
     // Try to get branch name from git
-    let branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim()
-    
+    let branch = execSync("git rev-parse --abbrev-ref HEAD").toString().trim();
+
     // In Cloudflare Pages (and other CI), git is in detached HEAD state
     // thankfully cloudflare has a bailout!
-    if (branch === 'HEAD') {
-      branch = process.env.CF_PAGES_BRANCH || 'main'
+    if (branch === "HEAD") {
+      branch = process.env.CF_PAGES_BRANCH || "main";
     }
-    
-    return { commitHash, branch, commitDate }
+
+    return { commitHash, branch, commitDate };
   } catch {
-    return { 
-      commitHash: 'unknown', 
-      branch: process.env.CF_PAGES_BRANCH || 'main', 
-      commitDate: new Date().toISOString() 
-    }
+    return {
+      commitHash: "unknown",
+      branch: process.env.CF_PAGES_BRANCH || "main",
+      commitDate: new Date().toISOString(),
+    };
   }
 }
 
 export default ({ mode }: { mode: string }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
-  const gitInfo = getGitInfo()
+  const gitInfo = getGitInfo();
 
   return defineConfig({
-    plugins: [
-      react(),
-      tailwindcss(),
-    ],
+    plugins: [react(), tailwindcss()],
 
     define: {
       __GIT_COMMIT_HASH__: JSON.stringify(gitInfo.commitHash),
@@ -52,9 +49,9 @@ export default ({ mode }: { mode: string }) => {
     },
 
     server: {
-      port: parseInt(process.env.VITE_PORT || '5173', 10),
+      port: parseInt(process.env.VITE_PORT || "5173", 10),
     },
 
-    base: '/'
+    base: "/",
   });
-}
+};

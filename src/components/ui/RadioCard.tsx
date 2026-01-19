@@ -1,38 +1,40 @@
 interface RadioCardProps {
-  name: string
-  value: string
-  checked: boolean
-  onChange: (value: string) => void
-  label: string
-  subtitle?: string
-  disabled?: boolean
+  name: string;
+  value: string;
+  checked: boolean;
+  onChange: (value: string) => void;
+  label: string;
+  subtitle?: string;
+  disabled?: boolean;
 }
 
-export function RadioCard({ 
-  name, 
-  value, 
-  checked, 
-  onChange, 
-  label, 
+export function RadioCard({
+  name,
+  value,
+  checked,
+  onChange,
+  label,
   subtitle,
-  disabled = false 
+  disabled = false,
 }: RadioCardProps) {
   return (
-    <label 
+    <label
       className="flex items-center p-4 rounded-lg cursor-pointer transition-colors border"
       style={{
-        backgroundColor: 'var(--color-surface-secondary-alpha-30)',
-        borderColor: 'var(--color-border-alpha-30)',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.6 : 1
+        backgroundColor: "var(--color-surface-secondary-alpha-30)",
+        borderColor: "var(--color-border-alpha-30)",
+        cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.6 : 1,
       }}
       onMouseEnter={(e) => {
         if (!disabled) {
-          (e.currentTarget as HTMLLabelElement).style.backgroundColor = 'var(--color-surface-secondary-alpha-40)'
+          (e.currentTarget as HTMLLabelElement).style.backgroundColor =
+            "var(--color-surface-secondary-alpha-40)";
         }
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLLabelElement).style.backgroundColor = 'var(--color-surface-secondary-alpha-30)'
+        (e.currentTarget as HTMLLabelElement).style.backgroundColor =
+          "var(--color-surface-secondary-alpha-30)";
       }}
     >
       <input
@@ -43,20 +45,29 @@ export function RadioCard({
         onChange={(e) => !disabled && onChange(e.target.value)}
         disabled={disabled}
         className="w-4 h-4 mr-4"
-        style={{ accentColor: 'var(--color-accent)' }}
+        style={{ accentColor: "var(--color-accent)" }}
         aria-describedby={subtitle ? `${name}-${value}-desc` : undefined}
       />
       <div className="flex-1 min-w-0 mr-4">
-        <span className="font-medium" style={{ color: 'var(--color-text)' }}>{label}</span>
+        <span className="font-medium" style={{ color: "var(--color-text)" }}>
+          {label}
+        </span>
         {subtitle && (
-          <p id={`${name}-${value}-desc`} className="text-xs mt-1 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
+          <p
+            id={`${name}-${value}-desc`}
+            className="text-xs mt-1 max-w-2xl"
+            style={{ color: "var(--color-text-secondary)" }}
+          >
             {subtitle}
           </p>
         )}
       </div>
       {checked && (
-        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-accent)' }} />
+        <div
+          className="w-2 h-2 rounded-full"
+          style={{ backgroundColor: "var(--color-accent)" }}
+        />
       )}
     </label>
-  )
+  );
 }

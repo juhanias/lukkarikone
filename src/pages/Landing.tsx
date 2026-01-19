@@ -1,9 +1,9 @@
-import { Link } from 'react-router-dom'
-import { Button } from '../components/ui/button'
-import { Check, X, GitBranch } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-import useDocumentTitle from '../hooks/useDocumentTitle'
-import { motion } from 'framer-motion'
+import { motion } from "framer-motion";
+import { Check, GitBranch, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { Button } from "../components/ui/button";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 // Blue theme colors as inline styles
 const blueTheme = {
@@ -15,7 +15,7 @@ const blueTheme = {
 };
 
 // Shared motion variants to give the landing page some entrance animation without affecting the app shell.
-const easeOutExpo = [0.16, 1, 0.3, 1] as const
+const easeOutExpo = [0.16, 1, 0.3, 1] as const;
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 24 },
@@ -24,7 +24,7 @@ const fadeInUp = {
     y: 0,
     transition: { duration: 0.5, ease: easeOutExpo },
   },
-}
+};
 
 const fadeIn = {
   hidden: { opacity: 0, scale: 0.98 },
@@ -33,14 +33,14 @@ const fadeIn = {
     scale: 1,
     transition: { duration: 0.5, ease: easeOutExpo },
   },
-}
+};
 
 const staggerContainer = {
   hidden: {},
   visible: {
     transition: { staggerChildren: 0.08 },
   },
-}
+};
 
 // Comparison data
 const comparisonFeatures = [
@@ -51,7 +51,7 @@ const comparisonFeatures = [
   { feature: "hideLectures", lukkari: true, official: false },
   { feature: "lectureDetails", lukkari: true, official: true },
   { feature: "courseDetails", lukkari: true, official: true },
-  { feature: "calendarExport", lukkari: false , official: true },
+  { feature: "calendarExport", lukkari: false, official: true },
   { feature: "freeHourSearch", lukkari: false, official: true },
   { feature: "officialService", lukkari: false, official: true },
   { feature: "languageSupport", lukkari: "finEng", official: "finEng" },
@@ -59,74 +59,85 @@ const comparisonFeatures = [
 ];
 
 // Helper function to render comparison value
-const renderComparisonValue = (value: boolean | string, t: (key: string) => string) => {
-  if (typeof value === 'boolean') {
+const renderComparisonValue = (
+  value: boolean | string,
+  t: (key: string) => string,
+) => {
+  if (typeof value === "boolean") {
     return value ? (
-      <Check size={24} style={{ color: 'rgb(34, 197, 94)', margin: '0 auto' }} />
+      <Check
+        size={24}
+        style={{ color: "rgb(34, 197, 94)", margin: "0 auto" }}
+      />
     ) : (
-      <X size={24} style={{ color: 'rgb(239, 68, 68)', margin: '0 auto' }} />
+      <X size={24} style={{ color: "rgb(239, 68, 68)", margin: "0 auto" }} />
     );
   }
   // If it's a translation key
-  return <span style={{ color: blueTheme.textSecondary }}>{t(`comparison.values.${value}`)}</span>;
+  return (
+    <span style={{ color: blueTheme.textSecondary }}>
+      {t(`comparison.values.${value}`)}
+    </span>
+  );
 };
 
 export default function Landing() {
-  const { t } = useTranslation('landing');
-  useDocumentTitle(t('title'))
+  const { t } = useTranslation("landing");
+  useDocumentTitle(t("title"));
   return (
-    <div 
+    <div
       className="w-full min-h-screen flex flex-col"
-      style={{ 
+      style={{
         background: `linear-gradient(to bottom, ${blueTheme.backgroundDark}, ${blueTheme.background})`,
         color: blueTheme.text,
-        fontFamily: "'Lexend', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        fontFamily:
+          "'Lexend', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       }}
     >
       {/* Header */}
-      <motion.header 
+      <motion.header
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: easeOutExpo }}
         className="p-4 flex justify-between items-center flex-shrink-0 absolute top-0 left-0 right-0 z-10"
         style={{
-          backgroundColor: 'transparent',
+          backgroundColor: "transparent",
         }}
       >
-        <div className='w-full max-w-7xl mx-auto flex gap-4 justify-between items-center'>
-          <Link 
+        <div className="w-full max-w-7xl mx-auto flex gap-4 justify-between items-center">
+          <Link
             to="/?landing"
-            className='text-xl font-medium transition-opacity hover:opacity-80'
+            className="text-xl font-medium transition-opacity hover:opacity-80"
             style={{ color: blueTheme.accent }}
           >
-            {t('header.title')}
+            {t("header.title")}
           </Link>
-          
-          <nav className='flex gap-6 items-center'>
-            <Link 
+
+          <nav className="flex gap-6 items-center">
+            <Link
               to="/app/cal-1"
-              className='text-sm font-medium transition-colors hover:opacity-80'
+              className="text-sm font-medium transition-colors hover:opacity-80"
               style={{ color: blueTheme.textSecondary }}
             >
-              {t('header.nav.app')}
+              {t("header.nav.app")}
             </Link>
-            <a 
+            <a
               href="https://github.com/juhanias/lukkarikone"
               target="_blank"
               rel="noopener noreferrer"
-              className='text-sm font-medium transition-colors hover:opacity-80'
+              className="text-sm font-medium transition-colors hover:opacity-80"
               style={{ color: blueTheme.textSecondary }}
             >
-              {t('header.nav.github')}
+              {t("header.nav.github")}
             </a>
-            <a 
+            <a
               href="https://github.com/juhanias/lukkarikone/releases"
               target="_blank"
               rel="noopener noreferrer"
-              className='text-sm font-medium transition-colors hover:opacity-80'
+              className="text-sm font-medium transition-colors hover:opacity-80"
               style={{ color: blueTheme.textSecondary }}
             >
-              {t('header.nav.updates')}
+              {t("header.nav.updates")}
             </a>
           </nav>
         </div>
@@ -147,67 +158,59 @@ export default function Landing() {
           <motion.div className="w-full mx-auto" variants={fadeIn}>
             {/* Desktop Layout */}
             <div className="hidden lg:flex items-center justify-center gap-4">
-              <div
-                className="w-1/4 opacity-40 hover:opacity-60 transition-opacity"
-              >
-                <img 
-                  src="/landing/showcase-2.webp" 
-                  alt="Lukkari app feature" 
+              <div className="w-1/4 opacity-40 hover:opacity-60 transition-opacity">
+                <img
+                  src="/landing/showcase-2.webp"
+                  alt="Lukkari app feature"
                   className="w-full h-auto rounded-lg shadow-lg"
                   loading="lazy"
                   srcSet="/landing/showcase-2-400.webp 400w, /landing/showcase-2-800.webp 800w, /landing/showcase-2.webp 1600w"
                   sizes="(max-width: 1024px) 0px, 400px"
                   style={{
-                    boxShadow: `0 10px 25px -5px rgba(0, 0, 0, 0.2)`
+                    boxShadow: `0 10px 25px -5px rgba(0, 0, 0, 0.2)`,
                   }}
                 />
               </div>
-              
-              <div
-                className="w-1/2"
-              >
+
+              <div className="w-1/2">
                 <div>
-                  <img 
-                    src="/landing/showcase.webp" 
-                    alt="Lukkari app showcase" 
+                  <img
+                    src="/landing/showcase.webp"
+                    alt="Lukkari app showcase"
                     className="w-full h-auto rounded-lg shadow-2xl"
                     srcSet="/landing/showcase-800.webp 800w, /landing/showcase-1200.webp 1200w, /landing/showcase.webp 2803w"
                     sizes="(max-width: 1024px) 0px, 800px"
                     style={{
-                      boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.3)`
+                      boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.3)`,
                     }}
                   />
                 </div>
               </div>
-              
-              <div
-                className="w-1/4 opacity-40 hover:opacity-60 transition-opacity"
-              >
-                <img 
-                  src="/landing/showcase-3.webp" 
-                  alt="Lukkari app feature" 
+
+              <div className="w-1/4 opacity-40 hover:opacity-60 transition-opacity">
+                <img
+                  src="/landing/showcase-3.webp"
+                  alt="Lukkari app feature"
                   className="w-full h-auto rounded-lg shadow-lg"
                   loading="lazy"
                   srcSet="/landing/showcase-3-400.webp 400w, /landing/showcase-3-800.webp 800w, /landing/showcase-3.webp 1600w"
                   sizes="(max-width: 1024px) 0px, 400px"
                   style={{
-                    boxShadow: `0 10px 25px -5px rgba(0, 0, 0, 0.2)`
+                    boxShadow: `0 10px 25px -5px rgba(0, 0, 0, 0.2)`,
                   }}
                 />
               </div>
             </div>
-            
-            <div
-              className="lg:hidden w-full md:w-3/4 mx-auto"
-            >
-              <motion.img 
-                src="/landing/showcase.webp" 
-                alt="Lukkari app showcase" 
+
+            <div className="lg:hidden w-full md:w-3/4 mx-auto">
+              <motion.img
+                src="/landing/showcase.webp"
+                alt="Lukkari app showcase"
                 className="w-full h-auto rounded-lg shadow-2xl"
                 srcSet="/landing/showcase-800.webp 800w, /landing/showcase-1200.webp 1200w, /landing/showcase.webp 2803w"
                 sizes="(max-width: 768px) 100vw, 75vw"
                 style={{
-                  boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.3)`
+                  boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.3)`,
                 }}
                 variants={fadeIn}
                 initial="hidden"
@@ -219,46 +222,45 @@ export default function Landing() {
 
           {/* Hero Text */}
           <motion.div className="space-y-4" variants={fadeInUp}>
-            <h1 
+            <h1
               className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight"
-              style={{ 
+              style={{
                 color: blueTheme.text,
-                fontFamily: "'Delius', cursive"
+                fontFamily: "'Delius', cursive",
               }}
             >
-              <span style={{ color: blueTheme.accent }}>
-                {t('hero.title')}
-              </span>
-              {t('hero.titleSite')}
+              <span style={{ color: blueTheme.accent }}>{t("hero.title")}</span>
+              {t("hero.titleSite")}
             </h1>
-            <p 
+            <p
               className="text-xl md:text-2xl max-w-2xl mx-auto"
               style={{ color: blueTheme.textSecondary }}
             >
-              {t('hero.subtitle')}
+              {t("hero.subtitle")}
             </p>
-            <p 
+            <p
               className="text-sm"
               style={{ color: `rgba(148, 163, 184, 0.7)` }}
-              dangerouslySetInnerHTML={{ __html: t('hero.disclaimer') }}
+              dangerouslySetInnerHTML={{ __html: t("hero.disclaimer") }}
             />
           </motion.div>
 
           {/* cta */}
-          <motion.div className="flex gap-4 justify-center pt-4" variants={fadeInUp}>
-            <Button 
+          <motion.div
+            className="flex gap-4 justify-center pt-4"
+            variants={fadeInUp}
+          >
+            <Button
               asChild
               size="default"
               className="text-base px-6 py-3 h-auto rounded-full transition-colors transition-transform duration-200 hover:scale-105"
               style={{
                 background: `linear-gradient(135deg, ${blueTheme.accent} 0%, rgb(37, 99, 235) 100%)`,
-                color: 'white',
-                boxShadow: '0 4px 14px 0 rgba(59, 130, 246, 0.39)',
+                color: "white",
+                boxShadow: "0 4px 14px 0 rgba(59, 130, 246, 0.39)",
               }}
             >
-              <Link to="/app/cal-1">
-                {t('hero.cta')}
-              </Link>
+              <Link to="/app/cal-1">{t("hero.cta")}</Link>
             </Button>
           </motion.div>
         </motion.div>
@@ -273,16 +275,19 @@ export default function Landing() {
         viewport={{ once: true, amount: 0.18 }}
       >
         <div className="max-w-6xl mx-auto">
-          <motion.div className="grid md:grid-cols-2 gap-12 items-center mb-32" variants={staggerContainer}>
+          <motion.div
+            className="grid md:grid-cols-2 gap-12 items-center mb-32"
+            variants={staggerContainer}
+          >
             <div className="order-2 md:order-1">
               <motion.div
                 className="w-full rounded-lg overflow-hidden shadow-xl transition-transform duration-200 hover:-translate-y-1"
                 style={{ boxShadow: `0 20px 40px -10px rgba(0, 0, 0, 0.25)` }}
                 variants={fadeIn}
               >
-                <img 
-                  src="/landing/showcase-colorful.webp" 
-                  alt="Värikäs teema" 
+                <img
+                  src="/landing/showcase-colorful.webp"
+                  alt="Värikäs teema"
                   className="w-full h-auto"
                   loading="lazy"
                   srcSet="/landing/showcase-colorful-800.webp 800w, /landing/showcase-colorful-1200.webp 1200w, /landing/showcase-colorful.webp 3200w"
@@ -290,35 +295,47 @@ export default function Landing() {
                 />
               </motion.div>
             </div>
-            <motion.div className="order-1 md:order-2 space-y-4" variants={fadeInUp}>
-              <h2 
+            <motion.div
+              className="order-1 md:order-2 space-y-4"
+              variants={fadeInUp}
+            >
+              <h2
                 className="text-3xl md:text-4xl font-bold"
-                style={{ 
+                style={{
                   color: blueTheme.text,
-                  fontFamily: "'Delius', cursive"
+                  fontFamily: "'Delius', cursive",
                 }}
               >
-                {t('features.colorful.title')}
+                {t("features.colorful.title")}
               </h2>
-              <p style={{ color: blueTheme.textSecondary }} className="text-lg leading-relaxed">
-                {t('features.colorful.description')}
+              <p
+                style={{ color: blueTheme.textSecondary }}
+                className="text-lg leading-relaxed"
+              >
+                {t("features.colorful.description")}
               </p>
             </motion.div>
           </motion.div>
 
-          <motion.div className="grid md:grid-cols-2 gap-12 items-center mb-32" variants={staggerContainer}>
+          <motion.div
+            className="grid md:grid-cols-2 gap-12 items-center mb-32"
+            variants={staggerContainer}
+          >
             <motion.div className="space-y-4" variants={fadeInUp}>
-              <h2 
+              <h2
                 className="text-3xl md:text-4xl font-bold"
-                style={{ 
+                style={{
                   color: blueTheme.text,
-                  fontFamily: "'Delius', cursive"
+                  fontFamily: "'Delius', cursive",
                 }}
               >
-                {t('features.fast.title')}
+                {t("features.fast.title")}
               </h2>
-              <p style={{ color: blueTheme.textSecondary }} className="text-lg leading-relaxed">
-                {t('features.fast.description')}
+              <p
+                style={{ color: blueTheme.textSecondary }}
+                className="text-lg leading-relaxed"
+              >
+                {t("features.fast.description")}
               </p>
             </motion.div>
             <div>
@@ -327,7 +344,7 @@ export default function Landing() {
                 style={{ boxShadow: `0 20px 40px -10px rgba(0, 0, 0, 0.25)` }}
                 variants={fadeIn}
               >
-                <video 
+                <video
                   autoPlay
                   loop
                   muted
@@ -335,21 +352,27 @@ export default function Landing() {
                   className="w-full h-auto"
                   poster="/landing/showcase-speed-poster.webp"
                 >
-                  <source src="/landing/showcase-speed.webm" type="video/webm" />
+                  <source
+                    src="/landing/showcase-speed.webm"
+                    type="video/webm"
+                  />
                   <source src="/landing/showcase-speed.mp4" type="video/mp4" />
                 </video>
               </motion.div>
             </div>
           </motion.div>
 
-          <motion.div className="grid md:grid-cols-2 gap-12 items-center mb-32" variants={staggerContainer}>
+          <motion.div
+            className="grid md:grid-cols-2 gap-12 items-center mb-32"
+            variants={staggerContainer}
+          >
             <div className="order-2 md:order-1">
               <motion.div
                 className="w-full rounded-lg overflow-hidden shadow-xl transition-transform duration-200 hover:-translate-y-1"
                 style={{ boxShadow: `0 20px 40px -10px rgba(0, 0, 0, 0.25)` }}
                 variants={fadeIn}
               >
-                <video 
+                <video
                   autoPlay
                   loop
                   muted
@@ -362,64 +385,84 @@ export default function Landing() {
                 </video>
               </motion.div>
             </div>
-            <motion.div className="order-1 md:order-2 space-y-4" variants={fadeInUp}>
-              <h2 
+            <motion.div
+              className="order-1 md:order-2 space-y-4"
+              variants={fadeInUp}
+            >
+              <h2
                 className="text-3xl md:text-4xl font-bold"
-                style={{ 
+                style={{
                   color: blueTheme.text,
-                  fontFamily: "'Delius', cursive"
+                  fontFamily: "'Delius', cursive",
                 }}
               >
-                {t('features.manageable.title')}
+                {t("features.manageable.title")}
               </h2>
-              <p style={{ color: blueTheme.textSecondary }} className="text-lg leading-relaxed">
-                {t('features.manageable.description')}
+              <p
+                style={{ color: blueTheme.textSecondary }}
+                className="text-lg leading-relaxed"
+              >
+                {t("features.manageable.description")}
               </p>
             </motion.div>
           </motion.div>
 
           <motion.div className="mb-20" variants={staggerContainer}>
-            <motion.h2 
+            <motion.h2
               className="text-3xl md:text-4xl font-bold text-center mb-12"
-              style={{ 
+              style={{
                 color: blueTheme.text,
-                fontFamily: "'Delius', cursive"
+                fontFamily: "'Delius', cursive",
               }}
               variants={fadeInUp}
             >
-              {t('comparison.title')}
+              {t("comparison.title")}
             </motion.h2>
-            <motion.p 
+            <motion.p
               className="text-lg text-center max-w-3xl mx-auto mb-12 leading-relaxed"
               style={{ color: blueTheme.textSecondary }}
               variants={fadeInUp}
             >
-              {t('comparison.subtitle')}
+              {t("comparison.subtitle")}
             </motion.p>
             <motion.div className="overflow-x-auto" variants={fadeIn}>
               <motion.table className="w-full" variants={staggerContainer}>
                 <thead>
-                  <tr style={{ borderBottomColor: `rgba(148, 163, 184, 0.3)`, borderBottomWidth: '2px' }}>
-                    <th className="text-left py-4 px-4">{t('comparison.headers.feature')}</th>
-                    <th className="text-center py-4 px-4">
-                      <span style={{ color: blueTheme.accent }} className="font-bold">{t('comparison.headers.lukkari')}</span>
+                  <tr
+                    style={{
+                      borderBottomColor: `rgba(148, 163, 184, 0.3)`,
+                      borderBottomWidth: "2px",
+                    }}
+                  >
+                    <th className="text-left py-4 px-4">
+                      {t("comparison.headers.feature")}
                     </th>
                     <th className="text-center py-4 px-4">
-                      <span style={{ color: blueTheme.textSecondary }}>{t('comparison.headers.official')}</span>
+                      <span
+                        style={{ color: blueTheme.accent }}
+                        className="font-bold"
+                      >
+                        {t("comparison.headers.lukkari")}
+                      </span>
+                    </th>
+                    <th className="text-center py-4 px-4">
+                      <span style={{ color: blueTheme.textSecondary }}>
+                        {t("comparison.headers.official")}
+                      </span>
                     </th>
                   </tr>
                 </thead>
                 <motion.tbody variants={staggerContainer}>
                   {comparisonFeatures.map((item, index) => (
-                    <motion.tr 
+                    <motion.tr
                       key={index}
                       variants={fadeInUp}
-                      style={{ 
-                        borderBottomColor: `rgba(148, 163, 184, 0.15)`, 
-                        borderBottomWidth: '1px'
+                      style={{
+                        borderBottomColor: `rgba(148, 163, 184, 0.15)`,
+                        borderBottomWidth: "1px",
                       }}
                     >
-                      <td 
+                      <td
                         className="py-4 px-4 font-medium"
                         style={{ color: blueTheme.text }}
                       >
@@ -436,40 +479,37 @@ export default function Landing() {
                 </motion.tbody>
               </motion.table>
             </motion.div>
-
           </motion.div>
 
           <motion.div className="max-w-4xl mx-auto mb-20" variants={fadeInUp}>
-            <motion.div 
+            <motion.div
               className="rounded-lg p-8 md:p-12 shadow-2xl transition-transform duration-200 hover:-translate-y-1"
-              style={{ 
+              style={{
                 backgroundColor: blueTheme.background,
-                boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.3)`
+                boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.3)`,
               }}
               variants={fadeIn}
             >
-              <h2 
+              <h2
                 className="text-3xl md:text-4xl font-bold text-center mb-6"
-                style={{ 
+                style={{
                   color: blueTheme.text,
-                  fontFamily: "'Delius', cursive"
+                  fontFamily: "'Delius', cursive",
                 }}
               >
-                {t('development.title')}
+                {t("development.title")}
               </h2>
-              <p 
+              <p
                 className="text-lg text-center leading-relaxed mb-6"
                 style={{ color: blueTheme.textSecondary }}
               >
-                {t('development.description')}
+                {t("development.description")}
               </p>
               <div className="flex justify-center">
-                <Button 
-                  asChild
-                  variant="outline"
-                  size="lg"
-                >
-                  <Link to="https://github.com/juhanias/lukkarikone">{t('development.cta')}</Link>
+                <Button asChild variant="outline" size="lg">
+                  <Link to="https://github.com/juhanias/lukkarikone">
+                    {t("development.cta")}
+                  </Link>
                 </Button>
               </div>
             </motion.div>
@@ -488,21 +528,27 @@ export default function Landing() {
       >
         <div className="max-w-6xl mx-auto text-center space-y-2">
           <p style={{ color: blueTheme.textSecondary }} className="text-sm">
-            {t('footer.copyright')}
+            {t("footer.copyright")}
           </p>
-          <p style={{ color: blueTheme.textSecondary, opacity: 0.6 }} className="text-xs">
-            {t('footer.author')}
+          <p
+            style={{ color: blueTheme.textSecondary, opacity: 0.6 }}
+            className="text-xs"
+          >
+            {t("footer.author")}
           </p>
-          <div className="flex items-center justify-center gap-1.5 text-xs" style={{ color: blueTheme.textSecondary, opacity: 0.4 }}>
+          <div
+            className="flex items-center justify-center gap-1.5 text-xs"
+            style={{ color: blueTheme.textSecondary, opacity: 0.4 }}
+          >
             <GitBranch size={12} />
             <span>{__GIT_BRANCH__}</span>
             <span>•</span>
-            <a 
+            <a
               href={`https://github.com/juhanias/lukkarikone/commit/${__GIT_COMMIT_HASH__}`}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:underline"
-              style={{ color: 'inherit' }}
+              style={{ color: "inherit" }}
             >
               {__GIT_COMMIT_HASH__}
             </a>
@@ -510,5 +556,5 @@ export default function Landing() {
         </div>
       </motion.footer>
     </div>
-  )
+  );
 }

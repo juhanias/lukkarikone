@@ -48,12 +48,12 @@ export const useHiddenEventsStore = create<HiddenEventsState>()(
 
       clearAllHiddenEvents: () => {
         set({ hiddenEventIds: new Set<string>() });
-      }
+      },
     }),
     {
       name: "hidden-events",
       partialize: (state) => ({
-        hiddenEventIds: Array.from(state.hiddenEventIds)
+        hiddenEventIds: Array.from(state.hiddenEventIds),
       }),
       storage: {
         getItem: (name) => {
@@ -64,8 +64,8 @@ export const useHiddenEventsStore = create<HiddenEventsState>()(
             ...parsed,
             state: {
               ...parsed.state,
-              hiddenEventIds: new Set(parsed.state.hiddenEventIds || [])
-            }
+              hiddenEventIds: new Set(parsed.state.hiddenEventIds || []),
+            },
           };
         },
         setItem: (name, value) => {
@@ -73,15 +73,15 @@ export const useHiddenEventsStore = create<HiddenEventsState>()(
             ...value,
             state: {
               ...value.state,
-              hiddenEventIds: Array.from(value.state.hiddenEventIds)
-            }
+              hiddenEventIds: Array.from(value.state.hiddenEventIds),
+            },
           };
           localStorage.setItem(name, JSON.stringify(serialized));
         },
-        removeItem: (name) => localStorage.removeItem(name)
-      }
-    }
-  )
+        removeItem: (name) => localStorage.removeItem(name),
+      },
+    },
+  ),
 );
 
 export type { HiddenEventsState };

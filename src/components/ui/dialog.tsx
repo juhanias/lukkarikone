@@ -1,30 +1,31 @@
-import * as React from "react"
-import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { XIcon } from "lucide-react"
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { XIcon } from "lucide-react";
+import type * as React from "react";
 
-import { cn } from "@/lib/utils"
-import useConfigStore from "@/state/state-management"
+import { cn } from "@/lib/utils";
+import useConfigStore from "@/state/state-management";
 
 function Dialog({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
-}function DialogTrigger({
+  return <DialogPrimitive.Root data-slot="dialog" {...props} />;
+}
+function DialogTrigger({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
 }
 
 function DialogPortal({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
 }
 
 function DialogClose({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Close>) {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
 function DialogOverlay({
@@ -37,11 +38,11 @@ function DialogOverlay({
       className={cn(
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
         "[will-change:opacity]",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function DialogContent({
@@ -51,32 +52,37 @@ function DialogContent({
   style,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  showCloseButton?: boolean
+  showCloseButton?: boolean;
 }) {
-  const useEnhancedDialogs = useConfigStore(state => state.config.enhancedDialogs)
-  const isLightTheme = useConfigStore(state => state.isCurrentThemeLight())
+  const useEnhancedDialogs = useConfigStore(
+    (state) => state.config.enhancedDialogs,
+  );
+  const isLightTheme = useConfigStore((state) => state.isCurrentThemeLight());
 
-  const enhancedClasses = "bg-transparent backdrop-blur-xl border-[var(--color-border-alpha-30)] text-[var(--color-text)]"
-  const basicClasses = "bg-[var(--color-surface)] border-[var(--color-border-alpha-30)] text-[var(--color-text)]"
+  const enhancedClasses =
+    "bg-transparent backdrop-blur-xl border-[var(--color-border-alpha-30)] text-[var(--color-text)]";
+  const basicClasses =
+    "bg-[var(--color-surface)] border-[var(--color-border-alpha-30)] text-[var(--color-text)]";
 
   const enhancedStyle: React.CSSProperties = useEnhancedDialogs
     ? {
-        background: 'linear-gradient(160deg, var(--color-surface-alpha-60) 0%, var(--color-background-alpha-80) 100%)',
-        willChange: 'transform, opacity',
-        boxShadow: isLightTheme 
-          ? '0 35px 120px rgba(0, 0, 0, 0.15)' 
-          : '0 35px 120px rgba(0, 0, 0, 0.45)'
+        background:
+          "linear-gradient(160deg, var(--color-surface-alpha-60) 0%, var(--color-background-alpha-80) 100%)",
+        willChange: "transform, opacity",
+        boxShadow: isLightTheme
+          ? "0 35px 120px rgba(0, 0, 0, 0.15)"
+          : "0 35px 120px rgba(0, 0, 0, 0.45)",
       }
     : {
-        willChange: 'transform, opacity',
-        boxShadow: isLightTheme 
-          ? '0 10px 30px rgba(0, 0, 0, 0.1)' 
-          : undefined
-      }
+        willChange: "transform, opacity",
+        boxShadow: isLightTheme ? "0 10px 30px rgba(0, 0, 0, 0.1)" : undefined,
+      };
 
   const overlayClassName = useEnhancedDialogs
-    ? isLightTheme ? "bg-black/40" : "bg-black/60"
-    : undefined
+    ? isLightTheme
+      ? "bg-black/40"
+      : "bg-black/60"
+    : undefined;
 
   return (
     <DialogPortal data-slot="dialog-portal">
@@ -87,7 +93,7 @@ function DialogContent({
           "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-2xl border p-6 duration-150 sm:max-w-lg",
           "[transform:translate3d(0,0,0)]",
           useEnhancedDialogs ? enhancedClasses : basicClasses,
-          className
+          className,
         )}
         style={{ ...(useEnhancedDialogs ? enhancedStyle : {}), ...style }}
         {...props}
@@ -104,7 +110,7 @@ function DialogContent({
         )}
       </DialogPrimitive.Content>
     </DialogPortal>
-  )
+  );
 }
 
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
@@ -114,7 +120,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
       {...props}
     />
-  )
+  );
 }
 
 function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
@@ -123,11 +129,11 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="dialog-footer"
       className={cn(
         "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function DialogTitle({
@@ -140,7 +146,7 @@ function DialogTitle({
       className={cn("text-lg leading-none font-semibold", className)}
       {...props}
     />
-  )
+  );
 }
 
 function DialogDescription({
@@ -153,7 +159,7 @@ function DialogDescription({
       className={cn("text-muted-foreground text-sm text-start", className)}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -167,4 +173,4 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-}
+};

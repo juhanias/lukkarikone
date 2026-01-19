@@ -1,12 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Font } from '../types/config';
+import type { Font } from "../types/config";
 
 // Color theme definitions
 export interface Theme {
   id: string;
   nameKey?: string;
-  descriptionKey?: string
+  descriptionKey?: string;
   name?: string; // deprecated, use nameKey
   description?: string; // deprecated, use descriptionKey
   delisted?: boolean;
@@ -50,7 +50,7 @@ const getThemes = (): Theme[] => [
       headerAccentSecondary: "rgb(37, 99, 235)",
       headerText: "rgb(148, 163, 184)",
       headerBackground: "rgb(30, 41, 59)",
-    }
+    },
   },
   {
     id: "purple",
@@ -72,7 +72,7 @@ const getThemes = (): Theme[] => [
       headerAccentSecondary: "rgb(120, 80, 190)",
       headerText: "rgb(155, 140, 180)",
       headerBackground: "rgb(28, 24, 42)",
-    }
+    },
   },
   {
     id: "dark-pink",
@@ -94,7 +94,7 @@ const getThemes = (): Theme[] => [
       headerAccentSecondary: "rgb(190, 80, 140)",
       headerText: "rgb(200, 140, 175)",
       headerBackground: "rgb(42, 24, 34)",
-    }
+    },
   },
   {
     id: "boring",
@@ -116,7 +116,7 @@ const getThemes = (): Theme[] => [
       headerAccentSecondary: "rgb(190, 24, 93)",
       headerText: "rgb(161, 161, 170)",
       headerBackground: "rgb(38, 38, 38)",
-    }
+    },
   },
   {
     id: "frog",
@@ -138,7 +138,7 @@ const getThemes = (): Theme[] => [
       headerAccentSecondary: "rgb(56, 183, 71)",
       headerText: "rgb(134, 239, 144)",
       headerBackground: "rgb(22, 78, 29)",
-    }
+    },
   },
   {
     id: "forest",
@@ -160,15 +160,16 @@ const getThemes = (): Theme[] => [
       headerAccentSecondary: "rgb(22, 163, 74)",
       headerText: "rgb(161, 161, 170)",
       headerBackground: "rgb(38, 38, 38)",
-    }
-  }
+    },
+  },
 ];
 
-export const getListedThemes = (): Theme[] => getThemes().filter(theme => !theme.delisted);
+export const getListedThemes = (): Theme[] =>
+  getThemes().filter((theme) => !theme.delisted);
 export const getAllThemes = (): Theme[] => getThemes();
 
 const sanitizeThemeId = (themeId?: string): string => {
-  const availableIds = new Set(getAllThemes().map(theme => theme.id));
+  const availableIds = new Set(getAllThemes().map((theme) => theme.id));
   if (!themeId || !availableIds.has(themeId)) {
     return "default";
   }
@@ -226,40 +227,42 @@ const defaultConfig: Config = {
   devToolsEnableEventGenerator: false,
 };
 
-export const LEGACY_PTIVIS25B_URL = "http://lukkari.turkuamk.fi/ical.php?hash=A64E5FCC3647C6FB5D7770DD86526B01FC67BD8A";
-export const UPDATED_PTIVIS25B_URL = "http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8";
+export const LEGACY_PTIVIS25B_URL =
+  "http://lukkari.turkuamk.fi/ical.php?hash=A64E5FCC3647C6FB5D7770DD86526B01FC67BD8A";
+export const UPDATED_PTIVIS25B_URL =
+  "http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8";
 
 const PRESET_CALENDARS = [
   {
-    url: 'http://lukkari.turkuamk.fi/ical.php?hash=9385A6CBC6B79C3DDCE6B2738B5C1B882A6D64CA',
-    name: 'PTIVIS25A'
+    url: "http://lukkari.turkuamk.fi/ical.php?hash=9385A6CBC6B79C3DDCE6B2738B5C1B882A6D64CA",
+    name: "PTIVIS25A",
   },
   {
-    url: 'http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8',
-    name: 'PTIVIS25B'
+    url: "http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8",
+    name: "PTIVIS25B",
   },
   {
-    url: 'http://lukkari.turkuamk.fi/ical.php?hash=E4AC87D135AF921A83B677DD15A19E6119DDF0BB',
-    name: 'PTIVIS25C'
+    url: "http://lukkari.turkuamk.fi/ical.php?hash=E4AC87D135AF921A83B677DD15A19E6119DDF0BB",
+    name: "PTIVIS25C",
   },
   {
-    url: 'http://lukkari.turkuamk.fi/ical.php?hash=E8F13D455EA82E8A7D0990CF6983BBE61AD839A7',
-    name: 'PTIVIS25D'
+    url: "http://lukkari.turkuamk.fi/ical.php?hash=E8F13D455EA82E8A7D0990CF6983BBE61AD839A7",
+    name: "PTIVIS25D",
   },
   {
-    url: 'http://lukkari.turkuamk.fi/ical.php?hash=346C225AD26BD6966FC656F8E77B5A3EA38A73B5',
-    name: 'PTIVIS25E'
+    url: "http://lukkari.turkuamk.fi/ical.php?hash=346C225AD26BD6966FC656F8E77B5A3EA38A73B5",
+    name: "PTIVIS25E",
   },
   {
-    url: 'http://lukkari.turkuamk.fi/ical.php?hash=6EAF3A6D4FC2B07836C2B742EC923629839CA0B7',
-    name: 'PTIVIS25F'
-  }
+    url: "http://lukkari.turkuamk.fi/ical.php?hash=6EAF3A6D4FC2B07836C2B742EC923629839CA0B7",
+    name: "PTIVIS25F",
+  },
 ] as const;
 
 const normalizeCalendarUrl = (url: string): string => url.trim();
 
 export const getPresetCalendarName = (url: string): string | null => {
-  const preset = PRESET_CALENDARS.find(p => p.url === url);
+  const preset = PRESET_CALENDARS.find((p) => p.url === url);
   return preset ? preset.name : null;
 };
 
@@ -282,8 +285,12 @@ const mergeConfigWithDefaults = (config?: Partial<Config>): Config => {
     return { ...defaultConfig };
   }
 
-  const sanitizedEntries = Object.entries(config).filter(([, value]) => value !== undefined);
-  const sanitizedConfig = Object.fromEntries(sanitizedEntries) as Partial<Config>;
+  const sanitizedEntries = Object.entries(config).filter(
+    ([, value]) => value !== undefined,
+  );
+  const sanitizedConfig = Object.fromEntries(
+    sanitizedEntries,
+  ) as Partial<Config>;
 
   const mergedConfig: Config = {
     ...defaultConfig,
@@ -307,11 +314,12 @@ const useConfigStore = create<ConfigState>()(
         set((state) => ({
           config: mergeConfigWithDefaults({ ...state.config, ...partial }),
         })),
-      resetConfig: () => set({ config: mergeConfigWithDefaults(), previousTheme: "default" }),
+      resetConfig: () =>
+        set({ config: mergeConfigWithDefaults(), previousTheme: "default" }),
       getCurrentTheme: () => {
         const { config } = get();
         const themes = getAllThemes();
-        return themes.find(theme => theme.id === config.theme) || themes[0];
+        return themes.find((theme) => theme.id === config.theme) || themes[0];
       },
       isCurrentThemeLight: () => {
         const currentTheme = get().getCurrentTheme();
@@ -320,7 +328,7 @@ const useConfigStore = create<ConfigState>()(
       toggleLightDarkMode: () => {
         set((state) => ({
           config: { ...state.config, theme: "default" },
-          previousTheme: "default"
+          previousTheme: "default",
         }));
       },
     }),
@@ -328,33 +336,42 @@ const useConfigStore = create<ConfigState>()(
       name: "app-config",
       version: 2,
       migrate: (persistedState: unknown, version: number) => {
-        const state = persistedState as { config?: Record<string, unknown> } | undefined;
+        const state = persistedState as
+          | { config?: Record<string, unknown> }
+          | undefined;
 
         if (version < 2 && state?.config?.calendarUrl) {
-          console.log('Removing legacy calendarUrl from config');
+          console.log("Removing legacy calendarUrl from config");
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { calendarUrl: _calendarUrl, ...configWithoutUrl } = state.config;
+          const { calendarUrl: _calendarUrl, ...configWithoutUrl } =
+            state.config;
           return {
             ...state,
-            config: configWithoutUrl
+            config: configWithoutUrl,
           };
         }
 
         return persistedState;
       },
-      partialize: (state) => ({ config: state.config, previousTheme: state.previousTheme }),
+      partialize: (state) => ({
+        config: state.config,
+        previousTheme: state.previousTheme,
+      }),
       merge: (persistedState, currentState) => {
-        const typedPersisted = persistedState as Partial<ConfigState> | undefined;
+        const typedPersisted = persistedState as
+          | Partial<ConfigState>
+          | undefined;
 
         return {
           ...currentState,
           ...typedPersisted,
           config: mergeConfigWithDefaults(typedPersisted?.config),
-          previousTheme: typedPersisted?.previousTheme ?? currentState.previousTheme,
+          previousTheme:
+            typedPersisted?.previousTheme ?? currentState.previousTheme,
         };
       },
-    }
-  )
+    },
+  ),
 );
 
 export default useConfigStore;

@@ -1,35 +1,41 @@
-import { useCallback } from 'react'
-import type { ScheduleEvent } from '../types/schedule'
-import { useEventDialogParam } from './useDialogParams'
-import { useScheduleStore } from '../state/state-management'
+import { useCallback } from "react";
+import { useScheduleStore } from "../state/state-management";
+import type { ScheduleEvent } from "../types/schedule";
+import { useEventDialogParam } from "./useDialogParams";
 
 export const useLectureDetailsDialog = () => {
-  const [eventId, setEventId] = useEventDialogParam()
-  const { getEventById } = useScheduleStore()
-  
-  const selectedEvent = eventId ? getEventById(eventId) : null
-  const isOpen = Boolean(eventId)
+  const [eventId, setEventId] = useEventDialogParam();
+  const { getEventById } = useScheduleStore();
 
-  const openDialog = useCallback((event: ScheduleEvent) => {
-    setEventId(event.id)
-  }, [setEventId])
+  const selectedEvent = eventId ? getEventById(eventId) : null;
+  const isOpen = Boolean(eventId);
+
+  const openDialog = useCallback(
+    (event: ScheduleEvent) => {
+      setEventId(event.id);
+    },
+    [setEventId],
+  );
 
   const closeDialog = useCallback(() => {
-    setEventId(null)
-  }, [setEventId])
+    setEventId(null);
+  }, [setEventId]);
 
-  const handleEventClick = useCallback((event: ScheduleEvent) => {
-    openDialog(event)
-    return true // Indicate that we handled the click
-  }, [openDialog])
+  const handleEventClick = useCallback(
+    (event: ScheduleEvent) => {
+      openDialog(event);
+      return true; // Indicate that we handled the click
+    },
+    [openDialog],
+  );
 
   return {
     isOpen,
     selectedEvent,
     openDialog,
     closeDialog,
-    handleEventClick
-  }
-}
+    handleEventClick,
+  };
+};
 
-export default useLectureDetailsDialog
+export default useLectureDetailsDialog;

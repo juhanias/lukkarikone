@@ -1,137 +1,143 @@
-import type { LucideIcon } from 'lucide-react'
-import type React from 'react'
+import type { LucideIcon } from "lucide-react";
+import type React from "react";
 
-export type SettingComponentType = 
-  | 'toggle'
-  | 'radio'
-  | 'slider'
-  | 'button'
-  | 'custom'
-  | 'theme-selector'
-  | 'select'
+export type SettingComponentType =
+  | "toggle"
+  | "radio"
+  | "slider"
+  | "button"
+  | "custom"
+  | "theme-selector"
+  | "select";
 
 export interface BaseComponentConfig {
-  componentType: SettingComponentType
-  id: string
+  componentType: SettingComponentType;
+  id: string;
 }
 
 export interface ToggleComponentConfig extends BaseComponentConfig {
-  componentType: 'toggle'
+  componentType: "toggle";
   data: {
-    label: string
-    subtitle: string
-    checked: boolean
-    onChange: (checked: boolean) => void
-  }
+    label: string;
+    subtitle: string;
+    checked: boolean;
+    onChange: (checked: boolean) => void;
+  };
 }
 
 export interface RadioComponentConfig extends BaseComponentConfig {
-  componentType: 'radio'
+  componentType: "radio";
   data: {
-    name: string
+    name: string;
     options: Array<{
-      value: string
-      label: string
-      subtitle: string
-      checked: boolean
-    }>
-    onChange: (value: string) => void
-  }
+      value: string;
+      label: string;
+      subtitle: string;
+      checked: boolean;
+    }>;
+    onChange: (value: string) => void;
+  };
 }
 
 export interface SliderComponentConfig extends BaseComponentConfig {
-  componentType: 'slider'
+  componentType: "slider";
   data: {
-    label: string
-    subtitle: string
-    value: number
-    min: number
-    max: number
-    step: number
-    unit?: string
-    onChange: (value: number) => void
-  }
+    label: string;
+    subtitle: string;
+    value: number;
+    min: number;
+    max: number;
+    step: number;
+    unit?: string;
+    onChange: (value: number) => void;
+  };
 }
 
 export interface SelectComponentConfig extends BaseComponentConfig {
-  componentType: 'select'
+  componentType: "select";
   data: {
-    label: string
-    subtitle?: string
-    value: string
+    label: string;
+    subtitle?: string;
+    value: string;
     options: Array<{
-      value: string
-      label: string
-    }>
-    onChange: (value: string) => void
-  }
+      value: string;
+      label: string;
+    }>;
+    onChange: (value: string) => void;
+  };
 }
 
 export interface ButtonComponentConfig extends BaseComponentConfig {
-  componentType: 'button'
+  componentType: "button";
   data: {
-    label: string
-    subtitle?: string
-    onClick: () => void
-    variant?: 'default' | 'danger' | 'outline'
-    icon?: LucideIcon
-  }
+    label: string;
+    subtitle?: string;
+    onClick: () => void;
+    variant?: "default" | "danger" | "outline";
+    icon?: LucideIcon;
+  };
 }
 
 export interface CustomComponentConfig extends BaseComponentConfig {
-  componentType: 'custom'
+  componentType: "custom";
   data: {
-    render: () => React.ReactNode
-  }
+    render: () => React.ReactNode;
+  };
 }
 
 export interface ThemeSelectorConfig extends BaseComponentConfig {
-  componentType: 'theme-selector'
+  componentType: "theme-selector";
   data: {
-    themes: Array<{ 
-      id: string
-      name: string
-      description: string
+    themes: Array<{
+      id: string;
+      name: string;
+      description: string;
       colors: {
-        background: string
-        surface: string
-        accent: string
-        accentSecondary: string
-        text: string
-      }
-    }>
-    selectedThemeId: string
-    onThemeSelect: (themeId: string) => void
-  }
+        background: string;
+        surface: string;
+        accent: string;
+        accentSecondary: string;
+        text: string;
+      };
+    }>;
+    selectedThemeId: string;
+    onThemeSelect: (themeId: string) => void;
+  };
 }
 
-export type SettingComponent = 
+export type SettingComponent =
   | ToggleComponentConfig
   | RadioComponentConfig
   | SliderComponentConfig
   | SelectComponentConfig
   | ButtonComponentConfig
   | CustomComponentConfig
-  | ThemeSelectorConfig
+  | ThemeSelectorConfig;
 
 export interface SettingComponentGroup {
-  groupName: string
-  groupDescription?: string
-  defaultExpanded?: boolean
-  components: SettingComponent[]
+  groupName: string;
+  groupDescription?: string;
+  defaultExpanded?: boolean;
+  components: SettingComponent[];
 }
 
 export interface SettingsBlock {
-  id: string
-  blockName: string
-  blockDescription: string
-  icon: LucideIcon | React.ComponentType<{ className?: string; style?: React.CSSProperties; size?: number }>
-  iconColor?: string
-  iconBgColor?: string
-  variant?: 'default' | 'danger'
-  components?: SettingComponent[]
-  groups?: SettingComponentGroup[]
-  condition?: () => boolean // Optional condition to show/hide the block
+  id: string;
+  blockName: string;
+  blockDescription: string;
+  icon:
+    | LucideIcon
+    | React.ComponentType<{
+        className?: string;
+        style?: React.CSSProperties;
+        size?: number;
+      }>;
+  iconColor?: string;
+  iconBgColor?: string;
+  variant?: "default" | "danger";
+  components?: SettingComponent[];
+  groups?: SettingComponentGroup[];
+  condition?: () => boolean; // Optional condition to show/hide the block
 }
 
-export type SettingsConfig = SettingsBlock[]
+export type SettingsConfig = SettingsBlock[];

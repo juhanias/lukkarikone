@@ -1,20 +1,20 @@
-import { useQueryState } from 'nuqs'
+import { useQueryState } from "nuqs";
 
 /**
  * Hook for managing schedule date via URL query params
  * Usage: ?date=2026-01-11
  */
 export function useDateParam() {
-  return useQueryState('date', {
+  return useQueryState("date", {
     defaultValue: null,
     clearOnDefault: true,
-    history: 'push',
+    history: "push",
     parse: (value) => {
-      if (!value) return null
-      const date = new Date(value)
-      return isNaN(date.getTime()) ? null : value
+      if (!value) return null;
+      const date = new Date(value);
+      return isNaN(date.getTime()) ? null : value;
     },
-  })
+  });
 }
 
 /**
@@ -22,13 +22,13 @@ export function useDateParam() {
  * Usage: ?view=day or ?view=week
  */
 export function useViewModeParam() {
-  return useQueryState<'day' | 'week'>('view', {
-    defaultValue: 'week',
+  return useQueryState<"day" | "week">("view", {
+    defaultValue: "week",
     clearOnDefault: true,
-    history: 'push',
+    history: "push",
     parse: (value) => {
-      if (value === 'day' || value === 'week') return value
-      return 'week'
+      if (value === "day" || value === "week") return value;
+      return "week";
     },
-  })
+  });
 }

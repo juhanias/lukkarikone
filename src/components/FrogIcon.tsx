@@ -4,7 +4,11 @@ interface FrogIconProps {
   size?: number;
 }
 
-export function FrogIcon({ className = '', style = {}, size = 24 }: FrogIconProps) {
+export function FrogIcon({
+  className = "",
+  style = {},
+  size = 24,
+}: FrogIconProps) {
   return (
     <svg
       width={size}
@@ -43,20 +47,8 @@ export function FrogIcon({ className = '', style = {}, size = 24 }: FrogIconProp
           strokeLinecap="round"
           d="M 70.849642,17.136088 A 23.437256,18.442432 0 0 1 91.510704,5.0325406 23.437256,18.442432 0 0 1 113.81776,15.166823 23.437256,18.442432 0 0 1 110.82744,35.298338"
         />
-        <ellipse
-          fill="currentColor"
-          cx="28"
-          cy="23"
-          rx="15"
-          ry="10"
-        />
-        <ellipse
-          fill="currentColor"
-          cx="93"
-          cy="23"
-          rx="15"
-          ry="10"
-        />
+        <ellipse fill="currentColor" cx="28" cy="23" rx="15" ry="10" />
+        <ellipse fill="currentColor" cx="93" cy="23" rx="15" ry="10" />
         <path
           fill="none"
           stroke="currentColor"

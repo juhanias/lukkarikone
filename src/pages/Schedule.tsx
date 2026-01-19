@@ -1,300 +1,363 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import useDocumentTitle from '../hooks/useDocumentTitle'
-import { motion } from 'framer-motion'
-import { useTranslation } from 'react-i18next'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useScheduleStore, useCalendarStore } from '../state/state-management'
-import useConfigStore from '../state/state-management'
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
-import { ScheduleDay, WeekView } from '../components/schedule'
-import { CalendarUrlModal } from '../components/CalendarUrlModal'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogPortal, DialogOverlay } from '@/components/ui/dialog'
-import { isToday, addDays, addWeeks, subDays, subWeeks, startOfWeek } from 'date-fns'
-import { toast } from 'sonner'
-import { useDateParam, useViewModeParam } from '../hooks/useScheduleParams'
+import {
+  addDays,
+  addWeeks,
+  isToday,
+  startOfWeek,
+  subDays,
+  subWeeks,
+} from "date-fns";
+import { motion } from "framer-motion";
+import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { CalendarUrlModal } from "../components/CalendarUrlModal";
+import { ScheduleDay, WeekView } from "../components/schedule";
+import useDocumentTitle from "../hooks/useDocumentTitle";
+import { useDateParam, useViewModeParam } from "../hooks/useScheduleParams";
+import useConfigStore, {
+  useCalendarStore,
+  useScheduleStore,
+} from "../state/state-management";
 
-const VIEW_MODES = ['day', 'week'] as const
+const VIEW_MODES = ["day", "week"] as const;
 
 export default function Schedule() {
-  const { t, i18n } = useTranslation('schedule')
-  const { calendarId } = useParams<{ calendarId: string }>()
-  const navigate = useNavigate()
-  const { getCalendar, getActiveCalendar, setActiveCalendar } = useCalendarStore()
-  
+  const { t, i18n } = useTranslation("schedule");
+  const { calendarId } = useParams<{ calendarId: string }>();
+  const navigate = useNavigate();
+  const { getCalendar, getActiveCalendar, setActiveCalendar } =
+    useCalendarStore();
+
   // URL-based state
-  const [dateParam, setDateParam] = useDateParam()
-  const [viewMode, setViewMode] = useViewModeParam()
-  
+  const [dateParam, setDateParam] = useDateParam();
+  const [viewMode, setViewMode] = useViewModeParam();
+
   // Parse date from URL or use today
   const currentDate = useMemo(() => {
     if (dateParam) {
-      const parsed = new Date(dateParam)
-      return isNaN(parsed.getTime()) ? new Date() : parsed
+      const parsed = new Date(dateParam);
+      return isNaN(parsed.getTime()) ? new Date() : parsed;
     }
-    return new Date()
-  }, [dateParam])
-  
-  const { 
-    getEventsForDate, 
-    fetchSchedule, 
-    isLoading, 
+    return new Date();
+  }, [dateParam]);
+
+  const {
+    getEventsForDate,
+    fetchSchedule,
+    isLoading,
     isCheckingHash,
     isFetchingCalendar,
-    error, 
+    error,
     clearError,
-    lastUpdated
-  } = useScheduleStore()
-  const { config } = useConfigStore()
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  
+    lastUpdated,
+  } = useScheduleStore();
+  const { config } = useConfigStore();
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
   // Validate and set active calendar from URL
   useEffect(() => {
-    if (!calendarId) return
-    
-    const calendar = getCalendar(calendarId)
-    const activeCalendar = getActiveCalendar()
-    
+    if (!calendarId) return;
+
+    const calendar = getCalendar(calendarId);
+    const activeCalendar = getActiveCalendar();
+
     // If calendar not found, redirect to active calendar or default
     if (!calendar) {
       if (activeCalendar) {
-        navigate(`/app/${activeCalendar.id}`, { replace: true })
+        navigate(`/app/${activeCalendar.id}`, { replace: true });
       }
-      return
+      return;
     }
-    
+
     // Set as active calendar if it's not already
     if (activeCalendar?.id !== calendarId) {
-      setActiveCalendar(calendarId)
+      setActiveCalendar(calendarId);
     }
-  }, [calendarId, getCalendar, getActiveCalendar, setActiveCalendar, navigate])
-  
-  const activeCalendar = getActiveCalendar()
-  
+  }, [calendarId, getCalendar, getActiveCalendar, setActiveCalendar, navigate]);
+
+  const activeCalendar = getActiveCalendar();
+
   const getWeekStart = useCallback((date: Date) => {
-    return startOfWeek(date, { weekStartsOn: 1 }) // Monday
-  }, [])
-  
+    return startOfWeek(date, { weekStartsOn: 1 }); // Monday
+  }, []);
+
   const goToNextDay = useCallback(() => {
-    const nextDate = addDays(currentDate, 1)
-    setDateParam(nextDate.toISOString().split('T')[0])
-  }, [currentDate, setDateParam])
-  
+    const nextDate = addDays(currentDate, 1);
+    setDateParam(nextDate.toISOString().split("T")[0]);
+  }, [currentDate, setDateParam]);
+
   const goToPreviousDay = useCallback(() => {
-    const prevDate = subDays(currentDate, 1)
-    setDateParam(prevDate.toISOString().split('T')[0])
-  }, [currentDate, setDateParam])
-  
+    const prevDate = subDays(currentDate, 1);
+    setDateParam(prevDate.toISOString().split("T")[0]);
+  }, [currentDate, setDateParam]);
+
   const goToNextWeek = useCallback(() => {
-    const nextWeek = addWeeks(currentDate, 1)
-    setDateParam(nextWeek.toISOString().split('T')[0])
-  }, [currentDate, setDateParam])
-  
+    const nextWeek = addWeeks(currentDate, 1);
+    setDateParam(nextWeek.toISOString().split("T")[0]);
+  }, [currentDate, setDateParam]);
+
   const goToPreviousWeek = useCallback(() => {
-    const prevWeek = subWeeks(currentDate, 1)
-    setDateParam(prevWeek.toISOString().split('T')[0])
-  }, [currentDate, setDateParam])
-  
-  const rotateViewMode = useCallback((direction: 'forward' | 'backward') => {
-    const currentIndex = VIEW_MODES.indexOf(viewMode)
+    const prevWeek = subWeeks(currentDate, 1);
+    setDateParam(prevWeek.toISOString().split("T")[0]);
+  }, [currentDate, setDateParam]);
 
-    if (currentIndex === -1) {
-      return
-    }
+  const rotateViewMode = useCallback(
+    (direction: "forward" | "backward") => {
+      const currentIndex = VIEW_MODES.indexOf(viewMode);
 
-    const step = direction === 'forward' ? 1 : -1
-    const nextIndex = (currentIndex + step + VIEW_MODES.length) % VIEW_MODES.length
+      if (currentIndex === -1) {
+        return;
+      }
 
-    setViewMode(VIEW_MODES[nextIndex])
-  }, [viewMode, setViewMode])
+      const step = direction === "forward" ? 1 : -1;
+      const nextIndex =
+        (currentIndex + step + VIEW_MODES.length) % VIEW_MODES.length;
+
+      setViewMode(VIEW_MODES[nextIndex]);
+    },
+    [viewMode, setViewMode],
+  );
 
   // Fetch schedule on component mount
   useEffect(() => {
-    fetchSchedule()
-  }, [fetchSchedule])
+    fetchSchedule();
+  }, [fetchSchedule]);
 
-  useDocumentTitle(`${t('title')} — lukkari.juh.fi`)
+  useDocumentTitle(`${t("title")} — lukkari.juh.fi`);
 
   // Show toast notification on error
   useEffect(() => {
     if (error) {
-      toast.error(t('errors.updateFailed'), {
-        description: `${t('errors.updateFailedDescription')} ${t('errors.errorCode')}: ${error}`,
+      toast.error(t("errors.updateFailed"), {
+        description: `${t("errors.updateFailedDescription")} ${t("errors.errorCode")}: ${error}`,
         action: {
-          label: t('errors.dismiss'),
-          onClick: () => clearError()
-        }
-      })
+          label: t("errors.dismiss"),
+          onClick: () => clearError(),
+        },
+      });
     }
-  }, [error, clearError, t])
+  }, [error, clearError, t]);
 
   // Get events for the current date (only for day view)
-  const currentEvents = viewMode === 'day' ? getEventsForDate(currentDate) : []
-  const isWeekView = viewMode === 'week'
-  const viewKey = isWeekView ? getWeekStart(currentDate).toDateString() : currentDate.toDateString()
+  const currentEvents = viewMode === "day" ? getEventsForDate(currentDate) : [];
+  const isWeekView = viewMode === "week";
+  const viewKey = isWeekView
+    ? getWeekStart(currentDate).toDateString()
+    : currentDate.toDateString();
 
   const lastUpdatedDisplay = useMemo(() => {
     if (!lastUpdated) {
-      return null
+      return null;
     }
 
     // Ensure lastUpdated is a Date object (it might be a string from localStorage)
-    const lastUpdatedDate = lastUpdated instanceof Date ? lastUpdated : new Date(lastUpdated)
-    
+    const lastUpdatedDate =
+      lastUpdated instanceof Date ? lastUpdated : new Date(lastUpdated);
+
     // Validate the date
     if (isNaN(lastUpdatedDate.getTime())) {
-      return null
+      return null;
     }
 
     try {
       if (isToday(lastUpdatedDate)) {
         const timeFormatter = new Intl.DateTimeFormat(i18n.language, {
-          hour: '2-digit',
-          minute: '2-digit'
-        })
-        return t('status.updatedAt', { time: timeFormatter.format(lastUpdatedDate) })
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return t("status.updatedAt", {
+          time: timeFormatter.format(lastUpdatedDate),
+        });
       }
 
       const dateTimeFormatter = new Intl.DateTimeFormat(i18n.language, {
-        dateStyle: 'medium',
-        timeStyle: 'short'
-      })
-      return t('status.updatedAt', { time: dateTimeFormatter.format(lastUpdatedDate) })
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+      return t("status.updatedAt", {
+        time: dateTimeFormatter.format(lastUpdatedDate),
+      });
     } catch {
       if (isToday(lastUpdatedDate)) {
-        return t('status.updatedAt', { time: lastUpdatedDate.toLocaleTimeString() })
+        return t("status.updatedAt", {
+          time: lastUpdatedDate.toLocaleTimeString(),
+        });
       }
-      return t('status.updatedAt', { time: lastUpdatedDate.toLocaleString() })
+      return t("status.updatedAt", { time: lastUpdatedDate.toLocaleString() });
     }
-  }, [lastUpdated, i18n.language, t])
+  }, [lastUpdated, i18n.language, t]);
 
-  const handleSwipe = useCallback((direction: 'left' | 'right') => {
-    if (isTransitioning) return
-    
-    setIsTransitioning(true)
-    
-    if (viewMode === 'day') {
-      if (direction === 'left') {
-        goToNextDay()
+  const handleSwipe = useCallback(
+    (direction: "left" | "right") => {
+      if (isTransitioning) return;
+
+      setIsTransitioning(true);
+
+      if (viewMode === "day") {
+        if (direction === "left") {
+          goToNextDay();
+        } else {
+          goToPreviousDay();
+        }
       } else {
-        goToPreviousDay()
+        if (direction === "left") {
+          goToNextWeek();
+        } else {
+          goToPreviousWeek();
+        }
       }
-    } else {
-      if (direction === 'left') {
-        goToNextWeek()
-      } else {
-        goToPreviousWeek()
-      }
-    }
 
-    setTimeout(() => {
-      setIsTransitioning(false)
-    }, 2)
-  }, [isTransitioning, viewMode, goToNextDay, goToPreviousDay, goToNextWeek, goToPreviousWeek])
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 2);
+    },
+    [
+      isTransitioning,
+      viewMode,
+      goToNextDay,
+      goToPreviousDay,
+      goToNextWeek,
+      goToPreviousWeek,
+    ],
+  );
 
-  const handlePanEnd = (_event: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
-    const threshold = 50
-    const velocity = Math.abs(info.velocity.x)
-    const offset = info.offset.x
-    
+  const handlePanEnd = (
+    _event: unknown,
+    info: { offset: { x: number }; velocity: { x: number } },
+  ) => {
+    const threshold = 50;
+    const velocity = Math.abs(info.velocity.x);
+    const offset = info.offset.x;
+
     if (Math.abs(offset) > threshold || velocity > 500) {
       if (offset > 0) {
-        handleSwipe('right')
+        handleSwipe("right");
       } else {
-        handleSwipe('left')
+        handleSwipe("left");
       }
     }
-  }
+  };
 
   const viewTransition = {
     initial: { opacity: 0.96, scale: 0.99 },
     animate: { opacity: 1, scale: 1 },
-    transition: { duration: 0.18, ease: 'easeOut' as const },
-  }
+    transition: { duration: 0.18, ease: "easeOut" as const },
+  };
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Ignore if user is typing in an input, textarea, or contenteditable element
       // probably won't happen butttt....
-      const activeElement = document.activeElement
+      const activeElement = document.activeElement;
       if (
-        activeElement?.tagName === 'INPUT' ||
-        activeElement?.tagName === 'TEXTAREA' ||
-        activeElement?.getAttribute('contenteditable') === 'true'
+        activeElement?.tagName === "INPUT" ||
+        activeElement?.tagName === "TEXTAREA" ||
+        activeElement?.getAttribute("contenteditable") === "true"
       ) {
-        return
+        return;
       }
 
       // Ignore if modifier keys are pressed (to allow browser shortcuts)
       if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) {
-        return
+        return;
       }
 
       // Handle navigation based on view mode
       switch (event.key) {
-        case 'ArrowLeft':
-          event.preventDefault()
-          handleSwipe('right') // Left arrow goes to previous
-          break
-        case 'ArrowRight':
-          event.preventDefault()
-          handleSwipe('left') // Right arrow goes to next
-          break
-        case 'ArrowUp':
-        case 'ArrowDown':
-          event.preventDefault()
-          rotateViewMode(event.key === 'ArrowUp' ? 'backward' : 'forward')
-          break
+        case "ArrowLeft":
+          event.preventDefault();
+          handleSwipe("right"); // Left arrow goes to previous
+          break;
+        case "ArrowRight":
+          event.preventDefault();
+          handleSwipe("left"); // Right arrow goes to next
+          break;
+        case "ArrowUp":
+        case "ArrowDown":
+          event.preventDefault();
+          rotateViewMode(event.key === "ArrowUp" ? "backward" : "forward");
+          break;
       }
-    }
+    };
 
     // Add event listener
-    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener("keydown", handleKeyDown);
 
     // Cleanup
     return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [handleSwipe, rotateViewMode])
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleSwipe, rotateViewMode]);
 
   return (
-    <div className="h-full flex flex-col" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div
+      className="h-full flex flex-col"
+      style={{ backgroundColor: "var(--color-background)" }}
+    >
       {/* Calendar Configuration Dialog */}
       <Dialog open={!activeCalendar} onOpenChange={() => {}}>
         <DialogPortal>
-          <DialogOverlay className="backdrop-blur-[20px]" style={{ backgroundColor: 'var(--color-background-alpha-80)' }} />
-          <DialogContent showCloseButton={false} className="sm:max-w-[425px]" style={{ fontFamily: `var(--font-${config.font})` }}>
+          <DialogOverlay
+            className="backdrop-blur-[20px]"
+            style={{ backgroundColor: "var(--color-background-alpha-80)" }}
+          />
+          <DialogContent
+            showCloseButton={false}
+            className="sm:max-w-[425px]"
+            style={{ fontFamily: `var(--font-${config.font})` }}
+          >
             <DialogHeader className="text-center">
               <div className="flex justify-center mb-4">
-                <Calendar className="h-12 w-12" style={{ color: 'var(--color-accent)' }} />
+                <Calendar
+                  className="h-12 w-12"
+                  style={{ color: "var(--color-accent)" }}
+                />
               </div>
-              <DialogTitle className="text-center" style={{ 
-                color: 'var(--color-text)',
-                fontFamily: `var(--font-${config.font})`
-              }}>
-                {t('calendar.urlMissing')}
+              <DialogTitle
+                className="text-center"
+                style={{
+                  color: "var(--color-text)",
+                  fontFamily: `var(--font-${config.font})`,
+                }}
+              >
+                {t("calendar.urlMissing")}
               </DialogTitle>
-              <DialogDescription className="text-center" style={{ 
-                color: 'var(--color-text-secondary)',
-                fontFamily: `var(--font-${config.font})`
-              }}>
-                {t('calendar.urlMissingDescription')}
+              <DialogDescription
+                className="text-center"
+                style={{
+                  color: "var(--color-text-secondary)",
+                  fontFamily: `var(--font-${config.font})`,
+                }}
+              >
+                {t("calendar.urlMissingDescription")}
               </DialogDescription>
             </DialogHeader>
             <div className="flex gap-3 justify-center pt-4">
               <CalendarUrlModal>
-                <Button 
+                <Button
                   className="flex items-center gap-2"
                   style={{
-                    backgroundColor: 'var(--color-accent)',
-                    color: 'white',
-                    border: 'none',
-                    fontFamily: `var(--font-${config.font})`
+                    backgroundColor: "var(--color-accent)",
+                    color: "white",
+                    border: "none",
+                    fontFamily: `var(--font-${config.font})`,
                   }}
                 >
                   <Calendar className="h-4 w-4" />
-                  {t('calendar.linkCalendar')}
+                  {t("calendar.linkCalendar")}
                 </Button>
               </CalendarUrlModal>
             </div>
@@ -306,41 +369,57 @@ export default function Schedule() {
       {isLoading && (
         <div
           className="absolute inset-0 z-50 backdrop-blur-sm flex items-center justify-center"
-          style={{ backgroundColor: 'var(--color-background-alpha-60)' }}
+          style={{ backgroundColor: "var(--color-background-alpha-60)" }}
         >
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-t-transparent mx-auto" style={{
-              borderColor: 'var(--color-accent)',
-              borderTopColor: 'transparent'
-            }}></div>
-            <p className="mt-4" style={{ color: 'var(--color-text-secondary)' }}>{t('loading.schedule')}</p>
+            <div
+              className="animate-spin rounded-full h-12 w-12 border-2 border-t-transparent mx-auto"
+              style={{
+                borderColor: "var(--color-accent)",
+                borderTopColor: "transparent",
+              }}
+            ></div>
+            <p
+              className="mt-4"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              {t("loading.schedule")}
+            </p>
           </div>
         </div>
       )}
 
       {/* Navigation Buttons - Fixed at top */}
-      <div className="flex flex-col border-b" style={{
-        backgroundColor: 'var(--color-surface-alpha-40)',
-        borderColor: 'var(--color-border-alpha-30)'
-      }}>
+      <div
+        className="flex flex-col border-b"
+        style={{
+          backgroundColor: "var(--color-surface-alpha-40)",
+          borderColor: "var(--color-border-alpha-30)",
+        }}
+      >
         {/* View Tabs */}
         <div className="w-full max-w-7xl mx-auto px-4 pt-4">
-          <div className="flex rounded-lg p-1" style={{ backgroundColor: 'var(--color-surface-secondary-alpha-30)' }}>
+          <div
+            className="flex rounded-lg p-1"
+            style={{
+              backgroundColor: "var(--color-surface-secondary-alpha-30)",
+            }}
+          >
             <Button
-              onClick={() => setViewMode('day')}
-              variant={viewMode === 'day' ? 'default' : 'ghost'}
+              onClick={() => setViewMode("day")}
+              variant={viewMode === "day" ? "default" : "ghost"}
               size="sm"
               className="flex-1"
             >
-              {t('navigation.day')}
+              {t("navigation.day")}
             </Button>
             <Button
-              onClick={() => setViewMode('week')}
-              variant={viewMode === 'week' ? 'default' : 'ghost'}
+              onClick={() => setViewMode("week")}
+              variant={viewMode === "week" ? "default" : "ghost"}
               size="sm"
               className="flex-1"
             >
-              {t('navigation.week')}
+              {t("navigation.week")}
             </Button>
           </div>
         </div>
@@ -348,53 +427,53 @@ export default function Schedule() {
         {/* Navigation Controls */}
         <div className="flex justify-between items-center p-4">
           <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
-            <Button 
-              onClick={() => handleSwipe('right')}
+            <Button
+              onClick={() => handleSwipe("right")}
               disabled={isTransitioning}
               variant="outline"
               size="icon"
               className="p-3 rounded-full disabled:opacity-50 transition-colors"
               style={{
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-text)',
-                borderColor: 'var(--color-border)'
+                backgroundColor: "var(--color-surface)",
+                color: "var(--color-text)",
+                borderColor: "var(--color-border)",
               }}
             >
               <ChevronLeft size={20} />
             </Button>
-            
+
             <Button
               onClick={() => {
-                const today = new Date()
-                today.setHours(0, 0, 0, 0)
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
                 if (currentDate.getTime() !== today.getTime()) {
-                  setIsTransitioning(true)
+                  setIsTransitioning(true);
                   setTimeout(() => {
-                    setDateParam(null) // null means use today
-                    setIsTransitioning(false)
-                  }, 2)
+                    setDateParam(null); // null means use today
+                    setIsTransitioning(false);
+                  }, 2);
                 }
               }}
               size="sm"
               className="px-4 py-2 rounded-full text-sm font-medium transition-colors"
               style={{
-                backgroundColor: 'var(--color-accent-alpha-20)',
-                color: 'var(--color-accent)'
+                backgroundColor: "var(--color-accent-alpha-20)",
+                color: "var(--color-accent)",
               }}
             >
-              {t('navigation.today')}
+              {t("navigation.today")}
             </Button>
-            
-            <Button 
-              onClick={() => handleSwipe('left')}
+
+            <Button
+              onClick={() => handleSwipe("left")}
               disabled={isTransitioning}
               variant="outline"
               size="icon"
               className="p-3 rounded-full disabled:opacity-50 transition-colors"
               style={{
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-text)',
-                borderColor: 'var(--color-border)'
+                backgroundColor: "var(--color-surface)",
+                color: "var(--color-text)",
+                borderColor: "var(--color-border)",
               }}
             >
               <ChevronRight size={20} />
@@ -417,8 +496,8 @@ export default function Schedule() {
           transition={viewTransition.transition}
         >
           <div className="h-full overflow-y-auto">
-            {viewMode === 'day' ? (
-              <ScheduleDay 
+            {viewMode === "day" ? (
+              <ScheduleDay
                 date={currentDate}
                 events={currentEvents}
                 lastUpdatedLabel={lastUpdatedDisplay}
@@ -427,7 +506,7 @@ export default function Schedule() {
                 hasError={!!error}
               />
             ) : (
-              <WeekView 
+              <WeekView
                 currentDate={currentDate}
                 setViewMode={setViewMode}
                 lastUpdatedLabel={lastUpdatedDisplay}
@@ -440,5 +519,5 @@ export default function Schedule() {
         </motion.div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import { RealizationApiService } from '../services/realizationApi';
-import { ScheduleUtils } from './schedule-utils';
+import { RealizationApiService } from "../services/realizationApi";
+import { ScheduleUtils } from "./schedule-utils";
 
 export class RealizationColorUtils {
   /**
@@ -7,14 +7,16 @@ export class RealizationColorUtils {
    */
   static getUniqueRealizationCodes(events: { title: string }[]): string[] {
     const codes = new Set<string>();
-    
-    events.forEach(event => {
-      const realizationCode = RealizationApiService.extractRealizationCode(event.title);
+
+    events.forEach((event) => {
+      const realizationCode = RealizationApiService.extractRealizationCode(
+        event.title,
+      );
       if (realizationCode) {
         codes.add(realizationCode);
       }
     });
-    
+
     return Array.from(codes).sort();
   }
 
@@ -23,8 +25,14 @@ export class RealizationColorUtils {
    * @param realizationCode The realization code to get color for
    * @param customColors Record of custom colors by realization code
    */
-  static getEffectiveColor(realizationCode: string, customColors: Record<string, string>): string {
-    return customColors[realizationCode] || ScheduleUtils.getDefaultRealizationColor(realizationCode);
+  static getEffectiveColor(
+    realizationCode: string,
+    customColors: Record<string, string>,
+  ): string {
+    return (
+      customColors[realizationCode] ||
+      ScheduleUtils.getDefaultRealizationColor(realizationCode)
+    );
   }
 
   /**
@@ -32,16 +40,19 @@ export class RealizationColorUtils {
    * @param realizationCode The realization code to get color pair for
    * @param customColors Record of custom colors by realization code
    */
-  static getEffectiveColorPair(realizationCode: string, customColors: Record<string, string>): { normal: string; flipped: string } {
+  static getEffectiveColorPair(
+    realizationCode: string,
+    customColors: Record<string, string>,
+  ): { normal: string; flipped: string } {
     if (customColors[realizationCode]) {
       const primaryColor = customColors[realizationCode];
       const secondaryColor = ScheduleUtils.lightenRgbColor(primaryColor);
       return {
         normal: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
-        flipped: `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`
+        flipped: `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`,
       };
     }
-    
+
     return ScheduleUtils.getDefaultColorPair(realizationCode);
   }
 
@@ -49,11 +60,12 @@ export class RealizationColorUtils {
    * Validates if a color string is a valid RGB color
    */
   static isValidRgbColor(color: string): boolean {
-    const rgbRegex = /^rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)$/;
+    const rgbRegex =
+      /^rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)$/;
     const match = color.match(rgbRegex);
-    
+
     if (!match) return false;
-    
+
     const [, r, g, b] = match.map(Number);
     return r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255;
   }
