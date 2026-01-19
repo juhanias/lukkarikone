@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { ScheduleUtils } from '../utils/schedule-utils';
+import { ScheduleUtils } from "../utils/schedule-utils";
 
 interface RealizationColorState {
   customColors: Record<string, string>;
@@ -29,8 +29,8 @@ export const useRealizationColorStore = create<RealizationColorState>()(
         set((state) => ({
           customColors: {
             ...state.customColors,
-            [realizationCode]: color
-          }
+            [realizationCode]: color,
+          },
         }));
       },
 
@@ -48,13 +48,13 @@ export const useRealizationColorStore = create<RealizationColorState>()(
       hasCustomColor: (realizationCode: string) => {
         const { customColors } = get();
         return realizationCode in customColors;
-      }
+      },
     }),
     {
       name: "realization-colors",
       partialize: (state) => ({ customColors: state.customColors }),
-    }
-  )
+    },
+  ),
 );
 
 export type { RealizationColorState };

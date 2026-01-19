@@ -1,44 +1,46 @@
-import { useRouteError, Link } from 'react-router-dom'
-import { Button } from '../components/ui/button'
-import { useTranslation } from 'react-i18next'
-import useDocumentTitle from '../hooks/useDocumentTitle'
+import { useTranslation } from "react-i18next";
+import { Link, useRouteError } from "react-router-dom";
+import { Button } from "../components/ui/button";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 interface RouteError {
-  statusText?: string
-  message?: string
-  status?: number
+  statusText?: string;
+  message?: string;
+  status?: number;
 }
 
 export default function ErrorPage() {
-  const error = useRouteError() as RouteError
-  const { t } = useTranslation('common')
+  const error = useRouteError() as RouteError;
+  const { t } = useTranslation("common");
 
-  useDocumentTitle(`${t('labels.error')} — lukkari.juh.fi`)
-  
+  useDocumentTitle(`${t("labels.error")} — lukkari.juh.fi`);
+
   return (
-    <div className='w-full h-full bg-slate-800 text-white flex items-center justify-center'>
-      <div className='text-center max-w-md mx-auto p-6'>
-        <div className='mb-8'>
-          <h1 className='text-6xl font-bold text-red-500 mb-4'>
-            {error?.status || ':('}
+    <div className="w-full h-full bg-slate-800 text-white flex items-center justify-center">
+      <div className="text-center max-w-md mx-auto p-6">
+        <div className="mb-8">
+          <h1 className="text-6xl font-bold text-red-500 mb-4">
+            {error?.status || ":("}
           </h1>
-          <h2 className='text-2xl font-semibold mb-4'>
+          <h2 className="text-2xl font-semibold mb-4">
             Oops! Something went wrong
           </h2>
-          <p className='text-gray-400 mb-6'>
-            {error?.statusText || error?.message || 'The page you are looking for does not exist.'}
+          <p className="text-gray-400 mb-6">
+            {error?.statusText ||
+              error?.message ||
+              "The page you are looking for does not exist."}
           </p>
         </div>
-        
-        <div className='space-y-4'>
-          <Link 
-            to="/" 
-            className='inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors'
+
+        <div className="space-y-4">
+          <Link
+            to="/"
+            className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
             Go Back Home
           </Link>
           <div>
-            <Button 
+            <Button
               onClick={() => window.location.reload()}
               variant="link"
               className="text-gray-400 hover:text-white underline p-0 h-auto"
@@ -49,5 +51,5 @@ export default function ErrorPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

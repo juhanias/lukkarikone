@@ -37,7 +37,7 @@
       "description": "Kurssin opettaja(t)"
     },
     "groups": {
-      "title": "Opiskelijaryhmät", 
+      "title": "Opiskelijaryhmät",
       "description": "Kohderyhmät"
     },
     "learningMaterial": {
@@ -61,7 +61,7 @@
     "basicInfo": "Perustiedot",
     "schedule": "Aikataulu",
     "location": "Sijainti",
-    "instructor": "Opettaja", 
+    "instructor": "Opettaja",
     "groups": "Ryhmät",
     "date": "Päivämäärä",
     "time": "Aika",

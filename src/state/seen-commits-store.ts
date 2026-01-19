@@ -21,7 +21,7 @@ export const useSeenCommitsStore = create<SeenCommitsState>()(
       },
       addSeenCommits: (shas: string[]) => {
         const { seenCommits } = get();
-        const newShas = shas.filter(sha => !seenCommits.includes(sha));
+        const newShas = shas.filter((sha) => !seenCommits.includes(sha));
         if (newShas.length > 0) {
           set({ seenCommits: [...seenCommits, ...newShas] });
         }
@@ -31,13 +31,13 @@ export const useSeenCommitsStore = create<SeenCommitsState>()(
       },
       clearSeenCommits: () => {
         set({ seenCommits: [] });
-      }
+      },
     }),
     {
-      name: 'seen-commits',
+      name: "seen-commits",
       version: 1,
-    }
-  )
+    },
+  ),
 );
 
 export default useSeenCommitsStore;

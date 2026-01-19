@@ -1,13 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
-import type { CSSProperties } from "react"
-import { Toaster as SonnerToaster } from "sonner"
-import type { ToasterProps } from "sonner"
+import type { CSSProperties } from "react";
+import type { ToasterProps } from "sonner";
+import { Toaster as SonnerToaster } from "sonner";
 
 const baseStyle = {
   "--normal-bg": "var(--color-surface)",
   "--normal-text": "var(--color-text)",
   "--normal-border": "var(--color-border-alpha-30)",
-} as CSSProperties
+} as CSSProperties;
 
 const Toaster = (props: ToasterProps) => (
   <SonnerToaster
@@ -24,8 +24,8 @@ const Toaster = (props: ToasterProps) => (
     style={baseStyle}
     {...props}
   />
-)
+);
 
-export { Toaster }
-export { toast } from "sonner"
-export type { ToasterProps }
+export { Toaster };
+export { toast } from "sonner";
+export type { ToasterProps };

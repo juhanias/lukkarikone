@@ -1,6 +1,6 @@
-import { Navigate, useSearchParams } from 'react-router-dom';
-import { useCalendarStore } from '../state/state-management';
-import Landing from '../pages/Landing';
+import { Navigate, useSearchParams } from "react-router-dom";
+import Landing from "../pages/Landing";
+import { useCalendarStore } from "../state/state-management";
 
 /**
  * Smart root component that redirects to /app/<calendar-id> if user has a calendar configured,
@@ -12,7 +12,7 @@ export default function RootRedirect() {
   const activeCalendar = getActiveCalendar();
 
   const hasActiveCalendar = Boolean(activeCalendar);
-  const forceLanding = searchParams.has('landing');
+  const forceLanding = searchParams.has("landing");
 
   if (hasActiveCalendar && !forceLanding && activeCalendar) {
     return <Navigate to={`/app/${activeCalendar.id}`} replace />;

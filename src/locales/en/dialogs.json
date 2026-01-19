@@ -37,7 +37,7 @@
       "description": "Course instructor(s)"
     },
     "groups": {
-      "title": "Student Groups", 
+      "title": "Student Groups",
       "description": "Target groups"
     },
     "learningMaterial": {
@@ -61,7 +61,7 @@
     "basicInfo": "Basic Information",
     "schedule": "Schedule",
     "location": "Location",
-    "instructor": "Instructor", 
+    "instructor": "Instructor",
     "groups": "Groups",
     "date": "Date",
     "time": "Time",

@@ -1,38 +1,38 @@
-import { API_CONFIG } from '../config/api';
+import { API_CONFIG } from "../config/api";
 
 interface RealizationApiResponse {
   data: {
-    name: string
-    code: string
-    teaching_language: string
-    scope_amount: string
-    evaluation_scale: string
-    gname: string
-    office: string
-    start_date: string
-    end_date: string
-    enrollment_start_date: string
-    enrollment_end_date: string
-    teacher: string
-    tgroup: string
-    learning_material: string
-    further_information: string
+    name: string;
+    code: string;
+    teaching_language: string;
+    scope_amount: string;
+    evaluation_scale: string;
+    gname: string;
+    office: string;
+    start_date: string;
+    end_date: string;
+    enrollment_start_date: string;
+    enrollment_end_date: string;
+    teacher: string;
+    tgroup: string;
+    learning_material: string;
+    further_information: string;
     events: Array<{
-      event_id: number
-      start_date: string
-      end_date: string
-      subject: string
+      event_id: number;
+      start_date: string;
+      end_date: string;
+      subject: string;
       location?: Array<{
-        class: string
-        name: string
-        parent: string
-      }>
-      reserved_for: string[]
-      student_groups: string[]
-    }>
-  }
-  cached: boolean
-  timestamp: string
+        class: string;
+        name: string;
+        parent: string;
+      }>;
+      reserved_for: string[];
+      student_groups: string[];
+    }>;
+  };
+  cached: boolean;
+  timestamp: string;
 }
 
 export class RealizationApiService {
@@ -45,14 +45,14 @@ export class RealizationApiService {
   static extractRealizationCode(eventTitle: string): string | null {
     // Match pattern: TE followed by alphanumerics, optional hyphen and more numbers
     // Handles surrounding punctuation like parentheses, dots, etc.
-    const match = eventTitle.match(/\b([A-Z]{2}[A-Z0-9]+-?\d+)/gi)
-    
+    const match = eventTitle.match(/\b([A-Z]{2}[A-Z0-9]+-?\d+)/gi);
+
     if (match && match.length > 0) {
       // Return the last match in lowercase
-      return match[match.length - 1].toLowerCase()
+      return match[match.length - 1].toLowerCase();
     }
-    
-    return null
+
+    return null;
   }
 
   /**
@@ -60,39 +60,46 @@ export class RealizationApiService {
    */
   static stripRealizationCode(eventTitle: string): string {
     if (!eventTitle) {
-      return eventTitle
+      return eventTitle;
     }
 
     // Remove the realization code and surrounding whitespace
     let result = eventTitle
-      .replace(/\s*\(?[A-Z]{2}[A-Z0-9]+-?\d+\)?[.,;:!?]*\s*/gi, ' ')
-      .trim()
-    
+      .replace(/\s*\(?[A-Z]{2}[A-Z0-9]+-?\d+\)?[.,;:!?]*\s*/gi, " ")
+      .trim();
+
     // Clean up multiple consecutive spaces
-    result = result.replace(/\s+/g, ' ')
-    
-    return result.length > 0 ? result : eventTitle
+    result = result.replace(/\s+/g, " ");
+
+    return result.length > 0 ? result : eventTitle;
   }
 
   /**
    * Fetches realization data from the backend API
    */
-  static async fetchRealizationData(realizationCode: string): Promise<RealizationApiResponse> {
+  static async fetchRealizationData(
+    realizationCode: string,
+  ): Promise<RealizationApiResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/realization/${encodeURIComponent(realizationCode)}`)
-      
+      const response = await fetch(
+        `${RealizationApiService.baseUrl}/api/realization/${encodeURIComponent(realizationCode)}`,
+      );
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`)
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message ||
+            `HTTP ${response.status}: ${response.statusText}`,
+        );
       }
 
-      const data: RealizationApiResponse = await response.json()
-      return data
+      const data: RealizationApiResponse = await response.json();
+      return data;
     } catch (error) {
       if (error instanceof Error) {
-        throw error
+        throw error;
       } else {
-        throw new Error('Tuntematon virhe haettaessa toteutustietoja')
+        throw new Error("Tuntematon virhe haettaessa toteutustietoja");
       }
     }
   }
@@ -101,8 +108,8 @@ export class RealizationApiService {
    * Checks if an event title likely contains a realization code
    */
   static hasRealizationCode(eventTitle: string): boolean {
-    return this.extractRealizationCode(eventTitle) !== null
+    return RealizationApiService.extractRealizationCode(eventTitle) !== null;
   }
 }
 
-export default RealizationApiService
+export default RealizationApiService;

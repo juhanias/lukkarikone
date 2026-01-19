@@ -1,9 +1,9 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
-import Layout from './components/Layout'
-import Schedule from './pages/Schedule'
-import Settings from './pages/Settings'
-import ErrorPage from './pages/ErrorPage'
-import RootRedirect from './components/RootRedirect'
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import Layout from "./components/Layout";
+import RootRedirect from "./components/RootRedirect";
+import ErrorPage from "./pages/ErrorPage";
+import Schedule from "./pages/Schedule";
+import Settings from "./pages/Settings";
 
 export const router = createBrowserRouter(
   [
@@ -33,6 +33,6 @@ export const router = createBrowserRouter(
     },
   ],
   {
-    basename: '/',
-  }
+    basename: "/",
+  },
 );

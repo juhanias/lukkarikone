@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react";
 
 /**
  * Sets document.title while the component using this hook is mounted.
@@ -7,18 +7,18 @@ import { useEffect, useRef } from 'react'
  * Usage: useDocumentTitle('Page — lukkari.juh.fi')
  */
 export default function useDocumentTitle(title?: string) {
-  const previousTitleRef = useRef<string | null>(null)
+  const previousTitleRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (typeof title !== 'string') return
+    if (typeof title !== "string") return;
 
-    previousTitleRef.current = document.title
-    document.title = title
+    previousTitleRef.current = document.title;
+    document.title = title;
 
     return () => {
       if (previousTitleRef.current !== null) {
-        document.title = previousTitleRef.current
+        document.title = previousTitleRef.current;
       }
-    }
-  }, [title])
+    };
+  }, [title]);
 }

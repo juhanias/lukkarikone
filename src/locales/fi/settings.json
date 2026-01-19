@@ -26,7 +26,7 @@
           "subtitle": "Käyttää laitteen oletusfonttia"
         },
         "lexend": {
-          "label": "Lexend-fontti", 
+          "label": "Lexend-fontti",
           "subtitle": "Optimoitu luettavuudelle"
         }
       }
@@ -82,7 +82,9 @@
     },
     "calendar": {
       "title": "Kalenterien hallinta",
-      "subtitle": "Hallinnoi kalentereitasi",      "manage": "Hallitse",      "calendarLabel": "Aktiivinen kalenteri",
+      "subtitle": "Hallinnoi kalentereitasi",
+      "manage": "Hallitse",
+      "calendarLabel": "Aktiivinen kalenteri",
       "notConfigured": "Ei kalenteria määritettynä",
       "configured": "{{name}}",
       "manageCalendars": "Hallinnoi kalentereita",

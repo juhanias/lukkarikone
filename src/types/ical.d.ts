@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // thingamajig for ical.js
-declare module 'ical.js' {
+declare module "ical.js" {
   type JCalData = unknown[];
 
   interface ICAL {
@@ -17,13 +17,13 @@ declare module 'ical.js' {
     constructor(jCal: JCalData, parent?: Component);
     name: string;
     jCal: JCalData;
-    
+
     getFirstProperty(name: string): Property | null;
     getAllProperties(name?: string): Property[];
     getFirstSubcomponent(name: string): Component | null;
     getAllSubcomponents(name?: string): Component[];
     hasProperty(name: string): boolean;
-    
+
     static fromString(str: string): Component;
   }
 
@@ -31,11 +31,11 @@ declare module 'ical.js' {
     constructor(jCal: JCalData, parent?: Component);
     name: string;
     type: string;
-    
+
     getFirstValue(): unknown;
     getValues(): unknown[];
     getParameter(name: string): string | null;
-    
+
     static fromString(str: string): Property;
   }
 
@@ -47,7 +47,7 @@ declare module 'ical.js' {
     description: string;
     location: string;
     attendees: Property[];
-    
+
     startDate: Time;
     endDate: Time;
     duration: Duration;
@@ -64,11 +64,11 @@ declare module 'ical.js' {
     second: number;
     isDate: boolean;
     zone: Timezone;
-    
+
     toJSDate(): Date;
     toString(): string;
     compare(other: Time): number;
-    
+
     static fromJSDate(date: Date, useUTC?: boolean): Time;
     static fromString(str: string): Time;
     static now(): Time;
@@ -80,10 +80,10 @@ declare module 'ical.js' {
     hours: number;
     minutes: number;
     seconds: number;
-    
+
     toString(): string;
     toSeconds(): number;
-    
+
     static fromString(str: string): Duration;
   }
 

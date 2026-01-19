@@ -52,7 +52,7 @@
   "dateFormat": {
     "days": {
       "monday": "maanantai",
-      "tuesday": "tiistai", 
+      "tuesday": "tiistai",
       "wednesday": "keskiviikko",
       "thursday": "torstai",
       "friday": "perjantai",
@@ -62,7 +62,7 @@
     "daysShort": {
       "monday": "Ma",
       "tuesday": "Ti",
-      "wednesday": "Ke", 
+      "wednesday": "Ke",
       "thursday": "To",
       "friday": "Pe",
       "saturday": "La",
@@ -84,7 +84,7 @@
     },
     "monthsShort": {
       "january": "tammi",
-      "february": "helmi", 
+      "february": "helmi",
       "march": "maalis",
       "april": "huhti",
       "may": "touko",

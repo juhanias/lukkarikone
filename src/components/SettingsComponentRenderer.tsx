@@ -1,17 +1,24 @@
-import { Toggle, RadioCard } from './ui'
-import { Slider } from './ui/Slider'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import { ThemeSelector } from './ThemeSelector'
-import type { SettingComponent } from '../types/settings-config'
+import type { SettingComponent } from "../types/settings-config";
+import { ThemeSelector } from "./ThemeSelector";
+import { RadioCard, Toggle } from "./ui";
+import { Slider } from "./ui/Slider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 interface SettingsComponentRendererProps {
-  component: SettingComponent
+  component: SettingComponent;
 }
 
-export function SettingsComponentRenderer({ component }: SettingsComponentRendererProps) {
-  
+export function SettingsComponentRenderer({
+  component,
+}: SettingsComponentRendererProps) {
   switch (component.componentType) {
-    case 'toggle':
+    case "toggle":
       return (
         <Toggle
           checked={component.data.checked}
@@ -19,9 +26,9 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
           label={component.data.label}
           subtitle={component.data.subtitle}
         />
-      )
+      );
 
-    case 'radio':
+    case "radio":
       return (
         <fieldset className="space-y-4">
           <legend className="sr-only">{component.data.name}</legend>
@@ -37,26 +44,29 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
             />
           ))}
         </fieldset>
-      )
+      );
 
-    case 'slider':
+    case "slider":
       return (
-        <div 
-          className="p-4 rounded-lg mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]"
-        >
+        <div className="p-4 rounded-lg mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex-1 min-w-0 mr-4">
-              <label className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+              <label
+                className="text-sm font-medium"
+                style={{ color: "var(--color-text)" }}
+              >
                 {component.data.label}
               </label>
-              <p className="text-xs mt-1 opacity-75 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
+              <p
+                className="text-xs mt-1 opacity-75 max-w-2xl"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
                 {component.data.subtitle}
               </p>
             </div>
-            <div 
-              className="font-mono text-sm px-2 py-1 rounded border bg-[var(--color-surface)] border-[var(--color-border-alpha-30)] text-[var(--color-text)]"
-            >
-              {component.data.value}{component.data.unit || ''}
+            <div className="font-mono text-sm px-2 py-1 rounded border bg-[var(--color-surface)] border-[var(--color-border-alpha-30)] text-[var(--color-text)]">
+              {component.data.value}
+              {component.data.unit || ""}
             </div>
           </div>
           <div className="relative">
@@ -70,9 +80,9 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
             />
           </div>
         </div>
-      )
+      );
 
-    case 'select':
+    case "select":
       return (
         <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]">
           <div className="flex-1 min-w-0">
@@ -85,7 +95,10 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
               </p>
             )}
           </div>
-          <Select value={component.data.value} onValueChange={component.data.onChange}>
+          <Select
+            value={component.data.value}
+            onValueChange={component.data.onChange}
+          >
             <SelectTrigger className="w-full sm:w-auto sm:min-w-[180px] cursor-pointer">
               <SelectValue />
             </SelectTrigger>
@@ -98,16 +111,19 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
             </SelectContent>
           </Select>
         </div>
-      )
+      );
 
-    case 'button': {
-      const isDanger = component.data.variant === 'danger'
-      const Icon = component.data.icon
-      
+    case "button": {
+      const isDanger = component.data.variant === "danger";
+      const Icon = component.data.icon;
+
       return (
         <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]">
           <div className="flex-1 min-w-0">
-            <label className="text-sm font-medium block" style={{ color: 'var(--color-text)' }}>
+            <label
+              className="text-sm font-medium block"
+              style={{ color: "var(--color-text)" }}
+            >
               {component.data.label}
             </label>
             {component.data.subtitle && (
@@ -120,31 +136,35 @@ export function SettingsComponentRenderer({ component }: SettingsComponentRender
             onClick={component.data.onClick}
             className="flex items-center justify-center gap-2 h-9 px-3 rounded-md border transition-colors w-full sm:w-auto sm:min-w-[180px] cursor-pointer hover:opacity-90"
             style={{
-              borderColor: isDanger ? '#ef4444' : 'var(--color-border)',
-              color: isDanger ? '#ef4444' : 'var(--color-text)',
-              backgroundColor: isDanger ? 'rgba(239,68,68,0.15)' : 'var(--color-surface)'
+              borderColor: isDanger ? "#ef4444" : "var(--color-border)",
+              color: isDanger ? "#ef4444" : "var(--color-text)",
+              backgroundColor: isDanger
+                ? "rgba(239,68,68,0.15)"
+                : "var(--color-surface)",
             }}
           >
             {Icon && <Icon className="w-4 h-4" />}
-            <span className="text-sm whitespace-nowrap">{component.data.label}</span>
+            <span className="text-sm whitespace-nowrap">
+              {component.data.label}
+            </span>
           </button>
         </div>
-      )
+      );
     }
 
-    case 'theme-selector':
+    case "theme-selector":
       return (
         <ThemeSelector
           themes={component.data.themes}
           selectedThemeId={component.data.selectedThemeId}
           onThemeSelect={component.data.onThemeSelect}
         />
-      )
+      );
 
-    case 'custom':
-      return <>{component.data.render()}</>
+    case "custom":
+      return <>{component.data.render()}</>;
 
     default:
-      return null
+      return null;
   }
 }

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type ViewMode = 'day' | 'week';
+type ViewMode = "day" | "week";
 
 interface ScheduleRangeState {
   currentDate: Date;
@@ -21,7 +21,7 @@ export const useScheduleRange = create<ScheduleRangeState>()(
   persist(
     (set, get) => ({
       currentDate: new Date(),
-      viewMode: 'day',
+      viewMode: "day",
       setCurrentDate: (date: Date) => set({ currentDate: date }),
       setViewMode: (mode: ViewMode) => set({ viewMode: mode }),
       goToPreviousDay: () => {
@@ -74,8 +74,8 @@ export const useScheduleRange = create<ScheduleRangeState>()(
     {
       name: "schedule-range",
       partialize: (state) => ({ viewMode: state.viewMode }),
-    }
-  )
+    },
+  ),
 );
 
 export type { ViewMode };

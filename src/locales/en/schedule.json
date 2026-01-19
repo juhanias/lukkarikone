@@ -14,7 +14,7 @@
   },
   "navigation": {
     "day": "Day",
-    "week": "Week", 
+    "week": "Week",
     "today": "Today"
   },
   "title": "Schedule",
@@ -52,7 +52,7 @@
   "dateFormat": {
     "days": {
       "monday": "Monday",
-      "tuesday": "Tuesday", 
+      "tuesday": "Tuesday",
       "wednesday": "Wednesday",
       "thursday": "Thursday",
       "friday": "Friday",
@@ -62,7 +62,7 @@
     "daysShort": {
       "monday": "Mon",
       "tuesday": "Tue",
-      "wednesday": "Wed", 
+      "wednesday": "Wed",
       "thursday": "Thu",
       "friday": "Fri",
       "saturday": "Sat",
@@ -84,7 +84,7 @@
     },
     "monthsShort": {
       "january": "Jan",
-      "february": "Feb", 
+      "february": "Feb",
       "march": "Mar",
       "april": "Apr",
       "may": "May",

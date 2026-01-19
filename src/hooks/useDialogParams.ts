@@ -1,15 +1,15 @@
-import { useQueryState } from 'nuqs'
+import { useQueryState } from "nuqs";
 
 /**
  * Hook for managing event details dialog state via URL query params
  * Usage: ?event=<event-id>
  */
 export function useEventDialogParam() {
-  return useQueryState('event', {
+  return useQueryState("event", {
     clearOnDefault: true,
-    history: 'push',
+    history: "push",
     throttleMs: 50,
-  })
+  });
 }
 
 /**
@@ -17,14 +17,14 @@ export function useEventDialogParam() {
  * Usage: ?calendars=true
  */
 export function useCalendarsDialogParam() {
-  return useQueryState('calendars', {
+  return useQueryState("calendars", {
     defaultValue: null,
     clearOnDefault: true,
-    history: 'push',
+    history: "push",
     throttleMs: 50,
-    parse: (value) => (value === 'true' ? 'true' : null),
-    serialize: (value) => (value === 'true' ? 'true' : ''),
-  })
+    parse: (value) => (value === "true" ? "true" : null),
+    serialize: (value) => (value === "true" ? "true" : ""),
+  });
 }
 
 /**
@@ -32,14 +32,14 @@ export function useCalendarsDialogParam() {
  * Usage: ?theme=true
  */
 export function useThemeDialogParam() {
-  return useQueryState('theme', {
+  return useQueryState("theme", {
     defaultValue: null,
     clearOnDefault: true,
-    history: 'push',
+    history: "push",
     throttleMs: 50,
-    parse: (value) => (value === 'true' ? 'true' : null),
-    serialize: (value) => (value === 'true' ? 'true' : ''),
-  })
+    parse: (value) => (value === "true" ? "true" : null),
+    serialize: (value) => (value === "true" ? "true" : ""),
+  });
 }
 
 /**
@@ -47,9 +47,9 @@ export function useThemeDialogParam() {
  * Usage: ?realization=<realization-code>
  */
 export function useRealizationDialogParam() {
-  return useQueryState('realization', {
+  return useQueryState("realization", {
     clearOnDefault: true,
-    history: 'push',
+    history: "push",
     throttleMs: 50,
-  })
+  });
 }

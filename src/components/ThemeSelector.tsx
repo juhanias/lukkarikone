@@ -1,5 +1,5 @@
-import { Check } from 'lucide-react';
-import useConfigStore from '../state/state-management';
+import { Check } from "lucide-react";
+import useConfigStore from "../state/state-management";
 
 interface Theme {
   id: string;
@@ -22,7 +22,11 @@ interface ThemeSelectorProps {
   onThemeSelect: (themeId: string) => void;
 }
 
-export function ThemeSelector({ themes, selectedThemeId, onThemeSelect }: ThemeSelectorProps) {
+export function ThemeSelector({
+  themes,
+  selectedThemeId,
+  onThemeSelect,
+}: ThemeSelectorProps) {
   const { getCurrentTheme } = useConfigStore();
   const currentTheme = getCurrentTheme();
 
@@ -39,7 +43,7 @@ export function ThemeSelector({ themes, selectedThemeId, onThemeSelect }: ThemeS
     <div className="flex flex-wrap gap-3">
       {themes.map((theme) => {
         const borderColor = theme.colors.accentSecondary || theme.colors.accent;
-        
+
         return (
           <button
             key={theme.id}
@@ -47,32 +51,34 @@ export function ThemeSelector({ themes, selectedThemeId, onThemeSelect }: ThemeS
             onClick={() => onThemeSelect(theme.id)}
             aria-label={`Select ${theme.id} theme`}
           >
-            <div 
+            <div
               className="w-12 h-12 rounded-full relative overflow-hidden border-2 transition-colors duration-150"
               style={{
-                borderColor: selectedThemeId === theme.id 
-                  ? currentTheme.colors.accentSecondary
-                  : rgbToRgba(borderColor, 0.6),
-                boxShadow: selectedThemeId === theme.id 
-                  ? `0 0 0 3px ${rgbToRgba(currentTheme.colors.accent, 0.3)}`
-                  : 'none'
+                borderColor:
+                  selectedThemeId === theme.id
+                    ? currentTheme.colors.accentSecondary
+                    : rgbToRgba(borderColor, 0.6),
+                boxShadow:
+                  selectedThemeId === theme.id
+                    ? `0 0 0 3px ${rgbToRgba(currentTheme.colors.accent, 0.3)}`
+                    : "none",
               }}
             >
               {/* Gradient background */}
-              <div 
+              <div
                 className="absolute inset-0"
-                style={{ 
-                  background: `linear-gradient(135deg, ${theme.colors.background} 0%, ${theme.colors.background} 45%, ${theme.colors.accent} 55%, ${theme.colors.accent} 100%)`
+                style={{
+                  background: `linear-gradient(135deg, ${theme.colors.background} 0%, ${theme.colors.background} 45%, ${theme.colors.accent} 55%, ${theme.colors.accent} 100%)`,
                 }}
               />
-              
+
               {/* Checkmark for selected theme */}
               {selectedThemeId === theme.id && (
                 <div
                   className="absolute inset-0 flex items-center justify-center"
-                  style={{ transition: 'opacity 0.12s ease' }}
+                  style={{ transition: "opacity 0.12s ease" }}
                 >
-                  <div 
+                  <div
                     className="w-6 h-6 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: currentTheme.colors.accent }}
                   >
