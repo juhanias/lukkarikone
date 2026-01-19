@@ -15,7 +15,8 @@
     "lint": "biome lint .",
     "preview": "vite preview",
     "fix:lint": "biome lint --write .",
-    "fix:format": "biome format --write ."
+    "fix:format": "biome format --write .",
+    "fix:all": "biome check --write"
   },
   "dependencies": {
     "@radix-ui/react-context-menu": "^2.2.16",
