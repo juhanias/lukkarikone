@@ -20,6 +20,7 @@ import {
   useScheduleStore,
 } from "../state/state-management";
 import type { ScheduleEvent } from "../types/schedule";
+import AttachRealizationDialog from "./AttachRealizationDialog";
 import { ActionButton } from "./ui/ActionButton";
 import {
   Dialog,
@@ -49,6 +50,7 @@ interface LectureDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
   event: ScheduleEvent | null;
   onOpenRealizationDialog?: (eventTitle: string) => void;
+  onOpenRealizationDialogByCode?: (realizationCode: string) => void;
   onOpenColorCustomizer?: (event: ScheduleEvent) => void;
   isRealizationLoading?: boolean;
 }
@@ -58,6 +60,7 @@ const LectureDetailsDialog = ({
   onOpenChange,
   event,
   onOpenRealizationDialog,
+  onOpenRealizationDialogByCode,
   onOpenColorCustomizer,
   isRealizationLoading = false,
 }: LectureDetailsDialogProps) => {
@@ -75,6 +78,7 @@ const LectureDetailsDialog = ({
   const { events } = useScheduleStore();
   const [lastEvent, setLastEvent] = useState<ScheduleEvent | null>(null);
   const [hideCourseDialogOpen, setHideCourseDialogOpen] = useState(false);
+  const [attachDialogOpen, setAttachDialogOpen] = useState(false);
   const noRealizationWhyNotLabel = t(
     "lectureDetailsDialog.noRealizationWhyNot",
   );
@@ -114,7 +118,16 @@ const LectureDetailsDialog = ({
   };
 
   const handleOpenRealizationDialog = () => {
-    if (event && onOpenRealizationDialog) {
+    if (!event) {
+      return;
+    }
+    const attachedRealizationId =
+      getEventMetadata(event.id)?.attachedRealizationId ?? null;
+    if (attachedRealizationId && onOpenRealizationDialogByCode) {
+      onOpenRealizationDialogByCode(attachedRealizationId);
+      return;
+    }
+    if (onOpenRealizationDialog) {
       onOpenRealizationDialog(event.title);
     }
   };
@@ -124,8 +137,11 @@ const LectureDetailsDialog = ({
       return;
     }
     // Visibility priority: per-event override, then realization hidden state, then event default; setEventHidden flips the effective state.
-    const realizationCode = RealizationApiService.extractRealizationCode(
+    const attachedRealizationId =
+      getEventMetadata(event.id)?.attachedRealizationId ?? null;
+    const realizationCode = RealizationApiService.getEffectiveRealizationCode(
       event.title,
+      attachedRealizationId,
     );
     const override = getEventMetadata(event.id)?.hidden;
     if (typeof override === "boolean") {
@@ -149,8 +165,11 @@ const LectureDetailsDialog = ({
     if (!event) {
       return;
     }
-    const realizationCode = RealizationApiService.extractRealizationCode(
+    const attachedRealizationId =
+      getEventMetadata(event.id)?.attachedRealizationId ?? null;
+    const realizationCode = RealizationApiService.getEffectiveRealizationCode(
       event.title,
+      attachedRealizationId,
     );
     if (!realizationCode) {
       return;
@@ -163,16 +182,22 @@ const LectureDetailsDialog = ({
     if (!event) {
       return;
     }
-    const realizationCode = RealizationApiService.extractRealizationCode(
+    const attachedRealizationId =
+      getEventMetadata(event.id)?.attachedRealizationId ?? null;
+    const realizationCode = RealizationApiService.getEffectiveRealizationCode(
       event.title,
+      attachedRealizationId,
     );
     if (!realizationCode) {
       return;
     }
     showRealization(realizationCode);
     events.forEach((scheduledEvent) => {
-      const scheduledCode = RealizationApiService.extractRealizationCode(
+      const scheduledAttached =
+        getEventMetadata(scheduledEvent.id)?.attachedRealizationId ?? null;
+      const scheduledCode = RealizationApiService.getEffectiveRealizationCode(
         scheduledEvent.title,
+        scheduledAttached,
       );
       if (scheduledCode !== realizationCode) {
         return;
@@ -199,18 +224,24 @@ const LectureDetailsDialog = ({
   };
 
   const displayEvent = event ?? lastEvent;
+  const attachedRealizationId = displayEvent
+    ? (getEventMetadata(displayEvent.id)?.attachedRealizationId ?? null)
+    : null;
+  const effectiveRealizationCode = displayEvent
+    ? RealizationApiService.getEffectiveRealizationCode(
+        displayEvent.title,
+        attachedRealizationId,
+      )
+    : null;
   const displayTitle = displayEvent
     ? (() => {
         const baseTitle = RealizationApiService.stripRealizationCode(
           displayEvent.title,
         );
-        const realizationCode = RealizationApiService.extractRealizationCode(
-          displayEvent.title,
-        );
-        if (!realizationCode) {
+        if (!effectiveRealizationCode) {
           return baseTitle;
         }
-        const codeForDisplay = realizationCode.toUpperCase();
+        const codeForDisplay = effectiveRealizationCode.toUpperCase();
         return `${baseTitle} ${codeForDisplay}`.trim();
       })()
     : "";
@@ -220,11 +251,15 @@ const LectureDetailsDialog = ({
   const headerTitle = displayEvent ? displayTitle : "";
   const headerDescription = displayEvent ? displayDescription : null;
   const realizationCode = event
-    ? RealizationApiService.extractRealizationCode(event.title)
+    ? RealizationApiService.getEffectiveRealizationCode(
+        event.title,
+        attachedRealizationId,
+      )
     : null;
   const hasRealizationCode = event
     ? RealizationApiService.hasRealizationCode(event.title)
     : false;
+  const hasEffectiveRealizationCode = Boolean(realizationCode);
   const isHidden = event
     ? (() => {
         const override = getEventMetadata(event.id)?.hidden;
@@ -433,24 +468,26 @@ const LectureDetailsDialog = ({
                     style={{ borderColor: "var(--color-border-alpha-30)" }}
                   >
                     <div className="space-y-2">
-                      {hasRealizationCode && onOpenRealizationDialog && (
-                        <ActionButton
-                          onClick={handleOpenRealizationDialog}
-                          variant="primary"
-                          disabled={isRealizationLoading}
-                          size="sm"
-                          className="w-full sm:w-auto"
-                        >
-                          <div className="flex items-center justify-center gap-2">
-                            {isRealizationLoading ? (
-                              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                            ) : (
-                              <ExternalLink className="h-4 w-4" />
-                            )}
-                            {t("lectureDetailsDialog.showRealizationDetails")}
-                          </div>
-                        </ActionButton>
-                      )}
+                      {hasEffectiveRealizationCode &&
+                        (onOpenRealizationDialog ||
+                          onOpenRealizationDialogByCode) && (
+                          <ActionButton
+                            onClick={handleOpenRealizationDialog}
+                            variant="primary"
+                            disabled={isRealizationLoading}
+                            size="sm"
+                            className="w-full sm:w-auto"
+                          >
+                            <div className="flex items-center justify-center gap-2">
+                              {isRealizationLoading ? (
+                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                              ) : (
+                                <ExternalLink className="h-4 w-4" />
+                              )}
+                              {t("lectureDetailsDialog.showRealizationDetails")}
+                            </div>
+                          </ActionButton>
+                        )}
                       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-start">
                         <ActionButton
                           onClick={handleToggleVisibility}
@@ -483,7 +520,24 @@ const LectureDetailsDialog = ({
                             </div>
                           </ActionButton>
                         )}
-                        {hasRealizationCode && (
+                        {!hasRealizationCode && (
+                          <ActionButton
+                            onClick={() => setAttachDialogOpen(true)}
+                            variant="subtle"
+                            className="w-full sm:w-auto"
+                          >
+                            <div className="flex items-center justify-center gap-2">
+                              {attachedRealizationId
+                                ? t(
+                                    "lectureDetailsDialog.attachRealization.change",
+                                  )
+                                : t(
+                                    "lectureDetailsDialog.attachRealization.button",
+                                  )}
+                            </div>
+                          </ActionButton>
+                        )}
+                        {hasEffectiveRealizationCode && (
                           <ActionButton
                             onClick={() => {
                               if (isCourseHidden) {
@@ -508,7 +562,7 @@ const LectureDetailsDialog = ({
                 )}
 
                 {/* Info about missing realization data */}
-                {event.title && !hasRealizationCode && (
+                {event.title && !hasEffectiveRealizationCode && (
                   <div
                     className="rounded-lg p-4 border"
                     style={{
@@ -570,6 +624,12 @@ const LectureDetailsDialog = ({
           </AnimatePresence>
         </DialogContent>
       </Dialog>
+
+      <AttachRealizationDialog
+        open={attachDialogOpen}
+        onOpenChange={setAttachDialogOpen}
+        event={event}
+      />
 
       <Dialog
         open={hideCourseDialogOpen}

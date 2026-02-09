@@ -130,6 +130,7 @@ const WeekView = memo(
       error: realizationError,
       realizationData,
       openDialog: openRealizationDialog,
+      openDialogByCode: openRealizationDialogByCode,
       closeDialog: closeRealizationDialog,
     } = useRealizationDialog();
 
@@ -305,8 +306,11 @@ const WeekView = memo(
       if (!event) {
         return isEventHidden(eventId);
       }
-      const realizationCode = RealizationApiService.extractRealizationCode(
+      const attachedRealizationId =
+        metadataByEvent[eventId]?.attachedRealizationId ?? null;
+      const realizationCode = RealizationApiService.getEffectiveRealizationCode(
         event.title,
+        attachedRealizationId,
       );
       return Boolean(realizationCode && isRealizationHidden(realizationCode));
     };
@@ -732,6 +736,7 @@ const WeekView = memo(
           onOpenChange={closeLectureDetailsDialog}
           event={selectedEvent}
           onOpenRealizationDialog={openRealizationDialog}
+          onOpenRealizationDialogByCode={openRealizationDialogByCode}
           onOpenColorCustomizer={openColorCustomizer}
           isRealizationLoading={realizationLoading}
         />
@@ -745,9 +750,12 @@ const WeekView = memo(
             eventTitle={getDisplayTitle(selectedEventForColor.title)}
             eventTitleRaw={selectedEventForColor.title}
             realizationCode={
+              metadataByEvent[selectedEventForColor.id]
+                ?.attachedRealizationId ||
               RealizationApiService.extractRealizationCode(
                 selectedEventForColor.title,
-              ) || ""
+              ) ||
+              ""
             }
             realizationTitle={RealizationApiService.stripRealizationCode(
               selectedEventForColor.title,

@@ -83,6 +83,7 @@ const ScheduleDay = memo(
       error: realizationError,
       realizationData,
       openDialog: openRealizationDialog,
+      openDialogByCode: openRealizationDialogByCode,
       closeDialog: closeRealizationDialog,
     } = useRealizationDialog();
 
@@ -121,7 +122,6 @@ const ScheduleDay = memo(
       () => new Map(events.map((event) => [event.id, event])),
       [events],
     );
-    const extractRealizationCode = RealizationApiService.extractRealizationCode;
     const isEventEffectivelyHidden = useMemo(
       () => (eventId: string) => {
         const event = eventsById.get(eventId);
@@ -132,16 +132,16 @@ const ScheduleDay = memo(
         if (!event) {
           return isEventHidden(eventId);
         }
-        const realizationCode = extractRealizationCode(event.title);
+        const attachedRealizationId =
+          metadataByEvent[eventId]?.attachedRealizationId ?? null;
+        const realizationCode =
+          RealizationApiService.getEffectiveRealizationCode(
+            event.title,
+            attachedRealizationId,
+          );
         return Boolean(realizationCode && isRealizationHidden(realizationCode));
       },
-      [
-        eventsById,
-        metadataByEvent,
-        isEventHidden,
-        isRealizationHidden,
-        extractRealizationCode,
-      ],
+      [eventsById, metadataByEvent, isEventHidden, isRealizationHidden],
     );
 
     const toggleEventVisibility = (event: ScheduleEvent) => {
@@ -498,6 +498,7 @@ const ScheduleDay = memo(
           onOpenChange={closeLectureDetailsDialog}
           event={selectedEvent}
           onOpenRealizationDialog={openRealizationDialog}
+          onOpenRealizationDialogByCode={openRealizationDialogByCode}
           isRealizationLoading={realizationLoading}
         />
 
@@ -510,9 +511,12 @@ const ScheduleDay = memo(
             eventTitle={getDisplayTitle(selectedEventForColor.title)}
             eventTitleRaw={selectedEventForColor.title}
             realizationCode={
+              metadataByEvent[selectedEventForColor.id]
+                ?.attachedRealizationId ||
               RealizationApiService.extractRealizationCode(
                 selectedEventForColor.title,
-              ) || ""
+              ) ||
+              ""
             }
             realizationTitle={RealizationApiService.stripRealizationCode(
               selectedEventForColor.title,

@@ -69,6 +69,18 @@
     "teachers": "Teachers",
     "studentGroups": "Student Groups",
     "showRealizationDetails": "Show Implementation Details",
+    "attachRealization": {
+      "title": "Attach to realization",
+      "description": "This event could not be linked to a realization automatically. Choose from the options below to attach it manually!",
+      "search": "Search by name or code",
+      "button": "Attach to realization",
+      "change": "Change attachment",
+      "attach": "Attach",
+      "attached": "Attached",
+      "current": "Currently attached",
+      "detach": "Detach",
+      "empty": "No realizations matched your search."
+    },
     "noRealizationData": "Detailed implementation information is not available for this event.",
     "noRealizationWhyNot": "Why not?",
     "noRealizationWhyNotExplanation": "Open Lukkarikone associates events to their classes by the Realization ID in their name (e.g. kh00cz65-3020). If this realization ID is missing, there is no way for the application to know what realization this belongs to. Each event in your calendar should, by default, have the realization ID in them.",

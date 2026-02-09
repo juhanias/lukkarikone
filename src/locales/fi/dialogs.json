@@ -69,6 +69,18 @@
     "teachers": "Opettajat",
     "studentGroups": "Opiskelijaryhmät",
     "showRealizationDetails": "Näytä toteutustiedot",
+    "attachRealization": {
+      "title": "Liitä toteutukseen",
+      "description": "Tätä tapahtumaa ei voitu liittää automaattisesti toteutukseen. Valitse seuraavista vaihtoehdoista liittääksesi sen manuaalisesti!",
+      "search": "Hae nimellä tai koodilla",
+      "button": "Liitä toteutukseen",
+      "change": "Vaihda liitos",
+      "attach": "Liitä",
+      "attached": "Liitetty",
+      "current": "Tällä hetkellä liitetty",
+      "detach": "Irrota",
+      "empty": "Haku ei löytänyt toteutuksia."
+    },
     "noRealizationData": "Tälle tapahtumalle ei ole saatavilla yksityiskohtaisia toteutustietoja.",
     "noRealizationWhyNot": "Miksi ei?",
     "noRealizationWhyNotExplanation": "Open Lukkarikone liittää tapahtumat toteutuksiin nimen toteutuskoodin perusteella (esim. kh00cz65-3020). Jos tämä toteutuskoodi puuttuu, sovellus ei voi tietää, mihin toteutukseen tapahtuma kuuluu. Jokaisessa kalenterisi tapahtumassa pitäisi oletuksena olla toteutuskoodi.",

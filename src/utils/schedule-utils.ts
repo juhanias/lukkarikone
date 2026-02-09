@@ -79,8 +79,14 @@ export class ScheduleUtils {
   }
 
   // Get the key to use for color generation - prioritize course ID if available
-  private static getColorKey(eventTitle: string): string {
-    const courseId = RealizationApiService.extractRealizationCode(eventTitle);
+  private static getColorKey(
+    eventTitle: string,
+    attachedRealizationId?: string | null,
+  ): string {
+    const courseId = RealizationApiService.getEffectiveRealizationCode(
+      eventTitle,
+      attachedRealizationId,
+    );
     return courseId || eventTitle;
   }
 
@@ -120,8 +126,13 @@ export class ScheduleUtils {
       return eventColor;
     }
 
-    const realizationCode =
-      RealizationApiService.extractRealizationCode(eventTitle);
+    const attachedRealizationId = eventId
+      ? metadataByEvent?.[eventId]?.attachedRealizationId
+      : null;
+    const realizationCode = RealizationApiService.getEffectiveRealizationCode(
+      eventTitle,
+      attachedRealizationId,
+    );
     const metadataColor = ScheduleUtils.getMetadataColor(
       realizationCode,
       metadataByRealization,
@@ -130,7 +141,10 @@ export class ScheduleUtils {
       return metadataColor;
     }
 
-    const colorKey = ScheduleUtils.getColorKey(eventTitle);
+    const colorKey = ScheduleUtils.getColorKey(
+      eventTitle,
+      attachedRealizationId,
+    );
     return ScheduleUtils.getDefaultRealizationColor(colorKey);
   }
 

@@ -122,6 +122,45 @@ export const useRealizationDialog = () => {
     [isLoading, loadedCode, realizationData, setRealizationCode],
   );
 
+  const openDialogByCode = useCallback(
+    async (code: string) => {
+      const normalizedCode = code.trim().toLowerCase();
+      if (!normalizedCode) {
+        return;
+      }
+
+      if (isLoading) {
+        return;
+      }
+
+      if (loadedCode === normalizedCode && realizationData) {
+        setRealizationCode(normalizedCode);
+        return;
+      }
+
+      setIsLoading(true);
+      setError(null);
+      setRealizationData(null);
+
+      try {
+        const response =
+          await RealizationApiService.fetchRealizationData(normalizedCode);
+        setRealizationData(response.data);
+        setLoadedCode(normalizedCode);
+        setRealizationCode(normalizedCode);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Virhe haettaessa toteutustietoja",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isLoading, loadedCode, realizationData, setRealizationCode],
+  );
+
   const closeDialog = useCallback(() => {
     setRealizationCode(null);
     setRealizationData(null);
@@ -148,6 +187,7 @@ export const useRealizationDialog = () => {
     error,
     realizationData,
     openDialog,
+    openDialogByCode,
     closeDialog,
     handleEventClick,
   };

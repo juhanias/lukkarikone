@@ -57,6 +57,9 @@ interface EventMetadataState {
   setEventColor: (eventId: string, color: string) => void;
   clearEventColor: (eventId: string) => void;
   hasEventColor: (eventId: string) => boolean;
+  getEventAttachedRealization: (eventId: string) => string | null;
+  setEventAttachedRealization: (eventId: string, realizationId: string) => void;
+  clearEventAttachedRealization: (eventId: string) => void;
   isEventHidden: (eventId: string) => boolean;
   hideEvent: (eventId: string) => void;
   showEvent: (eventId: string) => void;
@@ -160,6 +163,54 @@ export const useEventMetadataStore = create<EventMetadataState>()(
       hasEventColor: (eventId: string) => {
         const { metadataByEvent } = get();
         return Boolean(metadataByEvent[eventId]?.color);
+      },
+
+      getEventAttachedRealization: (eventId: string) => {
+        const { metadataByEvent } = get();
+        return metadataByEvent[eventId]?.attachedRealizationId || null;
+      },
+
+      setEventAttachedRealization: (eventId: string, realizationId: string) => {
+        const normalizedId = realizationId.trim().toLowerCase();
+        if (!normalizedId) {
+          return;
+        }
+        set((state) => ({
+          metadataByEvent: {
+            ...state.metadataByEvent,
+            [eventId]: {
+              ...(() => {
+                const existing = state.metadataByEvent[eventId];
+                if (!existing) {
+                  return {} as EventMetadata;
+                }
+                const { color: _, ...rest } = existing;
+                return rest;
+              })(),
+              attachedRealizationId: normalizedId,
+            },
+          },
+        }));
+      },
+
+      clearEventAttachedRealization: (eventId: string) => {
+        set((state) => {
+          const existing = state.metadataByEvent[eventId];
+          if (!existing) {
+            return state;
+          }
+          const { attachedRealizationId: _, ...rest } = existing;
+          if (Object.keys(rest).length === 0) {
+            const { [eventId]: __, ...remaining } = state.metadataByEvent;
+            return { metadataByEvent: remaining };
+          }
+          return {
+            metadataByEvent: {
+              ...state.metadataByEvent,
+              [eventId]: rest,
+            },
+          };
+        });
       },
 
       isEventHidden: (eventId: string) => {

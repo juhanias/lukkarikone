@@ -8,6 +8,7 @@ export type RealizationMetadataMap = Record<string, RealizationMetadata>;
 export interface EventMetadata {
   hidden?: boolean;
   color?: string;
+  attachedRealizationId?: string;
 }
 
 export type EventMetadataMap = Record<string, EventMetadata>;
