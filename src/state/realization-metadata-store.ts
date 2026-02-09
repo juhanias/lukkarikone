@@ -9,6 +9,8 @@ import { ScheduleUtils } from "../utils/schedule-utils";
 const STORAGE_KEY = "realization-metadata";
 const LEGACY_STORAGE_KEY = "realization-colors";
 
+let legacyCleanupPending = false;
+
 const canAccessStorage = () => {
   try {
     if (typeof localStorage === "undefined") {
@@ -52,7 +54,7 @@ const migrateLegacyRealizationColors = (): RealizationMetadataMap => {
       }
     });
 
-    localStorage.removeItem(LEGACY_STORAGE_KEY);
+    legacyCleanupPending = true;
     return metadata;
   } catch {
     localStorage.removeItem(LEGACY_STORAGE_KEY);
@@ -204,5 +206,22 @@ export const useRealizationMetadataStore = create<RealizationMetadataState>()(
     },
   ),
 );
+
+useRealizationMetadataStore.persist?.onFinishHydration?.(() => {
+  if (!canAccessStorage() || !legacyCleanupPending) {
+    return;
+  }
+
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    useRealizationMetadataStore.setState((state) => ({
+      metadataByRealization: { ...state.metadataByRealization },
+    }));
+  }
+
+  if (localStorage.getItem(STORAGE_KEY)) {
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
+    legacyCleanupPending = false;
+  }
+});
 
 export type { RealizationMetadataState };

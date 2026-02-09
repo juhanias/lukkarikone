@@ -5,7 +5,17 @@ import type { EventMetadata, EventMetadataMap } from "../types/metadata";
 const STORAGE_KEY = "event-metadata";
 const LEGACY_STORAGE_KEY = "hidden-events";
 
-const canAccessStorage = () => typeof localStorage !== "undefined";
+const canAccessStorage = () => {
+  try {
+    if (typeof localStorage === "undefined") {
+      return false;
+    }
+    localStorage.getItem(STORAGE_KEY);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 let legacyCleanupPending = false;
 
@@ -23,8 +33,6 @@ const migrateLegacyHiddenEvents = (): EventMetadataMap => {
     return {};
   }
 
-  legacyCleanupPending = true;
-
   try {
     const parsed = JSON.parse(legacy);
     const hiddenEventIds = parsed?.state?.hiddenEventIds ?? [];
@@ -32,6 +40,8 @@ const migrateLegacyHiddenEvents = (): EventMetadataMap => {
     if (!Array.isArray(hiddenEventIds)) {
       return {};
     }
+
+    legacyCleanupPending = true;
 
     const metadata: EventMetadataMap = {};
     hiddenEventIds.forEach((eventId) => {
