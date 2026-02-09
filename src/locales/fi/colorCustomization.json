@@ -1,6 +1,10 @@
 {
   "dialog": {
     "title": "Mukauta toteutuksen väri",
+    "tabs": {
+      "event": "Tämä tapahtuma",
+      "realization": "Koko toteutus"
+    },
     "eventLabel": "Tapahtuma:",
     "realizationCodeLabel": "Toteutuskoodi:",
     "colorPreviewLabel": "Värin esikatselu",

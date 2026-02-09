@@ -71,6 +71,16 @@
     "showRealizationDetails": "Show Implementation Details",
     "noRealizationData": "Detailed implementation information is not available for this event.",
     "noRealizationWhyNot": "Why not?",
-    "noRealizationWhyNotExplanation": "Open Lukkarikone associates events to their classes by the Realization ID in their name (e.g. kh00cz65-3020). If this realization ID is missing, there is no way for the application to know what realization this belongs to. Each event in your calendar should, by default, have the realization ID in them."
+    "noRealizationWhyNotExplanation": "Open Lukkarikone associates events to their classes by the Realization ID in their name (e.g. kh00cz65-3020). If this realization ID is missing, there is no way for the application to know what realization this belongs to. Each event in your calendar should, by default, have the realization ID in them.",
+    "hideCourse": "Hide course",
+    "showCourse": "Show course",
+    "hideCourseDialog": {
+      "title": "Hide entire course?",
+      "line1": "You're about to hide every event we can tie to this realization. This is not recommended.",
+      "line2": "We recommend going to Lukkarikone to remove these unwanted courses from your calendar and re-import them here.",
+      "line3": "You can always undo this.",
+      "confirm": "Hide course",
+      "cancel": "Cancel"
+    }
   }
 }

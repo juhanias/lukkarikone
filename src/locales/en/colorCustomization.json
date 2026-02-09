@@ -1,6 +1,10 @@
 {
   "dialog": {
     "title": "Customize Realization Color",
+    "tabs": {
+      "event": "This event",
+      "realization": "Entire course"
+    },
     "eventLabel": "Event:",
     "realizationCodeLabel": "Realization Code:",
     "colorPreviewLabel": "Color Preview",

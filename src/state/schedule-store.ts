@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 import type { ScheduleEvent } from "../types/schedule";
 import { ScheduleUtils } from "../utils/schedule-utils";
 import useCalendarStore from "./calendar-store";
-import { useRealizationColorStore } from "./realization-color-store";
+import { useRealizationMetadataStore } from "./realization-metadata-store";
 
 interface ICalCache {
   url: string;
@@ -97,7 +97,8 @@ export const useScheduleStore = create<ScheduleState>()(
         });
 
         try {
-          const { customColors } = useRealizationColorStore.getState();
+          const { metadataByRealization } =
+            useRealizationMetadataStore.getState();
           const eventsByUid = new Map<string, ScheduleEvent>();
           const newIcalCaches: Record<string, ICalCache> = {
             ...state.icalCaches,
@@ -161,7 +162,7 @@ export const useScheduleStore = create<ScheduleState>()(
                 const event = ScheduleUtils.convertToScheduleEvent(
                   vevent,
                   eventIndexCounter++,
-                  customColors,
+                  metadataByRealization,
                 );
                 if (!eventsByUid.has(event.id)) {
                   eventsByUid.set(event.id, event);

@@ -1,8 +1,11 @@
 import { motion } from "framer-motion";
 import { Check, Palette, RotateCcw, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useRealizationColorStore } from "../state/state-management";
+import {
+  useEventMetadataStore,
+  useRealizationMetadataStore,
+} from "../state/state-management";
 import { RealizationColorUtils } from "../utils/realization-color-utils";
 import { ScheduleUtils } from "../utils/schedule-utils";
 import { Button } from "./ui/button";
@@ -11,9 +14,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 interface RealizationColorCustomizerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  eventId: string;
+  eventTitle: string;
+  eventTitleRaw: string;
   realizationCode: string;
-  currentEventTitle: string;
+  realizationTitle: string;
 }
+
+type ColorScope = "event" | "realization";
 
 const PRESET_COLORS = [
   "rgb(30, 64, 175)", // blue
@@ -37,25 +45,54 @@ const PRESET_COLORS = [
 export const RealizationColorCustomizer = ({
   open,
   onOpenChange,
+  eventId,
+  eventTitle,
+  eventTitleRaw,
   realizationCode,
-  currentEventTitle,
+  realizationTitle,
 }: RealizationColorCustomizerProps) => {
   const { t } = useTranslation("colorCustomization");
   const {
-    customColors,
+    metadataByRealization,
     setRealizationColor,
-    resetRealizationColor,
-    hasCustomColor,
-  } = useRealizationColorStore();
+    clearRealizationColor,
+    hasRealizationColor,
+  } = useRealizationMetadataStore();
+  const { metadataByEvent, setEventColor, clearEventColor, hasEventColor } =
+    useEventMetadataStore();
 
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [customHexColor, setCustomHexColor] = useState("#3B82F6");
-
-  const effectiveColor = RealizationColorUtils.getEffectiveColor(
-    realizationCode,
-    customColors,
+  const hasRealization = Boolean(realizationCode);
+  const [activeScope, setActiveScope] = useState<ColorScope>(
+    hasRealization ? "realization" : "event",
   );
-  const isCustomized = hasCustomColor(realizationCode);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    setSelectedColor("");
+    setCustomHexColor("#3B82F6");
+    setActiveScope(hasRealization ? "realization" : "event");
+  }, [open, hasRealization]);
+
+  const effectiveRealizationColor = hasRealization
+    ? RealizationColorUtils.getEffectiveColor(
+        realizationCode,
+        metadataByRealization,
+      )
+    : ScheduleUtils.getDefaultRealizationColor(eventTitleRaw);
+  const effectiveEventColor =
+    metadataByEvent[eventId]?.color ||
+    (hasRealization ? metadataByRealization[realizationCode]?.color : null) ||
+    ScheduleUtils.getDefaultRealizationColor(eventTitleRaw);
+  const effectiveColor =
+    activeScope === "event" ? effectiveEventColor : effectiveRealizationColor;
+  const isCustomized =
+    activeScope === "event"
+      ? hasEventColor(eventId)
+      : hasRealization && hasRealizationColor(realizationCode);
 
   const handlePresetColorSelect = (color: string) => {
     setSelectedColor(color);
@@ -71,13 +108,21 @@ export const RealizationColorCustomizer = ({
 
   const handleApply = () => {
     if (selectedColor && RealizationColorUtils.isValidRgbColor(selectedColor)) {
-      setRealizationColor(realizationCode, selectedColor);
+      if (activeScope === "event") {
+        setEventColor(eventId, selectedColor);
+      } else if (hasRealization) {
+        setRealizationColor(realizationCode, selectedColor);
+      }
       onOpenChange(false);
     }
   };
 
   const handleReset = () => {
-    resetRealizationColor(realizationCode);
+    if (activeScope === "event") {
+      clearEventColor(eventId);
+    } else if (hasRealization) {
+      clearRealizationColor(realizationCode);
+    }
     setSelectedColor("");
     onOpenChange(false);
   };
@@ -87,13 +132,39 @@ export const RealizationColorCustomizer = ({
     onOpenChange(false);
   };
 
-  const previewColorPair = RealizationColorUtils.getEffectiveColorPair(
-    realizationCode,
-    {
-      ...customColors,
-      ...(selectedColor ? { [realizationCode]: selectedColor } : {}),
-    },
+  const previewEventMetadata =
+    selectedColor && activeScope === "event"
+      ? {
+          ...metadataByEvent,
+          [eventId]: {
+            ...metadataByEvent[eventId],
+            color: selectedColor,
+          },
+        }
+      : metadataByEvent;
+  const previewRealizationMetadata =
+    selectedColor && activeScope === "realization" && hasRealization
+      ? {
+          ...metadataByRealization,
+          [realizationCode]: {
+            ...metadataByRealization[realizationCode],
+            color: selectedColor,
+          },
+        }
+      : metadataByRealization;
+  const previewColorPair = ScheduleUtils.getColorPair(
+    eventTitleRaw,
+    eventId,
+    previewEventMetadata,
+    previewRealizationMetadata,
   );
+  const previewTitle =
+    activeScope === "event" ? eventTitle : realizationTitle || eventTitle;
+
+  const onScopeChange = (scope: ColorScope) => {
+    setActiveScope(scope);
+    setSelectedColor("");
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -107,35 +178,56 @@ export const RealizationColorCustomizer = ({
               className="h-5 w-5"
               style={{ color: "var(--color-accent)" }}
             />
-            {t("dialog.title")}
+            {previewTitle}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Current Event Info */}
-          <div
-            className="p-3 rounded-lg border"
-            style={{
-              backgroundColor: "var(--color-surface-secondary)",
-              borderColor: "var(--color-border)",
-            }}
-          >
-            <h4
-              className="font-semibold text-sm mb-1"
-              style={{ color: "var(--color-text)" }}
+          {/* Scope Tabs */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onScopeChange("event")}
+              className="px-3 py-1.5 text-xs font-semibold rounded-full transition-colors"
+              style={{
+                backgroundColor:
+                  activeScope === "event"
+                    ? "var(--color-accent)"
+                    : "var(--color-surface-secondary-alpha-30)",
+                color: activeScope === "event" ? "white" : "var(--color-text)",
+                border: "1px solid var(--color-border-alpha-30)",
+              }}
             >
-              {currentEventTitle}
-            </h4>
+              {t("dialog.tabs.event")}
+            </button>
+            <button
+              type="button"
+              onClick={() => onScopeChange("realization")}
+              className="px-3 py-1.5 text-xs font-semibold rounded-full transition-colors"
+              style={{
+                backgroundColor:
+                  activeScope === "realization"
+                    ? "var(--color-accent)"
+                    : "var(--color-surface-secondary-alpha-30)",
+                color:
+                  activeScope === "realization" ? "white" : "var(--color-text)",
+                border: "1px solid var(--color-border-alpha-30)",
+                opacity: hasRealization ? 1 : 0.5,
+              }}
+              disabled={!hasRealization}
+            >
+              {t("dialog.tabs.realization")}
+            </button>
           </div>
 
           {/* Color Preview */}
           <div className="space-y-2">
-            <label
+            <div
               className="text-sm font-medium"
               style={{ color: "var(--color-text)" }}
             >
               {t("dialog.colorPreviewLabel")}
-            </label>
+            </div>
             <div className="relative">
               <motion.div
                 className="h-16 rounded-lg shadow-sm"
@@ -148,7 +240,7 @@ export const RealizationColorCustomizer = ({
               >
                 <div className="flex items-center justify-center h-full">
                   <span className="text-white font-medium text-sm">
-                    {t("dialog.sampleEventText", { code: realizationCode })}
+                    {previewTitle}
                   </span>
                 </div>
               </motion.div>
@@ -157,12 +249,12 @@ export const RealizationColorCustomizer = ({
 
           {/* Preset Colors Grid */}
           <div className="space-y-2">
-            <label
+            <div
               className="text-sm font-medium"
               style={{ color: "var(--color-text)" }}
             >
               {t("dialog.selectColorLabel")}
-            </label>
+            </div>
             <div className="grid grid-cols-8 gap-2">
               {PRESET_COLORS.map((color) => {
                 const isSelected = selectedColor === color;
@@ -172,6 +264,7 @@ export const RealizationColorCustomizer = ({
                 return (
                   <button
                     key={color}
+                    type="button"
                     onClick={() => handlePresetColorSelect(color)}
                     className="relative w-10 h-10 rounded-lg border-2 transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2"
                     style={{
@@ -203,26 +296,18 @@ export const RealizationColorCustomizer = ({
             <label
               className="text-sm font-medium"
               style={{ color: "var(--color-text)" }}
+              htmlFor="custom-event-color"
             >
               {t("dialog.customColorLabel")}
             </label>
-            <div className="flex gap-2">
-              <input
-                type="color"
-                value={customHexColor}
-                onChange={(e) => handleCustomColorChange(e.target.value)}
-                className="w-16 h-10 rounded border cursor-pointer"
-                style={{ borderColor: "var(--color-border)" }}
-              />
-              <Button
-                onClick={() => handleCustomColorChange(customHexColor)}
-                variant="outline"
-                size="sm"
-                className="flex-1"
-              >
-                {t("dialog.buttons.useCustomColor")}
-              </Button>
-            </div>
+            <input
+              id="custom-event-color"
+              type="color"
+              value={customHexColor}
+              onChange={(e) => handleCustomColorChange(e.target.value)}
+              className="w-full h-10 rounded border cursor-pointer"
+              style={{ borderColor: "var(--color-border)" }}
+            />
           </div>
 
           {/* Action Buttons */}

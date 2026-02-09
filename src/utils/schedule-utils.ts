@@ -2,6 +2,10 @@ import { format, isSameDay } from "date-fns";
 import ICAL from "ical.js";
 import { API_CONFIG } from "../config/api";
 import { RealizationApiService } from "../services/realizationApi";
+import type {
+  EventMetadataMap,
+  RealizationMetadataMap,
+} from "../types/metadata";
 import type { ScheduleEvent, TurkuAmkScheduleEntry } from "../types/schedule";
 
 export class ScheduleUtils {
@@ -80,6 +84,56 @@ export class ScheduleUtils {
     return courseId || eventTitle;
   }
 
+  private static getMetadataColor(
+    realizationCode: string | null,
+    metadataByRealization?: RealizationMetadataMap,
+  ): string | null {
+    if (!realizationCode || !metadataByRealization) {
+      return null;
+    }
+
+    return metadataByRealization[realizationCode]?.color || null;
+  }
+
+  private static getEventMetadataColor(
+    eventId?: string,
+    metadataByEvent?: EventMetadataMap,
+  ): string | null {
+    if (!eventId || !metadataByEvent) {
+      return null;
+    }
+
+    return metadataByEvent[eventId]?.color || null;
+  }
+
+  private static getPrimaryColorForEvent(
+    eventTitle: string,
+    eventId?: string,
+    metadataByEvent?: EventMetadataMap,
+    metadataByRealization?: RealizationMetadataMap,
+  ): string {
+    const eventColor = ScheduleUtils.getEventMetadataColor(
+      eventId,
+      metadataByEvent,
+    );
+    if (eventColor) {
+      return eventColor;
+    }
+
+    const realizationCode =
+      RealizationApiService.extractRealizationCode(eventTitle);
+    const metadataColor = ScheduleUtils.getMetadataColor(
+      realizationCode,
+      metadataByRealization,
+    );
+    if (metadataColor) {
+      return metadataColor;
+    }
+
+    const colorKey = ScheduleUtils.getColorKey(eventTitle);
+    return ScheduleUtils.getDefaultRealizationColor(colorKey);
+  }
+
   /**
    * Gets the default color for a realization code (without custom overrides)
    * This method generates the same color that would be used in the original system
@@ -110,54 +164,44 @@ export class ScheduleUtils {
   /**
    * Gets a color pair for an event title, with support for custom colors
    * @param eventTitle The event title to generate colors for
-   * @param customColors Optional record of custom colors by realization code
+   * @param eventId Optional event id for event-level overrides
+   * @param metadataByEvent Optional record of event metadata
+   * @param metadataByRealization Optional record of realization metadata
    */
   static getColorPair(
     eventTitle: string,
-    customColors?: Record<string, string>,
+    eventId?: string,
+    metadataByEvent?: EventMetadataMap,
+    metadataByRealization?: RealizationMetadataMap,
   ): { normal: string; flipped: string } {
-    const colorKey = ScheduleUtils.getColorKey(eventTitle);
-    const realizationCode =
-      RealizationApiService.extractRealizationCode(eventTitle);
-
-    // Check if we have a custom color for this realization
-    if (realizationCode && customColors && customColors[realizationCode]) {
-      const primaryColor = customColors[realizationCode];
-      const secondaryColor = ScheduleUtils.lightenRgbColor(primaryColor);
-      return {
-        normal: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
-        flipped: `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`,
-      };
-    }
-
-    // Fall back to default color generation
-    return ScheduleUtils.getDefaultColorPair(colorKey);
+    const primaryColor = ScheduleUtils.getPrimaryColorForEvent(
+      eventTitle,
+      eventId,
+      metadataByEvent,
+      metadataByRealization,
+    );
+    const secondaryColor = ScheduleUtils.lightenRgbColor(primaryColor);
+    return {
+      normal: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
+      flipped: `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`,
+    };
   }
 
   /**
    * Gets a seeded color for an event title, with support for custom colors
    * @param eventTitle The event title to generate color for
-   * @param customColors Optional record of custom colors by realization code
+   * @param metadataByRealization Optional record of realization metadata
    */
   static getSeededColor(
     eventTitle: string,
-    customColors?: Record<string, string>,
+    metadataByRealization?: RealizationMetadataMap,
   ): string {
-    const colorKey = ScheduleUtils.getColorKey(eventTitle);
-    const realizationCode =
-      RealizationApiService.extractRealizationCode(eventTitle);
-
-    // Check if we have a custom color for this realization
-    if (realizationCode && customColors && customColors[realizationCode]) {
-      const primaryColor = customColors[realizationCode];
-      const secondaryColor = ScheduleUtils.lightenRgbColor(primaryColor);
-      return `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
-    }
-
-    // Fall back to default color generation
-    const hash = ScheduleUtils.hashString(colorKey);
-    const colorIndex = hash % ScheduleUtils.EVENT_COLORS.length;
-    const primaryColor = ScheduleUtils.EVENT_COLORS[colorIndex];
+    const primaryColor = ScheduleUtils.getPrimaryColorForEvent(
+      eventTitle,
+      undefined,
+      undefined,
+      metadataByRealization,
+    );
     const secondaryColor = ScheduleUtils.lightenRgbColor(primaryColor);
     return `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
   }
@@ -165,27 +209,18 @@ export class ScheduleUtils {
   /**
    * Gets a flipped seeded color for an event title, with support for custom colors
    * @param eventTitle The event title to generate color for
-   * @param customColors Optional record of custom colors by realization code
+   * @param metadataByRealization Optional record of realization metadata
    */
   static getSeededColorFlipped(
     eventTitle: string,
-    customColors?: Record<string, string>,
+    metadataByRealization?: RealizationMetadataMap,
   ): string {
-    const colorKey = ScheduleUtils.getColorKey(eventTitle);
-    const realizationCode =
-      RealizationApiService.extractRealizationCode(eventTitle);
-
-    // Check if we have a custom color for this realization
-    if (realizationCode && customColors && customColors[realizationCode]) {
-      const primaryColor = customColors[realizationCode];
-      const secondaryColor = ScheduleUtils.lightenRgbColor(primaryColor);
-      return `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`;
-    }
-
-    // Fall back to default color generation
-    const hash = ScheduleUtils.hashString(colorKey);
-    const colorIndex = hash % ScheduleUtils.EVENT_COLORS.length;
-    const primaryColor = ScheduleUtils.EVENT_COLORS[colorIndex];
+    const primaryColor = ScheduleUtils.getPrimaryColorForEvent(
+      eventTitle,
+      undefined,
+      undefined,
+      metadataByRealization,
+    );
     const secondaryColor = ScheduleUtils.lightenRgbColor(primaryColor);
     return `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)`;
   }
@@ -306,7 +341,7 @@ export class ScheduleUtils {
   static convertToScheduleEvent(
     vevent: InstanceType<typeof ICAL.Component>,
     index: number,
-    customColors?: Record<string, string>,
+    metadataByRealization?: RealizationMetadataMap,
   ): ScheduleEvent {
     const summary =
       (vevent.getFirstProperty("summary")?.getFirstValue() as string) ||
@@ -346,7 +381,7 @@ export class ScheduleUtils {
       endTime: endTime,
       duration: duration,
       startHour: startHour,
-      color: ScheduleUtils.getSeededColor(summary, customColors), // Use seeded color with custom color support
+      color: ScheduleUtils.getSeededColor(summary, metadataByRealization),
       teachers: metadata.teachers,
       groups: metadata.groups,
       description: description,

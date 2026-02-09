@@ -4,7 +4,8 @@ import { useTranslation } from "react-i18next";
 import { CalendarDialog } from "../components/CalendarDialog";
 import { ThemeDialog } from "../components/ThemeDialog";
 import useConfigStore, {
-  useRealizationColorStore,
+  useEventMetadataStore,
+  useRealizationMetadataStore,
   useSeenCommitsStore,
 } from "../state/state-management";
 import { FONT_OPTIONS, type Font } from "../types/config";
@@ -13,7 +14,9 @@ import type { SettingsConfig } from "../types/settings-config";
 export function useSettingsConfig(): SettingsConfig {
   const { t, i18n } = useTranslation("settings");
   const { config, setConfig, resetConfig } = useConfigStore();
-  const { customColors, clearAllCustomColors } = useRealizationColorStore();
+  const { metadataByRealization, clearAllRealizationMetadata } =
+    useRealizationMetadataStore();
+  const { metadataByEvent, clearAllEventMetadata } = useEventMetadataStore();
   const { clearSeenCommits, seenCommits } = useSeenCommitsStore();
 
   return useMemo(() => {
@@ -252,19 +255,19 @@ export function useSettingsConfig(): SettingsConfig {
                     </div>
                   </div>
 
-                  {/* Custom Realization Colors */}
+                  {/* Realization Metadata */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <h4
                         className="text-sm font-semibold"
                         style={{ color: "var(--color-text)" }}
                       >
-                        Custom Realization Colors (
-                        {Object.keys(customColors).length})
+                        Realization Metadata (
+                        {Object.keys(metadataByRealization).length})
                       </h4>
-                      {Object.keys(customColors).length > 0 && (
+                      {Object.keys(metadataByRealization).length > 0 && (
                         <button
-                          onClick={clearAllCustomColors}
+                          onClick={clearAllRealizationMetadata}
                           className="px-3 py-1 text-sm rounded transition-colors"
                           style={{
                             backgroundColor: "var(--color-danger-alpha-20)",
@@ -287,9 +290,50 @@ export function useSettingsConfig(): SettingsConfig {
                         className="text-sm font-mono overflow-auto"
                         style={{ color: "var(--color-accent)" }}
                       >
-                        {Object.keys(customColors).length === 0
+                        {Object.keys(metadataByRealization).length === 0
                           ? "{}"
-                          : JSON.stringify(customColors, null, 2)}
+                          : JSON.stringify(metadataByRealization, null, 2)}
+                      </pre>
+                    </div>
+                  </div>
+
+                  {/* Event Metadata */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4
+                        className="text-sm font-semibold"
+                        style={{ color: "var(--color-text)" }}
+                      >
+                        Event Metadata ({Object.keys(metadataByEvent).length})
+                      </h4>
+                      {Object.keys(metadataByEvent).length > 0 && (
+                        <button
+                          onClick={clearAllEventMetadata}
+                          className="px-3 py-1 text-sm rounded transition-colors"
+                          style={{
+                            backgroundColor: "var(--color-danger-alpha-20)",
+                            color: "var(--color-danger)",
+                            border: "1px solid var(--color-danger-alpha-30)",
+                          }}
+                        >
+                          Clear All
+                        </button>
+                      )}
+                    </div>
+                    <div
+                      className="rounded-lg p-4"
+                      style={{
+                        backgroundColor: "var(--color-background-alpha-60)",
+                        border: "1px solid var(--color-border-alpha-30)",
+                      }}
+                    >
+                      <pre
+                        className="text-sm font-mono overflow-auto"
+                        style={{ color: "var(--color-accent)" }}
+                      >
+                        {Object.keys(metadataByEvent).length === 0
+                          ? "{}"
+                          : JSON.stringify(metadataByEvent, null, 2)}
                       </pre>
                     </div>
                   </div>
@@ -378,8 +422,10 @@ export function useSettingsConfig(): SettingsConfig {
     config,
     setConfig,
     resetConfig,
-    customColors,
-    clearAllCustomColors,
+    metadataByRealization,
+    clearAllRealizationMetadata,
+    metadataByEvent,
+    clearAllEventMetadata,
     seenCommits,
     clearSeenCommits,
   ]);

@@ -1,5 +1,5 @@
 import { Calendar, Clock, Eye, EyeOff, Palette } from "lucide-react";
-import { memo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   DAY_HOUR_HEIGHT,
@@ -11,8 +11,8 @@ import { useRealizationDialog } from "../../hooks/useRealizationDialog";
 import { RealizationApiService } from "../../services/realizationApi";
 import {
   default as useConfigStore,
-  useHiddenEventsStore,
-  useRealizationColorStore,
+  useEventMetadataStore,
+  useRealizationMetadataStore,
 } from "../../state/state-management";
 import type { GapPeriod, ScheduleEvent } from "../../types/schedule";
 import { DateFormatUtils } from "../../utils/date-format-utils";
@@ -61,10 +61,12 @@ const ScheduleDay = memo(
       useState<ScheduleEvent | null>(null);
 
     // Realization color store
-    const { customColors } = useRealizationColorStore();
+    const { metadataByRealization, isRealizationHidden } =
+      useRealizationMetadataStore();
 
-    // Hidden events store
-    const { isEventHidden, toggleEventVisibility } = useHiddenEventsStore();
+    // Event metadata store
+    const { metadataByEvent, isEventHidden, setEventHidden } =
+      useEventMetadataStore();
 
     // Config store for opacity setting
     const { config } = useConfigStore();
@@ -94,18 +96,8 @@ const ScheduleDay = memo(
 
     // Helper function to open color customizer for an event
     const openColorCustomizer = (event: ScheduleEvent) => {
-      const realizationCode = RealizationApiService.extractRealizationCode(
-        event.title,
-      );
-      if (realizationCode) {
-        setSelectedEventForColor(event);
-        setColorCustomizerOpen(true);
-      }
-    };
-
-    // Helper function to check if event has realization code
-    const hasRealizationCode = (event: ScheduleEvent) => {
-      return RealizationApiService.hasRealizationCode(event.title);
+      setSelectedEventForColor(event);
+      setColorCustomizerOpen(true);
     };
 
     // Function to calculate gap periods between events
@@ -125,11 +117,43 @@ const ScheduleDay = memo(
       return ScheduleLayoutUtils.generateTimeSlots(events);
     };
 
+    const eventsById = useMemo(
+      () => new Map(events.map((event) => [event.id, event])),
+      [events],
+    );
+    const extractRealizationCode = RealizationApiService.extractRealizationCode;
+    const isEventEffectivelyHidden = useMemo(
+      () => (eventId: string) => {
+        const event = eventsById.get(eventId);
+        const override = metadataByEvent[eventId]?.hidden;
+        if (typeof override === "boolean") {
+          return override;
+        }
+        if (!event) {
+          return isEventHidden(eventId);
+        }
+        const realizationCode = extractRealizationCode(event.title);
+        return Boolean(realizationCode && isRealizationHidden(realizationCode));
+      },
+      [
+        eventsById,
+        metadataByEvent,
+        isEventHidden,
+        isRealizationHidden,
+        extractRealizationCode,
+      ],
+    );
+
+    const toggleEventVisibility = (event: ScheduleEvent) => {
+      const nextHidden = !isEventEffectivelyHidden(event.id);
+      setEventHidden(event.id, nextHidden);
+    };
+
     const formatDate = (date: Date, events: ScheduleEvent[]) => {
       return DateFormatUtils.formatDayViewDate(
         date,
         events,
-        isEventHidden,
+        isEventEffectivelyHidden,
         config.showTotalHours,
       );
     };
@@ -326,9 +350,11 @@ const ScheduleDay = memo(
                       (1000 * 60 * 60);
                     const colorPair = ScheduleUtils.getColorPair(
                       event.title,
-                      customColors,
+                      event.id,
+                      metadataByEvent,
+                      metadataByRealization,
                     );
-                    const isHidden = isEventHidden(event.id);
+                    const isHidden = isEventEffectivelyHidden(event.id);
 
                     return (
                       <ContextMenu key={event.id}>
@@ -420,7 +446,7 @@ const ScheduleDay = memo(
                             style={{ backgroundColor: "var(--color-border)" }}
                           />
                           <ContextMenuItem
-                            onClick={() => toggleEventVisibility(event.id)}
+                            onClick={() => toggleEventVisibility(event)}
                             style={{ color: "var(--color-text)" }}
                           >
                             {isHidden ? (
@@ -435,22 +461,18 @@ const ScheduleDay = memo(
                               </>
                             )}
                           </ContextMenuItem>
-                          {hasRealizationCode(event) && (
-                            <>
-                              <ContextMenuSeparator
-                                style={{
-                                  backgroundColor: "var(--color-border)",
-                                }}
-                              />
-                              <ContextMenuItem
-                                onClick={() => openColorCustomizer(event)}
-                                style={{ color: "var(--color-text)" }}
-                              >
-                                <Palette className="mr-2 h-4 w-4" />
-                                {tColor("contextMenu.customizeColor")}
-                              </ContextMenuItem>
-                            </>
-                          )}
+                          <ContextMenuSeparator
+                            style={{
+                              backgroundColor: "var(--color-border)",
+                            }}
+                          />
+                          <ContextMenuItem
+                            onClick={() => openColorCustomizer(event)}
+                            style={{ color: "var(--color-text)" }}
+                          >
+                            <Palette className="mr-2 h-4 w-4" />
+                            {tColor("contextMenu.customizeColor")}
+                          </ContextMenuItem>
                         </ContextMenuContent>
                       </ContextMenu>
                     );
@@ -484,12 +506,17 @@ const ScheduleDay = memo(
           <RealizationColorCustomizer
             open={colorCustomizerOpen}
             onOpenChange={setColorCustomizerOpen}
+            eventId={selectedEventForColor.id}
+            eventTitle={getDisplayTitle(selectedEventForColor.title)}
+            eventTitleRaw={selectedEventForColor.title}
             realizationCode={
               RealizationApiService.extractRealizationCode(
                 selectedEventForColor.title,
               ) || ""
             }
-            currentEventTitle={getDisplayTitle(selectedEventForColor.title)}
+            realizationTitle={RealizationApiService.stripRealizationCode(
+              selectedEventForColor.title,
+            )}
           />
         )}
       </div>
