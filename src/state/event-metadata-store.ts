@@ -17,20 +17,31 @@ const canAccessStorage = () => {
   }
 };
 
-let legacyCleanupPending = false;
-
-const migrateLegacyHiddenEvents = (): EventMetadataMap => {
+const writeMetadataToStorage = (metadataByEvent: EventMetadataMap) => {
   if (!canAccessStorage()) {
-    return {};
+    return false;
   }
 
-  if (localStorage.getItem(STORAGE_KEY)) {
-    return {};
+  try {
+    const payload = {
+      state: { metadataByEvent },
+      version: 1,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const readLegacyHiddenEvents = (): EventMetadataMap | null => {
+  if (!canAccessStorage()) {
+    return null;
   }
 
   const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
   if (!legacy) {
-    return {};
+    return null;
   }
 
   try {
@@ -38,10 +49,8 @@ const migrateLegacyHiddenEvents = (): EventMetadataMap => {
     const hiddenEventIds = parsed?.state?.hiddenEventIds ?? [];
 
     if (!Array.isArray(hiddenEventIds)) {
-      return {};
+      return null;
     }
-
-    legacyCleanupPending = true;
 
     const metadata: EventMetadataMap = {};
     hiddenEventIds.forEach((eventId) => {
@@ -52,9 +61,10 @@ const migrateLegacyHiddenEvents = (): EventMetadataMap => {
 
     return metadata;
   } catch {
-    return {};
+    return null;
   }
 };
+
 
 interface EventMetadataState {
   metadataByEvent: EventMetadataMap;
@@ -77,7 +87,17 @@ interface EventMetadataState {
   clearAllEventMetadata: () => void;
 }
 
-const initialMetadata = migrateLegacyHiddenEvents();
+const initialMetadata = readLegacyHiddenEvents() ?? {};
+
+if (
+  canAccessStorage() &&
+  !localStorage.getItem(STORAGE_KEY) &&
+  Object.keys(initialMetadata).length > 0
+) {
+  if (writeMetadataToStorage(initialMetadata)) {
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
+  }
+}
 
 export const useEventMetadataStore = create<EventMetadataState>()(
   persist(
@@ -247,25 +267,24 @@ export const useEventMetadataStore = create<EventMetadataState>()(
     }),
     {
       name: STORAGE_KEY,
+      version: 1,
       partialize: (state) => ({ metadataByEvent: state.metadataByEvent }),
     },
   ),
 );
 
 useEventMetadataStore.persist?.onFinishHydration?.(() => {
-  if (!canAccessStorage() || !legacyCleanupPending) {
+  if (!canAccessStorage()) {
     return;
   }
 
   if (!localStorage.getItem(STORAGE_KEY)) {
-    useEventMetadataStore.setState((state) => ({
-      metadataByEvent: { ...state.metadataByEvent },
-    }));
-  }
-
-  if (localStorage.getItem(STORAGE_KEY)) {
-    localStorage.removeItem(LEGACY_STORAGE_KEY);
-    legacyCleanupPending = false;
+    const { metadataByEvent } = useEventMetadataStore.getState();
+    if (!writeMetadataToStorage(metadataByEvent)) {
+      useEventMetadataStore.setState((state) => ({
+        metadataByEvent: { ...state.metadataByEvent },
+      }));
+    }
   }
 });
 

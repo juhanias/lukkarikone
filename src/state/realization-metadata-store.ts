@@ -9,7 +9,58 @@ import { ScheduleUtils } from "../utils/schedule-utils";
 const STORAGE_KEY = "realization-metadata";
 const LEGACY_STORAGE_KEY = "realization-colors";
 
-let legacyCleanupPending = false;
+const writeMetadataToStorage = (
+  metadataByRealization: RealizationMetadataMap,
+) => {
+  if (!canAccessStorage()) {
+    return false;
+  }
+
+  try {
+    const payload = {
+      state: { metadataByRealization },
+      version: 1,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const readLegacyRealizationColors = (): RealizationMetadataMap | null => {
+  if (!canAccessStorage()) {
+    return null;
+  }
+
+  const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+  if (!legacy) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(legacy);
+    const customColors =
+      parsed?.state?.customColors ?? parsed?.customColors ?? {};
+
+    if (!customColors || typeof customColors !== "object") {
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+      return null;
+    }
+
+    const metadata: RealizationMetadataMap = {};
+    Object.entries(customColors).forEach(([realizationCode, color]) => {
+      if (typeof color === "string" && color.length > 0) {
+        metadata[realizationCode] = { color };
+      }
+    });
+
+    return metadata;
+  } catch {
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
+    return null;
+  }
+};
 
 const canAccessStorage = () => {
   try {
@@ -23,44 +74,6 @@ const canAccessStorage = () => {
   }
 };
 
-const migrateLegacyRealizationColors = (): RealizationMetadataMap => {
-  if (!canAccessStorage()) {
-    return {};
-  }
-
-  if (localStorage.getItem(STORAGE_KEY)) {
-    return {};
-  }
-
-  const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-  if (!legacy) {
-    return {};
-  }
-
-  try {
-    const parsed = JSON.parse(legacy);
-    const customColors =
-      parsed?.state?.customColors ?? parsed?.customColors ?? {};
-
-    if (!customColors || typeof customColors !== "object") {
-      localStorage.removeItem(LEGACY_STORAGE_KEY);
-      return {};
-    }
-
-    const metadata: RealizationMetadataMap = {};
-    Object.entries(customColors).forEach(([realizationCode, color]) => {
-      if (typeof color === "string" && color.length > 0) {
-        metadata[realizationCode] = { color };
-      }
-    });
-
-    legacyCleanupPending = true;
-    return metadata;
-  } catch {
-    localStorage.removeItem(LEGACY_STORAGE_KEY);
-    return {};
-  }
-};
 
 interface RealizationMetadataState {
   metadataByRealization: RealizationMetadataMap;
@@ -82,7 +95,17 @@ interface RealizationMetadataState {
   hasRealizationColor: (realizationCode: string) => boolean;
 }
 
-const initialMetadata = migrateLegacyRealizationColors();
+const initialMetadata = readLegacyRealizationColors() ?? {};
+
+if (
+  canAccessStorage() &&
+  !localStorage.getItem(STORAGE_KEY) &&
+  Object.keys(initialMetadata).length > 0
+) {
+  if (writeMetadataToStorage(initialMetadata)) {
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
+  }
+}
 
 export const useRealizationMetadataStore = create<RealizationMetadataState>()(
   persist(
@@ -200,6 +223,7 @@ export const useRealizationMetadataStore = create<RealizationMetadataState>()(
     }),
     {
       name: STORAGE_KEY,
+      version: 1,
       partialize: (state) => ({
         metadataByRealization: state.metadataByRealization,
       }),
@@ -208,19 +232,17 @@ export const useRealizationMetadataStore = create<RealizationMetadataState>()(
 );
 
 useRealizationMetadataStore.persist?.onFinishHydration?.(() => {
-  if (!canAccessStorage() || !legacyCleanupPending) {
+  if (!canAccessStorage()) {
     return;
   }
 
   if (!localStorage.getItem(STORAGE_KEY)) {
-    useRealizationMetadataStore.setState((state) => ({
-      metadataByRealization: { ...state.metadataByRealization },
-    }));
-  }
-
-  if (localStorage.getItem(STORAGE_KEY)) {
-    localStorage.removeItem(LEGACY_STORAGE_KEY);
-    legacyCleanupPending = false;
+    const { metadataByRealization } = useRealizationMetadataStore.getState();
+    if (!writeMetadataToStorage(metadataByRealization)) {
+      useRealizationMetadataStore.setState((state) => ({
+        metadataByRealization: { ...state.metadataByRealization },
+      }));
+    }
   }
 });
 
