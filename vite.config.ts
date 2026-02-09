@@ -58,8 +58,8 @@ export default ({ mode }: { mode: string }) => {
       rollupOptions: {
         input: {
           main: path.resolve(__dirname, "index.html"),
-          en: path.resolve(__dirname, "src/en/index.html"),
-          fi: path.resolve(__dirname, "src/fi/index.html"),
+          en: path.resolve(__dirname, "en/index.html"),
+          fi: path.resolve(__dirname, "fi/index.html"),
         },
       },
     },
