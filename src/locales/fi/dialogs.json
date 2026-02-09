@@ -88,8 +88,8 @@
     "showCourse": "Näytä toteutus",
     "hideCourseDialog": {
       "title": "Piilota koko toteutus?",
-      "line1": "Olet piilottamassa kaikki tapahtumat, jotka voidaan liittää tähän toteutukseen. Tätä ei suositella.",
-      "line2": "On suositeltavampaa mennä Lukkarikoneeseen ja poistaa nämä turhat kurssit kalenteristasi ja tuoda ne uudelleen tänne.",
+      "line1": "Olet piilottamassa kaikki tapahtumat, jotka voidaan liittää tähän toteutukseen.",
+      "line2": "Huomautamme, että tämä on tehokas tapa siivota kalenteriasi, mutta ole varovainen, ettet piilota vahingossa toteutuksia, joita et tarkoittanut piilottaa.",
       "line3": "Voit aina perua tämän.",
       "confirm": "Piilota toteutus",
       "cancel": "Peruuta"

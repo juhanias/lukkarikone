@@ -88,8 +88,8 @@
     "showCourse": "Show course",
     "hideCourseDialog": {
       "title": "Hide entire course?",
-      "line1": "You're about to hide every event we can tie to this realization. This is not recommended.",
-      "line2": "We recommend going to Lukkarikone to remove these unwanted courses from your calendar and re-import them here.",
+      "line1": "You're about to hide every event we can tie to this realization.",
+      "line2": "We want to note that this is a powerful way to clean up your calendar, but be careful not to accidentally hide realizations you didn't mean to hide.",
       "line3": "You can always undo this.",
       "confirm": "Hide course",
       "cancel": "Cancel"
