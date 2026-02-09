@@ -53,5 +53,15 @@ export default ({ mode }: { mode: string }) => {
     },
 
     base: "/",
+
+    build: {
+      rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, "index.html"),
+          en: path.resolve(__dirname, "en/index.html"),
+          fi: path.resolve(__dirname, "fi/index.html"),
+        },
+      },
+    },
   });
 };

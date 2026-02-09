@@ -39,6 +39,7 @@ export const useRealizationDialog = () => {
   const [error, setError] = useState<string | null>(null);
   const [realizationData, setRealizationData] =
     useState<RealizationData | null>(null);
+  const [loadedCode, setLoadedCode] = useState<string | null>(null);
 
   const isOpen = Boolean(realizationCode);
 
@@ -48,6 +49,11 @@ export const useRealizationDialog = () => {
       setRealizationData(null);
       setError(null);
       setIsLoading(false);
+      setLoadedCode(null);
+      return;
+    }
+
+    if (loadedCode === realizationCode && realizationData) {
       return;
     }
 
@@ -60,6 +66,7 @@ export const useRealizationDialog = () => {
         const response =
           await RealizationApiService.fetchRealizationData(realizationCode);
         setRealizationData(response.data);
+        setLoadedCode(realizationCode);
       } catch (err) {
         setError(
           err instanceof Error
@@ -72,7 +79,7 @@ export const useRealizationDialog = () => {
     };
 
     fetchData();
-  }, [realizationCode]);
+  }, [loadedCode, realizationCode, realizationData]);
 
   const openDialog = useCallback(
     async (eventTitle: string) => {
@@ -84,13 +91,43 @@ export const useRealizationDialog = () => {
         return;
       }
 
-      setRealizationCode(code);
+      if (isLoading) {
+        return;
+      }
+
+      if (loadedCode === code && realizationData) {
+        setRealizationCode(code);
+        return;
+      }
+
+      setIsLoading(true);
+      setError(null);
+      setRealizationData(null);
+
+      try {
+        const response = await RealizationApiService.fetchRealizationData(code);
+        setRealizationData(response.data);
+        setLoadedCode(code);
+        setRealizationCode(code);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Virhe haettaessa toteutustietoja",
+        );
+      } finally {
+        setIsLoading(false);
+      }
     },
-    [setRealizationCode],
+    [isLoading, loadedCode, realizationData, setRealizationCode],
   );
 
   const closeDialog = useCallback(() => {
     setRealizationCode(null);
+    setRealizationData(null);
+    setError(null);
+    setLoadedCode(null);
+    setIsLoading(false);
   }, [setRealizationCode]);
 
   const handleEventClick = useCallback(

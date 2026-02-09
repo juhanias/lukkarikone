@@ -1,6 +1,5 @@
 {
   "realizationDialog": {
-    "title": "Course Implementation Details",
     "loading": "Loading implementation details...",
     "error": {
       "title": "Error",
@@ -47,8 +46,11 @@
       "title": "Further Information"
     },
     "events": {
-      "title": "Upcoming Events",
-      "moreEvents": "and {{count}} more events"
+      "title": "Events",
+      "upcoming": "Upcoming",
+      "completed": "Completed",
+      "overlapping": "Overlapping",
+      "overlapsWith": "Overlaps with {{event}}"
     },
     "description": {
       "title": "Description",
@@ -56,8 +58,6 @@
     }
   },
   "lectureDetailsDialog": {
-    "title": "Lecture Details",
-    "description": "Detailed information about the selected lecture",
     "basicInfo": "Basic Information",
     "schedule": "Schedule",
     "location": "Location",
@@ -69,6 +69,8 @@
     "teachers": "Teachers",
     "studentGroups": "Student Groups",
     "showRealizationDetails": "Show Implementation Details",
-    "noRealizationData": "Detailed implementation information is not available for this event."
+    "noRealizationData": "Detailed implementation information is not available for this event.",
+    "noRealizationWhyNot": "Why not?",
+    "noRealizationWhyNotExplanation": "Open Lukkarikone associates events to their classes by the Realization ID in their name (e.g. kh00cz65-3020). If this realization ID is missing, there is no way for the application to know what realization this belongs to. Each event in your calendar should, by default, have the realization ID in them."
   }
 }

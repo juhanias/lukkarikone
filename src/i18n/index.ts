@@ -14,8 +14,22 @@ import landingFi from "../locales/fi/landing.json";
 import scheduleFi from "../locales/fi/schedule.json";
 import settingsFi from "../locales/fi/settings.json";
 
-// Language detection order: localStorage -> navigator -> fallback
+const getPathLocale = (): string | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const match = window.location.pathname.match(/^\/(en|fi)(\/|$)/i);
+  return match ? match[1].toLowerCase() : null;
+};
+
+// Language detection order: URL -> localStorage -> navigator -> fallback
 const getInitialLanguage = (): string => {
+  const pathLocale = getPathLocale();
+  if (pathLocale && ["en", "fi"].includes(pathLocale)) {
+    return pathLocale;
+  }
+
   // Check localStorage first
   const stored = localStorage.getItem("lukkari-language");
   if (stored && ["en", "fi"].includes(stored)) {

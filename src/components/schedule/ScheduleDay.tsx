@@ -476,6 +476,7 @@ const ScheduleDay = memo(
           onOpenChange={closeLectureDetailsDialog}
           event={selectedEvent}
           onOpenRealizationDialog={openRealizationDialog}
+          isRealizationLoading={realizationLoading}
         />
 
         {/* Color Customizer Dialog */}
