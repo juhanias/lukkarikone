@@ -722,6 +722,7 @@ const WeekView = memo(
           onOpenChange={closeLectureDetailsDialog}
           event={selectedEvent}
           onOpenRealizationDialog={openRealizationDialog}
+          onOpenColorCustomizer={openColorCustomizer}
           isRealizationLoading={realizationLoading}
         />
 

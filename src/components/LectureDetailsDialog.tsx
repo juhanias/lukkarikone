@@ -3,14 +3,18 @@ import {
   BookOpen,
   Calendar,
   ExternalLink,
+  Eye,
+  EyeOff,
   GraduationCap,
   Info,
   MapPin,
+  Palette,
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RealizationApiService } from "../services/realizationApi";
+import { useHiddenEventsStore } from "../state/state-management";
 import type { ScheduleEvent } from "../types/schedule";
 import { ActionButton } from "./ui/ActionButton";
 import {
@@ -40,6 +44,7 @@ interface LectureDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
   event: ScheduleEvent | null;
   onOpenRealizationDialog?: (eventTitle: string) => void;
+  onOpenColorCustomizer?: (event: ScheduleEvent) => void;
   isRealizationLoading?: boolean;
 }
 
@@ -48,9 +53,12 @@ const LectureDetailsDialog = ({
   onOpenChange,
   event,
   onOpenRealizationDialog,
+  onOpenColorCustomizer,
   isRealizationLoading = false,
 }: LectureDetailsDialogProps) => {
   const { t } = useTranslation("dialogs");
+  const { t: tColor } = useTranslation("colorCustomization");
+  const { isEventHidden, toggleEventVisibility } = useHiddenEventsStore();
   const [lastEvent, setLastEvent] = useState<ScheduleEvent | null>(null);
   const noRealizationWhyNotLabel = t(
     "lectureDetailsDialog.noRealizationWhyNot",
@@ -96,6 +104,18 @@ const LectureDetailsDialog = ({
     }
   };
 
+  const handleToggleVisibility = () => {
+    if (event) {
+      toggleEventVisibility(event.id);
+    }
+  };
+
+  const handleOpenColorCustomizer = () => {
+    if (event && onOpenColorCustomizer) {
+      onOpenColorCustomizer(event);
+    }
+  };
+
   const getInterestingDescription = (description?: string | null) => {
     if (!description) return null;
 
@@ -132,6 +152,10 @@ const LectureDetailsDialog = ({
     : null;
   const headerTitle = displayEvent ? displayTitle : "";
   const headerDescription = displayEvent ? displayDescription : null;
+  const hasRealizationCode = event
+    ? RealizationApiService.hasRealizationCode(event.title)
+    : false;
+  const isHidden = event ? isEventHidden(event.id) : false;
 
   const teachers = (event?.teachers ?? [])
     .flatMap((teacher) => teacher.split(","))
@@ -319,89 +343,123 @@ const LectureDetailsDialog = ({
               )}
 
               {/* Action Button for Realization Dialog */}
-              {event.title &&
-                RealizationApiService.hasRealizationCode(event.title) &&
-                onOpenRealizationDialog && (
-                  <div
-                    className="pt-4 border-t"
-                    style={{ borderColor: "var(--color-border-alpha-30)" }}
-                  >
-                    <ActionButton
-                      onClick={handleOpenRealizationDialog}
-                      variant="primary"
-                      disabled={isRealizationLoading}
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        {isRealizationLoading ? (
-                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                        ) : (
-                          <ExternalLink className="h-4 w-4" />
-                        )}
-                        {t("lectureDetailsDialog.showRealizationDetails")}
-                      </div>
-                    </ActionButton>
+              {event && (
+                <div
+                  className="pt-4 border-t"
+                  style={{ borderColor: "var(--color-border-alpha-30)" }}
+                >
+                  <div className="space-y-2">
+                    {hasRealizationCode && onOpenRealizationDialog && (
+                      <ActionButton
+                        onClick={handleOpenRealizationDialog}
+                        variant="primary"
+                        disabled={isRealizationLoading}
+                        size="sm"
+                        className="w-full sm:w-auto"
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          {isRealizationLoading ? (
+                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                          ) : (
+                            <ExternalLink className="h-4 w-4" />
+                          )}
+                          {t("lectureDetailsDialog.showRealizationDetails")}
+                        </div>
+                      </ActionButton>
+                    )}
+                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-start">
+                      <ActionButton
+                        onClick={handleToggleVisibility}
+                        variant="subtle"
+                        className="w-full sm:w-auto"
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          {isHidden ? (
+                            <>
+                              <Eye className="h-4 w-4" />
+                              {tColor("contextMenu.showEvent")}
+                            </>
+                          ) : (
+                            <>
+                              <EyeOff className="h-4 w-4" />
+                              {tColor("contextMenu.hideEvent")}
+                            </>
+                          )}
+                        </div>
+                      </ActionButton>
+                      {hasRealizationCode && onOpenColorCustomizer && (
+                        <ActionButton
+                          onClick={handleOpenColorCustomizer}
+                          variant="subtle"
+                          className="w-full sm:w-auto"
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                            <Palette className="h-4 w-4" />
+                            {tColor("contextMenu.customizeColor")}
+                          </div>
+                        </ActionButton>
+                      )}
+                    </div>
                   </div>
-                )}
+                </div>
+              )}
 
               {/* Info about missing realization data */}
-              {event.title &&
-                !RealizationApiService.hasRealizationCode(event.title) && (
+              {event.title && !hasRealizationCode && (
+                <div
+                  className="rounded-lg p-4 border"
+                  style={{
+                    backgroundColor: "var(--color-surface-alpha-40)",
+                    borderColor: "var(--color-border-alpha-30)",
+                  }}
+                >
                   <div
-                    className="rounded-lg p-4 border"
-                    style={{
-                      backgroundColor: "var(--color-surface-alpha-40)",
-                      borderColor: "var(--color-border-alpha-30)",
-                    }}
+                    className="flex items-center gap-2"
+                    style={{ color: "var(--color-text-secondary)" }}
                   >
-                    <div
-                      className="flex items-center gap-2"
-                      style={{ color: "var(--color-text-secondary)" }}
-                    >
-                      <Info className="h-4 w-4 shrink-0" />
-                      <span className="text-sm">
-                        {t("lectureDetailsDialog.noRealizationData")}{" "}
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                type="button"
-                                className="hidden md:inline-flex underline underline-offset-2"
-                              >
-                                {noRealizationWhyNotLabel}
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent
-                              side="top"
-                              className="max-w-xs text-xs"
-                            >
-                              {noRealizationWhyNotExplanation}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        <Sheet>
-                          <SheetTrigger asChild>
+                    <Info className="h-4 w-4 shrink-0" />
+                    <span className="text-sm">
+                      {t("lectureDetailsDialog.noRealizationData")}{" "}
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
                             <button
                               type="button"
-                              className="md:hidden underline underline-offset-2"
+                              className="hidden md:inline-flex underline underline-offset-2"
                             >
                               {noRealizationWhyNotLabel}
                             </button>
-                          </SheetTrigger>
-                          <SheetContent side="bottom">
-                            <SheetHeader>
-                              <SheetTitle>
-                                {noRealizationWhyNotLabel}
-                              </SheetTitle>
-                              <SheetDescription>
-                                {noRealizationWhyNotExplanation}
-                              </SheetDescription>
-                            </SheetHeader>
-                          </SheetContent>
-                        </Sheet>
-                      </span>
-                    </div>
+                          </TooltipTrigger>
+                          <TooltipContent
+                            side="top"
+                            className="max-w-xs text-xs"
+                          >
+                            {noRealizationWhyNotExplanation}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Sheet>
+                        <SheetTrigger asChild>
+                          <button
+                            type="button"
+                            className="md:hidden underline underline-offset-2"
+                          >
+                            {noRealizationWhyNotLabel}
+                          </button>
+                        </SheetTrigger>
+                        <SheetContent side="bottom">
+                          <SheetHeader>
+                            <SheetTitle>{noRealizationWhyNotLabel}</SheetTitle>
+                            <SheetDescription>
+                              {noRealizationWhyNotExplanation}
+                            </SheetDescription>
+                          </SheetHeader>
+                        </SheetContent>
+                      </Sheet>
+                    </span>
                   </div>
-                )}
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
