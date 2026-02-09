@@ -13,8 +13,8 @@ import { useRealizationDialog } from "../../hooks/useRealizationDialog";
 import { RealizationApiService } from "../../services/realizationApi";
 import {
   default as useConfigStore,
-  useHiddenEventsStore,
-  useRealizationColorStore,
+  useEventMetadataStore,
+  useRealizationMetadataStore,
   useScheduleStore,
 } from "../../state/state-management";
 import type { ScheduleEvent } from "../../types/schedule";
@@ -65,8 +65,10 @@ const WeekView = memo(
 
     const { getEventsForWeek } = useScheduleStore();
     const { config, isCurrentThemeLight } = useConfigStore();
-    const { customColors } = useRealizationColorStore();
-    const { isEventHidden, toggleEventVisibility } = useHiddenEventsStore();
+    const { metadataByRealization, isRealizationHidden } =
+      useRealizationMetadataStore();
+    const { metadataByEvent, isEventHidden, setEventHidden } =
+      useEventMetadataStore();
 
     // Color customizer state
     const [colorCustomizerOpen, setColorCustomizerOpen] = useState(false);
@@ -128,6 +130,7 @@ const WeekView = memo(
       error: realizationError,
       realizationData,
       openDialog: openRealizationDialog,
+      openDialogByCode: openRealizationDialogByCode,
       closeDialog: closeRealizationDialog,
     } = useRealizationDialog();
 
@@ -141,17 +144,8 @@ const WeekView = memo(
 
     // Helper functions for color customization
     const openColorCustomizer = (event: ScheduleEvent) => {
-      const realizationCode = RealizationApiService.extractRealizationCode(
-        event.title,
-      );
-      if (realizationCode) {
-        setSelectedEventForColor(event);
-        setColorCustomizerOpen(true);
-      }
-    };
-
-    const hasRealizationCode = (event: ScheduleEvent) => {
-      return RealizationApiService.hasRealizationCode(event.title);
+      setSelectedEventForColor(event);
+      setColorCustomizerOpen(true);
     };
 
     const weekStart = getWeekStart(currentDate);
@@ -301,12 +295,34 @@ const WeekView = memo(
     };
 
     // Format week indicator with hours
+    const allWeekEvents = Object.values(mergedWeekEvents).flat();
+    const eventById = new Map(allWeekEvents.map((event) => [event.id, event]));
+    const isEventEffectivelyHidden = (eventId: string) => {
+      const event = eventById.get(eventId);
+      const override = metadataByEvent[eventId]?.hidden;
+      if (typeof override === "boolean") {
+        return override;
+      }
+      if (!event) {
+        return isEventHidden(eventId);
+      }
+      const attachedRealizationId =
+        metadataByEvent[eventId]?.attachedRealizationId ?? null;
+      const realizationCode = RealizationApiService.getEffectiveRealizationCode(
+        event.title,
+        attachedRealizationId,
+      );
+      return Boolean(realizationCode && isRealizationHidden(realizationCode));
+    };
+    const toggleEventVisibility = (event: ScheduleEvent) => {
+      const nextHidden = !isEventEffectivelyHidden(event.id);
+      setEventHidden(event.id, nextHidden);
+    };
     const formatWeekIndicator = () => {
-      const allWeekEvents = Object.values(mergedWeekEvents).flat();
       return DateFormatUtils.formatWeekIndicator(
         DateFormatUtils.getWeekNumber(currentDate),
         allWeekEvents,
-        isEventHidden,
+        isEventEffectivelyHidden,
         config.showTotalHours,
       );
     };
@@ -563,9 +579,13 @@ const WeekView = memo(
                                     event.duration * WEEK_HOUR_HEIGHT; // WEEK_HOUR_HEIGHT px per hour
                                   const colorPair = ScheduleUtils.getColorPair(
                                     event.title,
-                                    customColors,
+                                    event.id,
+                                    metadataByEvent,
+                                    metadataByRealization,
                                   );
-                                  const isHidden = isEventHidden(event.id);
+                                  const isHidden = isEventEffectivelyHidden(
+                                    event.id,
+                                  );
                                   // Layout for overlapping events (column index & total cols)
                                   const layout = eventLayoutByDate[
                                     date.toDateString()
@@ -650,7 +670,7 @@ const WeekView = memo(
                                         />
                                         <ContextMenuItem
                                           onClick={() =>
-                                            toggleEventVisibility(event.id)
+                                            toggleEventVisibility(event)
                                           }
                                           style={{ color: "var(--color-text)" }}
                                         >
@@ -666,29 +686,23 @@ const WeekView = memo(
                                             </>
                                           )}
                                         </ContextMenuItem>
-                                        {hasRealizationCode(event) && (
-                                          <>
-                                            <ContextMenuSeparator
-                                              style={{
-                                                backgroundColor:
-                                                  "var(--color-border)",
-                                              }}
-                                            />
-                                            <ContextMenuItem
-                                              onClick={() =>
-                                                openColorCustomizer(event)
-                                              }
-                                              style={{
-                                                color: "var(--color-text)",
-                                              }}
-                                            >
-                                              <Palette className="mr-2 h-4 w-4" />
-                                              {tColor(
-                                                "contextMenu.customizeColor",
-                                              )}
-                                            </ContextMenuItem>
-                                          </>
-                                        )}
+                                        <ContextMenuSeparator
+                                          style={{
+                                            backgroundColor:
+                                              "var(--color-border)",
+                                          }}
+                                        />
+                                        <ContextMenuItem
+                                          onClick={() =>
+                                            openColorCustomizer(event)
+                                          }
+                                          style={{
+                                            color: "var(--color-text)",
+                                          }}
+                                        >
+                                          <Palette className="mr-2 h-4 w-4" />
+                                          {tColor("contextMenu.customizeColor")}
+                                        </ContextMenuItem>
                                       </ContextMenuContent>
                                     </ContextMenu>
                                   );
@@ -722,6 +736,8 @@ const WeekView = memo(
           onOpenChange={closeLectureDetailsDialog}
           event={selectedEvent}
           onOpenRealizationDialog={openRealizationDialog}
+          onOpenRealizationDialogByCode={openRealizationDialogByCode}
+          onOpenColorCustomizer={openColorCustomizer}
           isRealizationLoading={realizationLoading}
         />
 
@@ -730,12 +746,20 @@ const WeekView = memo(
           <RealizationColorCustomizer
             open={colorCustomizerOpen}
             onOpenChange={setColorCustomizerOpen}
+            eventId={selectedEventForColor.id}
+            eventTitle={getDisplayTitle(selectedEventForColor.title)}
+            eventTitleRaw={selectedEventForColor.title}
             realizationCode={
+              metadataByEvent[selectedEventForColor.id]
+                ?.attachedRealizationId ||
               RealizationApiService.extractRealizationCode(
                 selectedEventForColor.title,
-              ) || ""
+              ) ||
+              ""
             }
-            currentEventTitle={getDisplayTitle(selectedEventForColor.title)}
+            realizationTitle={RealizationApiService.stripRealizationCode(
+              selectedEventForColor.title,
+            )}
           />
         )}
       </div>

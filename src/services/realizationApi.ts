@@ -110,6 +110,36 @@ export class RealizationApiService {
   static hasRealizationCode(eventTitle: string): boolean {
     return RealizationApiService.extractRealizationCode(eventTitle) !== null;
   }
+
+  /**
+   * Resolves the effective realization code, preferring an attached realization id when present.
+   */
+  static getEffectiveRealizationCode(
+    eventTitle: string,
+    attachedRealizationId?: string | null,
+  ): string | null {
+    const extracted = RealizationApiService.extractRealizationCode(eventTitle);
+    if (extracted) {
+      return extracted;
+    }
+    const attached = attachedRealizationId?.trim();
+    if (attached) {
+      return attached.toLowerCase();
+    }
+    return null;
+  }
+
+  static hasEffectiveRealizationCode(
+    eventTitle: string,
+    attachedRealizationId?: string | null,
+  ): boolean {
+    return (
+      RealizationApiService.getEffectiveRealizationCode(
+        eventTitle,
+        attachedRealizationId,
+      ) !== null
+    );
+  }
 }
 
 export default RealizationApiService;

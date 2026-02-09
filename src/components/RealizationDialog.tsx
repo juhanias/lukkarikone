@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RealizationApiService } from "../services/realizationApi";
 import { useScheduleStore } from "../state/schedule-store";
+import { useEventMetadataStore } from "../state/state-management";
 import type { ScheduleEvent } from "../types/schedule";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
@@ -129,6 +130,7 @@ const RealizationDialog = ({
   const [lastRealization, setLastRealization] =
     useState<RealizationData | null>(null);
   const calendarEvents = useScheduleStore((s) => s.events);
+  const { metadataByEvent } = useEventMetadataStore();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -177,14 +179,19 @@ const RealizationDialog = ({
     const now = new Date();
     const realizationCode = displayRealization.code?.toLowerCase() ?? "";
 
+    const getEventCode = (event: ScheduleEvent) =>
+      RealizationApiService.getEffectiveRealizationCode(
+        event.title,
+        metadataByEvent[event.id]?.attachedRealizationId,
+      );
     const realizationCalendarEvents = calendarEvents.filter((ce) => {
-      const ceCode = RealizationApiService.extractRealizationCode(ce.title);
+      const ceCode = getEventCode(ce);
       return ceCode?.toLowerCase() === realizationCode;
     });
 
     // Pre-filter calendar events: exclude events from the same realization
     const otherCalendarEvents = calendarEvents.filter((ce) => {
-      const ceCode = RealizationApiService.extractRealizationCode(ce.title);
+      const ceCode = getEventCode(ce);
       return ceCode?.toLowerCase() !== realizationCode;
     });
 
@@ -215,7 +222,7 @@ const RealizationDialog = ({
         overlappingEvents,
       };
     });
-  }, [displayRealization, calendarEvents]);
+  }, [displayRealization, calendarEvents, metadataByEvent]);
 
   const upcomingCount = analyzedEvents.filter((e) => !e.isCompleted).length;
   const completedCount = analyzedEvents.filter((e) => e.isCompleted).length;

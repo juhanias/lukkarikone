@@ -1,4 +1,5 @@
 import { RealizationApiService } from "../services/realizationApi";
+import type { RealizationMetadataMap } from "../types/metadata";
 import { ScheduleUtils } from "./schedule-utils";
 
 export class RealizationColorUtils {
@@ -23,14 +24,14 @@ export class RealizationColorUtils {
   /**
    * Gets the effective color for a realization code (custom or default)
    * @param realizationCode The realization code to get color for
-   * @param customColors Record of custom colors by realization code
+   * @param metadataByRealization Record of realization metadata
    */
   static getEffectiveColor(
     realizationCode: string,
-    customColors: Record<string, string>,
+    metadataByRealization: RealizationMetadataMap,
   ): string {
     return (
-      customColors[realizationCode] ||
+      metadataByRealization[realizationCode]?.color ||
       ScheduleUtils.getDefaultRealizationColor(realizationCode)
     );
   }
@@ -38,14 +39,14 @@ export class RealizationColorUtils {
   /**
    * Gets the effective color pair for a realization code (custom or default)
    * @param realizationCode The realization code to get color pair for
-   * @param customColors Record of custom colors by realization code
+   * @param metadataByRealization Record of realization metadata
    */
   static getEffectiveColorPair(
     realizationCode: string,
-    customColors: Record<string, string>,
+    metadataByRealization: RealizationMetadataMap,
   ): { normal: string; flipped: string } {
-    if (customColors[realizationCode]) {
-      const primaryColor = customColors[realizationCode];
+    const primaryColor = metadataByRealization[realizationCode]?.color;
+    if (primaryColor) {
       const secondaryColor = ScheduleUtils.lightenRgbColor(primaryColor);
       return {
         normal: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
