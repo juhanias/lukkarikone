@@ -1,6 +1,5 @@
 {
   "realizationDialog": {
-    "title": "Toteutustiedot",
     "loading": "Ladataan toteutustietoja...",
     "error": {
       "title": "Virhe",
@@ -47,8 +46,11 @@
       "title": "Lisätietoja"
     },
     "events": {
-      "title": "Tulevat tapahtumat",
-      "moreEvents": "ja {{count}} muuta tapahtumaa"
+      "title": "Tapahtumat",
+      "upcoming": "Tulevat",
+      "completed": "Suoritetut",
+      "overlapping": "Päällekkäiset",
+      "overlapsWith": "Päällekkäin: {{event}}"
     },
     "description": {
       "title": "Kuvaus",
@@ -56,8 +58,6 @@
     }
   },
   "lectureDetailsDialog": {
-    "title": "Luennon tiedot",
-    "description": "Yksityiskohtaiset tiedot valitusta luennosta",
     "basicInfo": "Perustiedot",
     "schedule": "Aikataulu",
     "location": "Sijainti",
@@ -69,6 +69,8 @@
     "teachers": "Opettajat",
     "studentGroups": "Opiskelijaryhmät",
     "showRealizationDetails": "Näytä toteutustiedot",
-    "noRealizationData": "Tälle tapahtumalle ei ole saatavilla yksityiskohtaisia toteutustietoja."
+    "noRealizationData": "Tälle tapahtumalle ei ole saatavilla yksityiskohtaisia toteutustietoja.",
+    "noRealizationWhyNot": "Miksi ei?",
+    "noRealizationWhyNotExplanation": "Open Lukkarikone liittää tapahtumat toteutuksiin nimen toteutus toteutuskoodin perusteella (esim. kh00cz65-3020). Jos tämä toteutuskoodi puuttuu, sovellus ei voi tietää, mihin toteutukseen tapahtuma kuuluu. Jokaisessa kalenterisi tapahtumassa pitäisi oletuksena olla toteutuskoodi."
   }
 }

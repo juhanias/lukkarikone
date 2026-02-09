@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
+import LocaleLanding from "./components/LocaleLanding";
 import RootRedirect from "./components/RootRedirect";
 import ErrorPage from "./pages/ErrorPage";
 import Schedule from "./pages/Schedule";
@@ -10,6 +11,11 @@ export const router = createBrowserRouter(
     {
       path: "/",
       element: <RootRedirect />,
+      errorElement: <ErrorPage />,
+    },
+    {
+      path: "/:locale",
+      element: <LocaleLanding />,
       errorElement: <ErrorPage />,
     },
     {

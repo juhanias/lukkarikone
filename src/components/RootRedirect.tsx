@@ -1,5 +1,4 @@
 import { Navigate, useSearchParams } from "react-router-dom";
-import Landing from "../pages/Landing";
 import { useCalendarStore } from "../state/state-management";
 
 /**
@@ -18,6 +17,5 @@ export default function RootRedirect() {
     return <Navigate to={`/app/${activeCalendar.id}`} replace />;
   }
 
-  // Show landing page if no calendar configured or user explicitly requested it
-  return <Landing />;
+  return <Navigate to="/en" replace />;
 }
