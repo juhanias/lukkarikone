@@ -94,5 +94,26 @@
       "confirm": "Hide course",
       "cancel": "Cancel"
     }
+  },
+  "eventTimeEditWarning": {
+    "title": "Notice about editing events",
+    "description": "You can edit this event's schedule. The change is visible only to you. <strong>Please note</strong> that your edit will be overwritten immediately if the schedule keepers (your teachers, etc.) modify this event in any way.",
+    "cancel": "Cancel",
+    "confirm": "I understand"
+  },
+  "eventTimeEditDialog": {
+    "title": "Edit event time",
+    "description": "Update the date and time for this event.",
+    "openButton": "Edit time",
+    "dateLabel": "Date",
+    "pickDate": "Pick a date",
+    "startTimeLabel": "Starts",
+    "endTimeLabel": "Ends",
+    "cancel": "Cancel",
+    "save": "Save",
+    "errors": {
+      "missingDate": "Please pick a date first.",
+      "invalidRange": "End time must be after start time."
+    }
   }
 }

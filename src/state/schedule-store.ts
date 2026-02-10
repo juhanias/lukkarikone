@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 import type { ScheduleEvent } from "../types/schedule";
 import { ScheduleUtils } from "../utils/schedule-utils";
 import useCalendarStore from "./calendar-store";
+import { useEventMetadataStore } from "./event-metadata-store";
 import { useRealizationMetadataStore } from "./realization-metadata-store";
 
 interface ICalCache {
@@ -32,6 +33,11 @@ interface ScheduleState {
   getEventById: (id: string) => ScheduleEvent | null;
   refreshSchedule: () => Promise<void>;
   clearError: () => void;
+  applyEventTimeOverride: (
+    eventId: string,
+    override: { startTimeIso: string; endTimeIso: string } | null,
+    fallbackOriginal?: { startTimeIso: string; endTimeIso: string },
+  ) => void;
   getICalCacheInfo: () => {
     url: string;
     lastUpdated: Date | null;
@@ -180,10 +186,32 @@ export const useScheduleStore = create<ScheduleState>()(
           }
 
           const allEvents = Array.from(eventsByUid.values());
+          const { metadataByEvent, clearEventTimeOverride } =
+            useEventMetadataStore.getState();
+          const overriddenEvents = allEvents.map((event) => {
+            const override = metadataByEvent[event.id]?.overrides?.time;
+            if (!override) {
+              return event;
+            }
+            const currentHash = ScheduleUtils.getEventDefaultHash(
+              event.title,
+              event.startTime,
+              event.endTime,
+            );
+            if (currentHash !== override.defaultHash) {
+              clearEventTimeOverride(event.id);
+              return event;
+            }
+            return ScheduleUtils.applyTimeOverride(
+              event,
+              override.startTimeIso,
+              override.endTimeIso,
+            );
+          });
           const now = new Date();
 
           set({
-            events: allEvents,
+            events: overriddenEvents,
             isLoading: false,
             isCheckingHash: false,
             isFetchingCalendar: false,
@@ -241,6 +269,52 @@ export const useScheduleStore = create<ScheduleState>()(
       },
 
       clearError: () => set({ error: null }),
+
+      applyEventTimeOverride: (
+        eventId,
+        override,
+        fallbackOriginal,
+      ) => {
+        set((state) => {
+          const existing = state.events.find((event) => event.id === eventId);
+          if (!existing) {
+            return state;
+          }
+          if (override) {
+            const updated = ScheduleUtils.applyTimeOverride(
+              existing,
+              override.startTimeIso,
+              override.endTimeIso,
+            );
+            return {
+              events: state.events.map((event) =>
+                event.id === eventId ? updated : event,
+              ),
+            };
+          }
+          const metadataOverride =
+            useEventMetadataStore.getState().getEventTimeOverride(eventId);
+          const original = metadataOverride
+            ? {
+                startTimeIso: metadataOverride.originalStartTimeIso,
+                endTimeIso: metadataOverride.originalEndTimeIso,
+              }
+            : fallbackOriginal;
+          if (!original) {
+            return state;
+          }
+          const restored = ScheduleUtils.applyTimeOverride(
+            existing,
+            original.startTimeIso,
+            original.endTimeIso,
+          );
+          return {
+            events: state.events.map((event) =>
+              event.id === eventId ? restored : event,
+            ),
+          };
+        });
+      },
 
       getICalCacheInfo: () => {
         const state = get();

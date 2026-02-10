@@ -1,5 +1,5 @@
-import { Calendar, Clock, Eye, EyeOff, Palette } from "lucide-react";
-import { memo, useMemo, useState } from "react";
+import { Calendar, Clock, Eye, EyeOff, Palette, Pencil } from "lucide-react";
+import { memo, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
   DAY_HOUR_HEIGHT,
@@ -8,6 +8,7 @@ import {
 import { useCurrentTime } from "../../hooks/useCurrentTime";
 import { useLectureDetailsDialog } from "../../hooks/useLectureDetailsDialog";
 import { useRealizationDialog } from "../../hooks/useRealizationDialog";
+import { useColorCustomizerDialogParam } from "../../hooks/useDialogParams";
 import { RealizationApiService } from "../../services/realizationApi";
 import {
   default as useConfigStore,
@@ -24,7 +25,7 @@ import { ScheduleUtils } from "../../utils/schedule-utils";
 import { CalendarViewBadge } from "../CalendarViewBadge";
 import { LastUpdatedBadge } from "../LastUpdatedBadge";
 import LectureDetailsDialog from "../LectureDetailsDialog";
-import { RealizationColorCustomizer } from "../RealizationColorCustomizer";
+import { RealizationColorCustomizer } from "@/components/RealizationColorCustomizer";
 import RealizationDialog from "../RealizationDialog";
 import {
   ContextMenu,
@@ -55,10 +56,7 @@ const ScheduleDay = memo(
     const { t } = useTranslation("schedule");
     const { t: tColor } = useTranslation("colorCustomization");
 
-    // Color customizer state
-    const [colorCustomizerOpen, setColorCustomizerOpen] = useState(false);
-    const [selectedEventForColor, setSelectedEventForColor] =
-      useState<ScheduleEvent | null>(null);
+    const [colorEventId, setColorEventId] = useColorCustomizerDialogParam();
 
     // Realization color store
     const { metadataByRealization, isRealizationHidden } =
@@ -97,8 +95,7 @@ const ScheduleDay = memo(
 
     // Helper function to open color customizer for an event
     const openColorCustomizer = (event: ScheduleEvent) => {
-      setSelectedEventForColor(event);
-      setColorCustomizerOpen(true);
+      setColorEventId(event.id);
     };
 
     // Function to calculate gap periods between events
@@ -122,6 +119,15 @@ const ScheduleDay = memo(
       () => new Map(events.map((event) => [event.id, event])),
       [events],
     );
+    const selectedEventForColor = colorEventId
+      ? eventsById.get(colorEventId) ?? null
+      : null;
+
+    useEffect(() => {
+      if (colorEventId && !selectedEventForColor) {
+        setColorEventId(null);
+      }
+    }, [colorEventId, selectedEventForColor, setColorEventId]);
     const isEventEffectivelyHidden = useMemo(
       () => (eventId: string) => {
         const event = eventsById.get(eventId);
@@ -147,6 +153,19 @@ const ScheduleDay = memo(
     const toggleEventVisibility = (event: ScheduleEvent) => {
       const nextHidden = !isEventEffectivelyHidden(event.id);
       setEventHidden(event.id, nextHidden);
+    };
+
+    const hasTimeOverrideChange = (event: ScheduleEvent) => {
+      const override = metadataByEvent[event.id]?.overrides?.time;
+      if (!override) {
+        return false;
+      }
+      const originalStart = new Date(override.originalStartTimeIso);
+      const originalEnd = new Date(override.originalEndTimeIso);
+      return (
+        event.startTime.getTime() !== originalStart.getTime() ||
+        event.endTime.getTime() !== originalEnd.getTime()
+      );
     };
 
     const formatDate = (date: Date, events: ScheduleEvent[]) => {
@@ -359,8 +378,9 @@ const ScheduleDay = memo(
                     return (
                       <ContextMenu key={event.id}>
                         <ContextMenuTrigger asChild>
-                          <div
-                            className={`absolute rounded-lg text-white shadow-lg cursor-pointer overflow-hidden transition-colors duration-200 schedule-event-gradient`}
+                          <button
+                            type="button"
+                            className={`absolute rounded-lg text-white shadow-lg cursor-pointer overflow-hidden transition-colors duration-200 schedule-event-gradient border-none p-0 text-left appearance-none flex flex-col items-start justify-start`}
                             style={
                               {
                                 top: `${(event.startHour - START_HOUR) * DAY_HOUR_HEIGHT}px`,
@@ -406,7 +426,7 @@ const ScheduleDay = memo(
                                 {getDisplayTitle(event.title)}
                               </h3>
 
-                              {event.location && (
+                              {event.location && eventDurationInHours >= 1.5 && (
                                 <p
                                   className={`text-xs opacity-90 leading-tight ${
                                     eventDurationInHours >= 3
@@ -426,7 +446,14 @@ const ScheduleDay = memo(
                                   </p>
                                 )}
                             </div>
-                          </div>
+
+                            {/* Footer notes */}
+                            {hasTimeOverrideChange(event) && (
+                              <div className="absolute bottom-1 right-1 flex items-center gap-1 text-white/80 pointer-events-none">
+                                <Pencil className="h-3.5 w-3.5" />
+                              </div>
+                            )}
+                          </button>
                         </ContextMenuTrigger>
                         <ContextMenuContent
                           style={{
@@ -505,8 +532,12 @@ const ScheduleDay = memo(
         {/* Color Customizer Dialog */}
         {selectedEventForColor && (
           <RealizationColorCustomizer
-            open={colorCustomizerOpen}
-            onOpenChange={setColorCustomizerOpen}
+            open={Boolean(colorEventId)}
+            onOpenChange={(isOpen: boolean) => {
+              if (!isOpen) {
+                setColorEventId(null);
+              }
+            }}
             eventId={selectedEventForColor.id}
             eventTitle={getDisplayTitle(selectedEventForColor.title)}
             eventTitleRaw={selectedEventForColor.title}

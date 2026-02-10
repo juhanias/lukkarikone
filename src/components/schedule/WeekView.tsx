@@ -1,6 +1,6 @@
 import { addDays, startOfWeek } from "date-fns";
-import { Calendar, Clock, Eye, EyeOff, Palette } from "lucide-react";
-import { memo, useState } from "react";
+import { Calendar, Clock, Eye, EyeOff, Palette, Pencil } from "lucide-react";
+import { memo, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   SCHEDULE_LAYOUT,
@@ -9,6 +9,7 @@ import {
 } from "../../constants/schedule-layout-constants";
 import { useCurrentTime } from "../../hooks/useCurrentTime";
 import { useLectureDetailsDialog } from "../../hooks/useLectureDetailsDialog";
+import { useColorCustomizerDialogParam } from "../../hooks/useDialogParams";
 import { useRealizationDialog } from "../../hooks/useRealizationDialog";
 import { RealizationApiService } from "../../services/realizationApi";
 import {
@@ -24,7 +25,7 @@ import { ScheduleUtils } from "../../utils/schedule-utils";
 import { CalendarViewBadge } from "../CalendarViewBadge";
 import { LastUpdatedBadge } from "../LastUpdatedBadge";
 import LectureDetailsDialog from "../LectureDetailsDialog";
-import { RealizationColorCustomizer } from "../RealizationColorCustomizer";
+import { RealizationColorCustomizer } from "@/components/RealizationColorCustomizer";
 import RealizationDialog from "../RealizationDialog";
 import {
   ContextMenu,
@@ -63,17 +64,14 @@ const WeekView = memo(
       return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
     };
 
-    const { getEventsForWeek } = useScheduleStore();
+    const { getEventsForWeek, getEventById } = useScheduleStore();
     const { config, isCurrentThemeLight } = useConfigStore();
     const { metadataByRealization, isRealizationHidden } =
       useRealizationMetadataStore();
     const { metadataByEvent, isEventHidden, setEventHidden } =
       useEventMetadataStore();
 
-    // Color customizer state
-    const [colorCustomizerOpen, setColorCustomizerOpen] = useState(false);
-    const [selectedEventForColor, setSelectedEventForColor] =
-      useState<ScheduleEvent | null>(null);
+    const [colorEventId, setColorEventId] = useColorCustomizerDialogParam();
     // Temporary debug events for testing overlapping layout
     const [debugEvents, setDebugEvents] = useState<ScheduleEvent[]>([]);
 
@@ -144,13 +142,21 @@ const WeekView = memo(
 
     // Helper functions for color customization
     const openColorCustomizer = (event: ScheduleEvent) => {
-      setSelectedEventForColor(event);
-      setColorCustomizerOpen(true);
+      setColorEventId(event.id);
     };
 
     const weekStart = getWeekStart(currentDate);
     const weekDates = getWeekDates(currentDate);
     const weekEvents = getEventsForWeek(weekStart);
+    const selectedEventForColor = colorEventId
+      ? getEventById(colorEventId)
+      : null;
+
+    useEffect(() => {
+      if (colorEventId && !selectedEventForColor) {
+        setColorEventId(null);
+      }
+    }, [colorEventId, selectedEventForColor, setColorEventId]);
 
     // Filter dates and events based on showWeekends config
     // Always show weekends if they have events, regardless of setting
@@ -317,6 +323,19 @@ const WeekView = memo(
     const toggleEventVisibility = (event: ScheduleEvent) => {
       const nextHidden = !isEventEffectivelyHidden(event.id);
       setEventHidden(event.id, nextHidden);
+    };
+
+    const hasTimeOverrideChange = (event: ScheduleEvent) => {
+      const override = metadataByEvent[event.id]?.overrides?.time;
+      if (!override) {
+        return false;
+      }
+      const originalStart = new Date(override.originalStartTimeIso);
+      const originalEnd = new Date(override.originalEndTimeIso);
+      return (
+        event.startTime.getTime() !== originalStart.getTime() ||
+        event.endTime.getTime() !== originalEnd.getTime()
+      );
     };
     const formatWeekIndicator = () => {
       return DateFormatUtils.formatWeekIndicator(
@@ -597,8 +616,9 @@ const WeekView = memo(
                                   return (
                                     <ContextMenu key={event.id}>
                                       <ContextMenuTrigger asChild>
-                                        <div
-                                          className={`absolute rounded text-white text-xs p-1 cursor-pointer overflow-hidden hover:z-20 hover:scale-101 transition-all duration-500 schedule-event-gradient`}
+                                        <button
+                                          type="button"
+                                          className={`absolute rounded text-white text-xs p-1 cursor-pointer overflow-hidden hover:z-20 hover:scale-101 transition-all duration-500 schedule-event-gradient border-none text-left appearance-none flex flex-col items-start justify-start`}
                                           style={
                                             {
                                               top: `${topOffset}px`,
@@ -632,7 +652,7 @@ const WeekView = memo(
                                           <div className="font-semibold line-clamp-2 leading-tight">
                                             {getDisplayTitle(event.title)}
                                           </div>
-                                          {event.location && height > 40 && (
+                                          {event.location && height > 56 && (
                                             <div className="text-xs opacity-90 leading-tight">
                                               📍 {event.location}
                                             </div>
@@ -643,7 +663,12 @@ const WeekView = memo(
                                               event.endTime,
                                             )}
                                           </div>
-                                        </div>
+                                          {hasTimeOverrideChange(event) && (
+                                            <div className="absolute bottom-1 right-1 flex items-center gap-1 text-white/80 pointer-events-none">
+                                              <Pencil className="h-3 w-3" />
+                                            </div>
+                                          )}
+                                        </button>
                                       </ContextMenuTrigger>
                                       <ContextMenuContent
                                         style={{
@@ -744,8 +769,12 @@ const WeekView = memo(
         {/* Color Customizer Dialog */}
         {selectedEventForColor && (
           <RealizationColorCustomizer
-            open={colorCustomizerOpen}
-            onOpenChange={setColorCustomizerOpen}
+            open={Boolean(colorEventId)}
+            onOpenChange={(isOpen: boolean) => {
+              if (!isOpen) {
+                setColorEventId(null);
+              }
+            }}
             eventId={selectedEventForColor.id}
             eventTitle={getDisplayTitle(selectedEventForColor.title)}
             eventTitleRaw={selectedEventForColor.title}

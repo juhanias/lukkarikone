@@ -94,5 +94,26 @@
       "confirm": "Piilota toteutus",
       "cancel": "Peruuta"
     }
+  },
+  "eventTimeEditWarning": {
+    "title": "Huomio tapahtumien muokkaamisesta",
+    "description": "Voit muokata tämän tapahtuman aikataulua. Muutos näkyy vain sinulle. <strong>Huomaathan</strong>, että muokkauksesi yliajetaan välittömästi, jos lukkarinpitäjät (opettajasi jne) muokkaavat tätä tapahtumaa millään tavalla.",
+    "cancel": "Peruuta",
+    "confirm": "Ymmärrän"
+  },
+  "eventTimeEditDialog": {
+    "title": "Muokkaa tapahtuman aikaa",
+    "description": "Päivitä tämän tapahtuman päivä ja kellonaika.",
+    "openButton": "Muokkaa aikaa",
+    "dateLabel": "Päivä",
+    "pickDate": "Valitse päivä",
+    "startTimeLabel": "Alkaa",
+    "endTimeLabel": "Päättyy",
+    "cancel": "Peruuta",
+    "save": "Tallenna",
+    "errors": {
+      "missingDate": "Valitse ensin päivä.",
+      "invalidRange": "Päättymisajan on oltava alkamisajan jälkeen."
+    }
   }
 }

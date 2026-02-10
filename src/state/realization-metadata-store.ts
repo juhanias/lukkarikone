@@ -74,7 +74,6 @@ const canAccessStorage = () => {
   }
 };
 
-
 interface RealizationMetadataState {
   metadataByRealization: RealizationMetadataMap;
 

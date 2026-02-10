@@ -1,6 +1,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { EventMetadata, EventMetadataMap } from "../types/metadata";
+import type {
+  EventMetadata,
+  EventMetadataMap,
+  EventTimeOverride,
+} from "../types/metadata";
 
 const STORAGE_KEY = "event-metadata";
 const LEGACY_STORAGE_KEY = "hidden-events";
@@ -65,12 +69,15 @@ const readLegacyHiddenEvents = (): EventMetadataMap | null => {
   }
 };
 
-
 interface EventMetadataState {
   metadataByEvent: EventMetadataMap;
+  hasSeenEditWarning: boolean;
 
   getEventMetadata: (eventId: string) => EventMetadata | undefined;
   setEventMetadata: (eventId: string, metadata: EventMetadata) => void;
+  getEventTimeOverride: (eventId: string) => EventTimeOverride | null;
+  setEventTimeOverride: (eventId: string, override: EventTimeOverride) => void;
+  clearEventTimeOverride: (eventId: string) => void;
   setEventHidden: (eventId: string, hidden: boolean) => void;
   clearEventHidden: (eventId: string) => void;
   getEventColor: (eventId: string) => string | null;
@@ -85,6 +92,7 @@ interface EventMetadataState {
   showEvent: (eventId: string) => void;
   toggleEventVisibility: (eventId: string) => void;
   clearAllEventMetadata: () => void;
+  setHasSeenEditWarning: (value: boolean) => void;
 }
 
 const initialMetadata = readLegacyHiddenEvents() ?? {};
@@ -103,6 +111,7 @@ export const useEventMetadataStore = create<EventMetadataState>()(
   persist(
     (set, get) => ({
       metadataByEvent: initialMetadata,
+      hasSeenEditWarning: false,
 
       getEventMetadata: (eventId: string) => {
         const { metadataByEvent } = get();
@@ -119,6 +128,52 @@ export const useEventMetadataStore = create<EventMetadataState>()(
             },
           },
         }));
+      },
+
+      getEventTimeOverride: (eventId: string) => {
+        const { metadataByEvent } = get();
+        return metadataByEvent[eventId]?.overrides?.time ?? null;
+      },
+
+      setEventTimeOverride: (eventId: string, override: EventTimeOverride) => {
+        set((state) => ({
+          metadataByEvent: {
+            ...state.metadataByEvent,
+            [eventId]: {
+              ...state.metadataByEvent[eventId],
+              overrides: {
+                ...state.metadataByEvent[eventId]?.overrides,
+                time: override,
+              },
+            },
+          },
+        }));
+      },
+
+      clearEventTimeOverride: (eventId: string) => {
+        set((state) => {
+          const existing = state.metadataByEvent[eventId];
+          if (!existing?.overrides?.time) {
+            return state;
+          }
+          const { overrides: __, ...restEvent } = existing;
+          const { time: _, ...restOverrides } = existing.overrides ?? {};
+          const overrides =
+            Object.keys(restOverrides).length > 0 ? restOverrides : undefined;
+          if (Object.keys(restEvent).length === 0 && !overrides) {
+            const { [eventId]: __, ...remaining } = state.metadataByEvent;
+            return { metadataByEvent: remaining };
+          }
+          return {
+            metadataByEvent: {
+              ...state.metadataByEvent,
+              [eventId]: {
+                ...restEvent,
+                ...(overrides ? { overrides } : {}),
+              },
+            },
+          };
+        });
       },
 
       setEventHidden: (eventId: string, hidden: boolean) => {
@@ -264,11 +319,18 @@ export const useEventMetadataStore = create<EventMetadataState>()(
       clearAllEventMetadata: () => {
         set({ metadataByEvent: {} });
       },
+
+      setHasSeenEditWarning: (value: boolean) => {
+        set({ hasSeenEditWarning: value });
+      },
     }),
     {
       name: STORAGE_KEY,
       version: 1,
-      partialize: (state) => ({ metadataByEvent: state.metadataByEvent }),
+      partialize: (state) => ({
+        metadataByEvent: state.metadataByEvent,
+        hasSeenEditWarning: state.hasSeenEditWarning,
+      }),
     },
   ),
 );

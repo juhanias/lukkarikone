@@ -78,6 +78,34 @@ export class ScheduleUtils {
     return Math.abs(hash);
   }
 
+  static getEventDefaultHash(
+    title: string,
+    startTime: Date,
+    endTime: Date,
+  ): string {
+    const payload = `${title}|${startTime.toISOString()}|${endTime.toISOString()}`;
+    return ScheduleUtils.hashString(payload).toString();
+  }
+
+  static applyTimeOverride(
+    event: ScheduleEvent,
+    startTimeIso: string,
+    endTimeIso: string,
+  ): ScheduleEvent {
+    const startTime = new Date(startTimeIso);
+    const endTime = new Date(endTimeIso);
+    const durationMs = endTime.getTime() - startTime.getTime();
+    const duration = durationMs / (1000 * 60 * 60);
+    const startHour = startTime.getHours() + startTime.getMinutes() / 60;
+    return {
+      ...event,
+      startTime,
+      endTime,
+      duration,
+      startHour,
+    };
+  }
+
   // Get the key to use for color generation - prioritize course ID if available
   private static getColorKey(
     eventTitle: string,

@@ -9,10 +9,11 @@ import {
   Info,
   MapPin,
   Palette,
+  Pencil,
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { RealizationApiService } from "../services/realizationApi";
 import {
   useEventMetadataStore,
@@ -20,8 +21,11 @@ import {
   useScheduleStore,
 } from "../state/state-management";
 import type { ScheduleEvent } from "../types/schedule";
+import { useEventTimeEditDialogParam } from "../hooks/useDialogParams";
 import AttachRealizationDialog from "./AttachRealizationDialog";
+import EventTimeEditDialog from "./EventTimeEditDialog";
 import { ActionButton } from "./ui/ActionButton";
+import { Button } from "./ui/button";
 import {
   Dialog,
   DialogContent,
@@ -70,7 +74,9 @@ const LectureDetailsDialog = ({
     clearEventHidden,
     getEventMetadata,
     isEventHidden,
+    hasSeenEditWarning,
     metadataByEvent,
+    setHasSeenEditWarning,
     setEventHidden,
   } = useEventMetadataStore();
   const { hideRealization, isRealizationHidden, showRealization } =
@@ -79,6 +85,8 @@ const LectureDetailsDialog = ({
   const [lastEvent, setLastEvent] = useState<ScheduleEvent | null>(null);
   const [hideCourseDialogOpen, setHideCourseDialogOpen] = useState(false);
   const [attachDialogOpen, setAttachDialogOpen] = useState(false);
+  const [editWarningOpen, setEditWarningOpen] = useState(false);
+  const [editTimeParam, setEditTimeParam] = useEventTimeEditDialogParam();
   const noRealizationWhyNotLabel = t(
     "lectureDetailsDialog.noRealizationWhyNot",
   );
@@ -91,6 +99,12 @@ const LectureDetailsDialog = ({
       setLastEvent(event);
     }
   }, [event]);
+
+  useEffect(() => {
+    if (!event && editTimeParam) {
+      setEditTimeParam(null);
+    }
+  }, [event, editTimeParam, setEditTimeParam]);
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString("fi-FI", {
@@ -115,6 +129,23 @@ const LectureDetailsDialog = ({
     if (hours === 0) return `${minutes} min`;
     if (minutes === 0) return `${hours} h`;
     return `${hours} h ${minutes} min`;
+  };
+
+  const handleOpenTimeEdit = () => {
+    if (!event) {
+      return;
+    }
+    if (hasSeenEditWarning) {
+      setEditTimeParam("true");
+      return;
+    }
+    setEditWarningOpen(true);
+  };
+
+  const handleConfirmTimeEditWarning = () => {
+    setHasSeenEditWarning(true);
+    setEditWarningOpen(false);
+    setEditTimeParam("true");
   };
 
   const handleOpenRealizationDialog = () => {
@@ -272,6 +303,34 @@ const LectureDetailsDialog = ({
   const isCourseHidden = realizationCode
     ? isRealizationHidden(realizationCode)
     : false;
+  const timeOverride = event
+    ? getEventMetadata(event.id)?.overrides?.time
+    : null;
+  const originalStartTime = timeOverride
+    ? new Date(timeOverride.originalStartTimeIso)
+    : null;
+  const originalEndTime = timeOverride
+    ? new Date(timeOverride.originalEndTimeIso)
+    : null;
+  const hasTimeOverrideChange =
+    timeOverride &&
+    originalStartTime &&
+    originalEndTime &&
+    (event
+      ? formatDate(originalStartTime) !== formatDate(event.startTime) ||
+        formatTime(originalStartTime) !== formatTime(event.startTime) ||
+        formatTime(originalEndTime) !== formatTime(event.endTime)
+      : false);
+  const hasDateOverrideChange =
+    timeOverride &&
+    originalStartTime &&
+    event &&
+    formatDate(originalStartTime) !== formatDate(event.startTime);
+  const originalDuration =
+    originalStartTime && originalEndTime
+      ? (originalEndTime.getTime() - originalStartTime.getTime()) /
+        (1000 * 60 * 60)
+      : null;
 
   const teachers = (event?.teachers ?? [])
     .flatMap((teacher) => teacher.split(","))
@@ -327,33 +386,92 @@ const LectureDetailsDialog = ({
                   }}
                 >
                   <div className="p-4">
-                    <h4
-                      className="text-sm font-semibold mb-2 flex items-center gap-1.5"
-                      style={{ color: "var(--color-text-secondary)" }}
-                    >
-                      <Calendar className="h-4 w-4" />
-                      {t("lectureDetailsDialog.schedule")}
-                    </h4>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4
+                        className="text-sm font-semibold flex items-center gap-1.5"
+                        style={{ color: "var(--color-text-secondary)" }}
+                      >
+                        <Calendar className="h-4 w-4" />
+                        {t("lectureDetailsDialog.schedule")}
+                      </h4>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleOpenTimeEdit}
+                        aria-label={t("eventTimeEditDialog.openButton")}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </div>
                     <div className="space-y-1">
-                      <p
-                        className="text-sm"
-                        style={{ color: "var(--color-text)" }}
-                      >
-                        {formatDate(event.startTime)}
-                      </p>
-                      <p
-                        className="text-sm"
-                        style={{ color: "var(--color-text)" }}
-                      >
-                        {formatTime(event.startTime)} –{" "}
-                        {formatTime(event.endTime)}
-                        <span
-                          className="ml-2 text-xs"
-                          style={{ color: "var(--color-text-secondary)" }}
-                        >
-                          ({getDurationString(event.duration)})
-                        </span>
-                      </p>
+                      {hasTimeOverrideChange &&
+                      originalStartTime &&
+                      originalEndTime ? (
+                        <>
+                          {hasDateOverrideChange && (
+                            <p
+                              className="text-sm line-through"
+                              style={{ color: "var(--color-text-secondary)" }}
+                            >
+                              {formatDate(originalStartTime)}
+                            </p>
+                          )}
+                          <p
+                            className="text-sm"
+                            style={{ color: "var(--color-text)" }}
+                          >
+                            {formatDate(event.startTime)}
+                          </p>
+                          <p
+                            className="text-sm line-through"
+                            style={{ color: "var(--color-text-secondary)" }}
+                          >
+                            {formatTime(originalStartTime)} –{" "}
+                            {formatTime(originalEndTime)}
+                            {typeof originalDuration === "number" && (
+                              <span className="ml-2 text-xs">
+                                ({getDurationString(originalDuration)})
+                              </span>
+                            )}
+                          </p>
+                          <p
+                            className="text-sm"
+                            style={{ color: "var(--color-text)" }}
+                          >
+                            {formatTime(event.startTime)} –{" "}
+                            {formatTime(event.endTime)}
+                            <span
+                              className="ml-2 text-xs"
+                              style={{ color: "var(--color-text-secondary)" }}
+                            >
+                              ({getDurationString(event.duration)})
+                            </span>
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p
+                            className="text-sm"
+                            style={{ color: "var(--color-text)" }}
+                          >
+                            {formatDate(event.startTime)}
+                          </p>
+                          <p
+                            className="text-sm"
+                            style={{ color: "var(--color-text)" }}
+                          >
+                            {formatTime(event.startTime)} –{" "}
+                            {formatTime(event.endTime)}
+                            <span
+                              className="ml-2 text-xs"
+                              style={{ color: "var(--color-text-secondary)" }}
+                            >
+                              ({getDurationString(event.duration)})
+                            </span>
+                          </p>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -666,6 +784,49 @@ const LectureDetailsDialog = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={editWarningOpen} onOpenChange={setEditWarningOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t("eventTimeEditWarning.title")}</DialogTitle>
+          </DialogHeader>
+          <DialogDescription asChild>
+            <div className="space-y-3">
+              <p>
+                <Trans
+                  i18nKey="eventTimeEditWarning.description"
+                  t={t}
+                  components={{ strong: <strong /> }}
+                />
+              </p>
+            </div>
+          </DialogDescription>
+          <DialogFooter>
+            <ActionButton
+              onClick={() => setEditWarningOpen(false)}
+              variant="subtle"
+              className="w-full sm:w-auto"
+            >
+              {t("eventTimeEditWarning.cancel")}
+            </ActionButton>
+            <ActionButton
+              onClick={handleConfirmTimeEditWarning}
+              variant="primary"
+              className="w-full sm:w-auto"
+            >
+              {t("eventTimeEditWarning.confirm")}
+            </ActionButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <EventTimeEditDialog
+        open={editTimeParam === "true"}
+        onOpenChange={(nextOpen: boolean) =>
+          setEditTimeParam(nextOpen ? "true" : null)
+        }
+        event={event}
+      />
     </>
   );
 };

@@ -5,10 +5,12 @@ import { useQueryState } from "nuqs";
  * Usage: ?event=<event-id>
  */
 export function useEventDialogParam() {
-  return useQueryState("event", {
+  return useQueryState<string | null>("event", {
+    defaultValue: null,
     clearOnDefault: true,
     history: "push",
     throttleMs: 50,
+    parse: (value) => value || null,
   });
 }
 
@@ -17,7 +19,7 @@ export function useEventDialogParam() {
  * Usage: ?calendars=true
  */
 export function useCalendarsDialogParam() {
-  return useQueryState("calendars", {
+  return useQueryState<"true" | null>("calendars", {
     defaultValue: null,
     clearOnDefault: true,
     history: "push",
@@ -32,7 +34,7 @@ export function useCalendarsDialogParam() {
  * Usage: ?theme=true
  */
 export function useThemeDialogParam() {
-  return useQueryState("theme", {
+  return useQueryState<"true" | null>("theme", {
     defaultValue: null,
     clearOnDefault: true,
     history: "push",
@@ -47,9 +49,40 @@ export function useThemeDialogParam() {
  * Usage: ?realization=<realization-code>
  */
 export function useRealizationDialogParam() {
-  return useQueryState("realization", {
+  return useQueryState<string | null>("realization", {
+    defaultValue: null,
     clearOnDefault: true,
     history: "push",
     throttleMs: 50,
+    parse: (value) => value || null,
+  });
+}
+
+/**
+ * Hook for managing event time edit dialog state via URL query params
+ * Usage: ?editTime=true
+ */
+export function useEventTimeEditDialogParam() {
+  return useQueryState<"true" | null>("editTime", {
+    defaultValue: null,
+    clearOnDefault: true,
+    history: "push",
+    throttleMs: 50,
+    parse: (value) => (value === "true" ? "true" : null),
+    serialize: (value) => (value === "true" ? "true" : ""),
+  });
+}
+
+/**
+ * Hook for managing color customizer dialog state via URL query params
+ * Usage: ?color=<event-id>
+ */
+export function useColorCustomizerDialogParam() {
+  return useQueryState<string | null>("color", {
+    defaultValue: null,
+    clearOnDefault: true,
+    history: "push",
+    throttleMs: 50,
+    parse: (value) => value || null,
   });
 }
