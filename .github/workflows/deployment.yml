@@ -37,7 +37,7 @@ jobs:
           DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
         run: |
           RELEASE_CODE=${{ github.sha }}
-          cd backend
+          cd apps/backend
           docker build -t lukkari-api .
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
           docker tag lukkari-api $DOCKER_USERNAME/$DOCKER_REPO:$RELEASE_CODE

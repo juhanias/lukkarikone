@@ -29,7 +29,7 @@ This is a pretty barebones React Router based project bootstrapped with Vite. Bu
 At the present moment, in production, the frontend builds are being served through a Cloudflare Pages instance, while the backend API is hosted separately. This is subject (and likely) to change in the future.
 
 ### `apps/backend`
-The backend is an Elysia server. The stack is Typescript & Bun, with Prisma ORM. The backend is responsible for proxying & caching data, providing utility endpoints, enforcing business logic & handling user data.
+The backend is an Elysia server. The stack is Typescript & Bun, with Prisma ORM (todo). The backend is responsible for proxying & caching data, providing utility endpoints, enforcing business logic & handling user data (todo!).
 
 
 ### Prerequisites
