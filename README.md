@@ -1,9 +1,9 @@
 <div align="center">
     <br/>
     <p>
-        <img src="public/icon.svg"
+        <img src="apps/frontend/public/icon.svg"
             title="Open Lukkarikone" alt="Open Lukkarikone logo" width="100" />
-        <h1>Open Lukkarikone</h1>
+        <h1>Open Lukkarikone Monorepository</h1>
     </p>
     <p width="120">
         An open-source alternative to the widely used Lukkarikone 4
@@ -20,14 +20,17 @@
 > [!IMPORTANT]
 > Currently only supports the Lukkarikone instance of Turku UAS.
 
-## Development
-This is a pretty barebones React Router based project bootstrapped with Vite.
+## Development & Components
+`juhanias/lukkarikone` is structured as a monorepo. It contains the relevant service components for Open Lukkarikone.
 
-Both the frontend and backend are contained in the same repository. Both utilize Bun and Typescript.
-
-Pull requests welcome. Preferably, issues should be created first to discuss larger changes.
+### `apps/frontend`
+This is a pretty barebones React Router based project bootstrapped with Vite. Bun, TS, Tailwind, Zustand are the main technologies used.
 
 At the present moment, in production, the frontend builds are being served through a Cloudflare Pages instance, while the backend API is hosted separately. This is subject (and likely) to change in the future.
+
+### `apps/backend`
+The backend is an Elysia server. The stack is Typescript & Bun, with Prisma ORM. The backend is responsible for proxying & caching data, providing utility endpoints, enforcing business logic & handling user data.
+
 
 ### Prerequisites
 - [Bun](https://bun.sh/)
