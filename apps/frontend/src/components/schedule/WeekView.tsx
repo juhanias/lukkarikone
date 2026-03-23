@@ -2,14 +2,15 @@ import { addDays, startOfWeek } from "date-fns";
 import { Calendar, Clock, Eye, EyeOff, Palette, Pencil } from "lucide-react";
 import { memo, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { RealizationColorCustomizer } from "@/components/RealizationColorCustomizer";
 import {
   SCHEDULE_LAYOUT,
   START_HOUR,
   WEEK_HOUR_HEIGHT,
 } from "../../constants/schedule-layout-constants";
 import { useCurrentTime } from "../../hooks/useCurrentTime";
-import { useLectureDetailsDialog } from "../../hooks/useLectureDetailsDialog";
 import { useColorCustomizerDialogParam } from "../../hooks/useDialogParams";
+import { useLectureDetailsDialog } from "../../hooks/useLectureDetailsDialog";
 import { useRealizationDialog } from "../../hooks/useRealizationDialog";
 import { RealizationApiService } from "../../services/realizationApi";
 import {
@@ -25,7 +26,6 @@ import { ScheduleUtils } from "../../utils/schedule-utils";
 import { CalendarViewBadge } from "../CalendarViewBadge";
 import { LastUpdatedBadge } from "../LastUpdatedBadge";
 import LectureDetailsDialog from "../LectureDetailsDialog";
-import { RealizationColorCustomizer } from "@/components/RealizationColorCustomizer";
 import RealizationDialog from "../RealizationDialog";
 import {
   ContextMenu,
@@ -285,12 +285,16 @@ const WeekView = memo(
     const currentTimeInHours =
       DateFormatUtils.getCurrentTimeInHours(currentTime);
     const currentTimeString = DateFormatUtils.getCurrentTimeString(currentTime);
+    const weekGridHeight = timeSlots.length * WEEK_HOUR_HEIGHT;
+    const currentTimePosition =
+      (currentTimeInHours - START_HOUR) * WEEK_HOUR_HEIGHT;
     const showCurrentTimeIndicator =
       filteredWeekDates.some((date) => DateFormatUtils.isToday(date)) &&
-      currentTimeInHours >= START_HOUR &&
-      timeSlots.length > 0;
-    const currentTimePosition = showCurrentTimeIndicator
-      ? (currentTimeInHours - START_HOUR) * WEEK_HOUR_HEIGHT
+      weekGridHeight > 0 &&
+      currentTimePosition >= 0 &&
+      currentTimePosition <= weekGridHeight;
+    const currentTimeIndicatorPosition = showCurrentTimeIndicator
+      ? currentTimePosition
       : 0;
 
     // Format week header
@@ -504,7 +508,7 @@ const WeekView = memo(
                       <div
                         className="absolute w-full z-40"
                         style={{
-                          top: `${currentTimePosition}px`,
+                          top: `${currentTimeIndicatorPosition}px`,
                           left: "0",
                           right: "0",
                         }}
@@ -578,11 +582,15 @@ const WeekView = memo(
                             {mergedWeekEvents[date.toDateString()]?.map(
                               (event) => {
                                 const eventStartHour = event.startHour;
-                                const slotHour = parseInt(time.split(":")[0]);
+                                const slotHour = parseInt(
+                                  time.split(":")[0],
+                                  10,
+                                );
                                 const nextSlotHour =
                                   timeIndex < timeSlots.length - 1
                                     ? parseInt(
                                         timeSlots[timeIndex + 1].split(":")[0],
+                                        10,
                                       )
                                     : slotHour + 1;
 

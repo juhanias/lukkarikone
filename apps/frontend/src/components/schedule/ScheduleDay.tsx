@@ -1,14 +1,15 @@
 import { Calendar, Clock, Eye, EyeOff, Palette, Pencil } from "lucide-react";
 import { memo, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { RealizationColorCustomizer } from "@/components/RealizationColorCustomizer";
 import {
   DAY_HOUR_HEIGHT,
   START_HOUR,
 } from "../../constants/schedule-layout-constants";
 import { useCurrentTime } from "../../hooks/useCurrentTime";
+import { useColorCustomizerDialogParam } from "../../hooks/useDialogParams";
 import { useLectureDetailsDialog } from "../../hooks/useLectureDetailsDialog";
 import { useRealizationDialog } from "../../hooks/useRealizationDialog";
-import { useColorCustomizerDialogParam } from "../../hooks/useDialogParams";
 import { RealizationApiService } from "../../services/realizationApi";
 import {
   default as useConfigStore,
@@ -25,7 +26,6 @@ import { ScheduleUtils } from "../../utils/schedule-utils";
 import { CalendarViewBadge } from "../CalendarViewBadge";
 import { LastUpdatedBadge } from "../LastUpdatedBadge";
 import LectureDetailsDialog from "../LectureDetailsDialog";
-import { RealizationColorCustomizer } from "@/components/RealizationColorCustomizer";
 import RealizationDialog from "../RealizationDialog";
 import {
   ContextMenu,
@@ -120,7 +120,7 @@ const ScheduleDay = memo(
       [events],
     );
     const selectedEventForColor = colorEventId
-      ? eventsById.get(colorEventId) ?? null
+      ? (eventsById.get(colorEventId) ?? null)
       : null;
 
     useEffect(() => {
@@ -188,12 +188,16 @@ const ScheduleDay = memo(
     const currentTimeInHours =
       DateFormatUtils.getCurrentTimeInHours(currentTime);
     const currentTimeString = DateFormatUtils.getCurrentTimeString(currentTime);
+    const scheduleHeight = timeSlots.length * DAY_HOUR_HEIGHT;
+    const currentTimePosition =
+      (currentTimeInHours - START_HOUR) * DAY_HOUR_HEIGHT;
     const showCurrentTimeIndicator =
       isToday &&
-      currentTimeInHours >= START_HOUR &&
-      currentTimeInHours <= START_HOUR + timeSlots.length;
-    const currentTimePosition = showCurrentTimeIndicator
-      ? (currentTimeInHours - START_HOUR) * DAY_HOUR_HEIGHT
+      scheduleHeight > 0 &&
+      currentTimePosition >= 0 &&
+      currentTimePosition <= scheduleHeight;
+    const currentTimeIndicatorPosition = showCurrentTimeIndicator
+      ? currentTimePosition
       : 0;
 
     return (
@@ -314,7 +318,7 @@ const ScheduleDay = memo(
                     <div
                       className="absolute z-20"
                       style={{
-                        top: `${currentTimePosition}px`,
+                        top: `${currentTimeIndicatorPosition}px`,
                         left: "-4rem", // Extend to include time column
                         right: "-1rem", // Extend to the edge
                         width: "calc(100% + 5rem)", // Ensure full width coverage
@@ -426,17 +430,18 @@ const ScheduleDay = memo(
                                 {getDisplayTitle(event.title)}
                               </h3>
 
-                              {event.location && eventDurationInHours >= 1.5 && (
-                                <p
-                                  className={`text-xs opacity-90 leading-tight ${
-                                    eventDurationInHours >= 3
-                                      ? "line-clamp-3"
-                                      : "line-clamp-2"
-                                  }`}
-                                >
-                                  {event.location}
-                                </p>
-                              )}
+                              {event.location &&
+                                eventDurationInHours >= 1.5 && (
+                                  <p
+                                    className={`text-xs opacity-90 leading-tight ${
+                                      eventDurationInHours >= 3
+                                        ? "line-clamp-3"
+                                        : "line-clamp-2"
+                                    }`}
+                                  >
+                                    {event.location}
+                                  </p>
+                                )}
 
                               {event.teachers &&
                                 event.teachers.length > 0 &&
