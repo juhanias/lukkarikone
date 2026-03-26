@@ -21,6 +21,10 @@
       "title": "Font Settings",
       "subtitle": "Choose application font",
       "options": {
+        "gabarito-open-sans": {
+          "label": "Gabarito (default)",
+          "subtitle": "The default branding of Open Lukkari"
+        },
         "system": {
           "label": "System Font",
           "subtitle": "Uses device default font"

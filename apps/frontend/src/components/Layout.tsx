@@ -21,7 +21,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const { calendarId } = useParams<{ calendarId: string }>();
   const { getActiveCalendar } = useCalendarStore();
-  const { config, isCurrentThemeLight } = useConfigStore();
+  const isCurrentThemeLight = useConfigStore((state) => state.isCurrentThemeLight);
   const [settingsDialogParam, setSettingsDialogParam] = useSettingsDialogParam();
   const [isDesktop, setIsDesktop] = useState(() => {
     if (typeof window === "undefined") {
@@ -72,12 +72,7 @@ export default function Layout() {
 
   return (
     <div
-      className={cn(
-        "bg-background text-foreground w-full h-full flex flex-col min-w-[320px]",
-        config.font === "lexend"
-          ? "font-[var(--font-lexend)]"
-          : "font-[var(--font-system)]",
-      )}
+      className="bg-background text-foreground w-full h-full flex flex-col min-w-[320px]"
     >
       {/* Header */}
       <header

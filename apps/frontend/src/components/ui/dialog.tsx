@@ -54,9 +54,6 @@ function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
 }) {
-  const dialogFontClass = useConfigStore((state) =>
-    state.config.font === "lexend" ? "font-[var(--font-lexend)]" : "font-[var(--font-system)]",
-  );
   const useEnhancedDialogs = useConfigStore(
     (state) => state.config.enhancedDialogs,
   );
@@ -95,7 +92,6 @@ function DialogContent({
         className={cn(
           "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-2xl border p-6 duration-150 sm:max-w-lg",
           "[transform:translate3d(0,0,0)]",
-          dialogFontClass,
           useEnhancedDialogs ? enhancedClasses : basicClasses,
           className,
         )}

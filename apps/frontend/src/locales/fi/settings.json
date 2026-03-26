@@ -21,6 +21,10 @@
       "title": "Fonttiasetukset",
       "subtitle": "Valitse sovelluksen fontti",
       "options": {
+        "gabarito-open-sans": {
+          "label": "Gabarito (default)",
+          "subtitle": "Avoimen Lukkarin oletusbrändäys!"
+        },
         "system": {
           "label": "Järjestelmäfontti",
           "subtitle": "Käyttää laitteen oletusfonttia"

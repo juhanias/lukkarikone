@@ -7,10 +7,12 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const currentThemeId = useConfigStore((state) => state.config.theme);
+  const currentFontId = useConfigStore((state) => state.config.font);
 
   useEffect(() => {
     document.documentElement.dataset.theme = currentThemeId;
-  }, [currentThemeId]);
+    document.documentElement.dataset.font = currentFontId;
+  }, [currentThemeId, currentFontId]);
 
   return <>{children}</>;
 }

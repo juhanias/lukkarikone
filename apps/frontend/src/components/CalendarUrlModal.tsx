@@ -11,10 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import useConfigStore, {
-  useCalendarStore,
-  useScheduleStore,
-} from "@/state/state-management";
+import { useCalendarStore, useScheduleStore } from "@/state/state-management";
 
 interface CalendarUrlModalProps {
   children: React.ReactNode;
@@ -56,7 +53,6 @@ const QUICK_SETUP_CALENDARS = [
 export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
   const { t } = useTranslation("schedule");
   const { t: tCommon } = useTranslation("common");
-  const { config } = useConfigStore();
   const { refreshSchedule, clearError } = useScheduleStore();
   const { addCalendar, getActiveCalendar } = useCalendarStore();
   const activeCalendar = getActiveCalendar();
@@ -133,21 +129,15 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
   };
 
   return (
-    <div style={{ fontFamily: `var(--font-${config.font})` }}>
+    <div>
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>{children}</DialogTrigger>
-        <DialogContent
-          className="sm:max-w-[525px] max-h-[90vh] overflow-y-auto"
-          style={{
-            fontFamily: `var(--font-${config.font})`,
-          }}
-        >
+        <DialogContent className="sm:max-w-[525px] max-h-[90vh] overflow-y-auto">
           <DialogHeader className="text-left">
             <DialogTitle
               className="flex items-center gap-2"
               style={{
                 color: "var(--color-text)",
-                fontFamily: `var(--font-${config.font})`,
               }}
             >
               <Calendar
@@ -159,7 +149,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
             <DialogDescription
               style={{
                 color: "var(--color-text-secondary)",
-                fontFamily: `var(--font-${config.font})`,
               }}
             >
               {t("calendarModal.description")}
@@ -170,16 +159,12 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
             {/* Quick Setup Options */}
             <div
               className="rounded-md"
-              style={{
-                fontFamily: `var(--font-${config.font})`,
-              }}
             >
               <div className="mb-3">
                 <h4
                   className="font-medium mb-1"
                   style={{
                     color: "var(--color-text)",
-                    fontFamily: `var(--font-${config.font})`,
                   }}
                 >
                   {t("calendarModal.quickSetup.title")}
@@ -188,7 +173,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                   className="text-sm"
                   style={{
                     color: "var(--color-text-secondary)",
-                    fontFamily: `var(--font-${config.font})`,
                   }}
                 >
                   {t("calendarModal.quickSetup.description")}
@@ -217,7 +201,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                           ? "var(--color-accent)"
                           : "var(--color-border)",
                         color: "var(--color-text)",
-                        fontFamily: `var(--font-${config.font})`,
                       }}
                       className="justify-center"
                     >
@@ -240,7 +223,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                 className="text-sm"
                 style={{
                   color: "var(--color-text-secondary)",
-                  fontFamily: `var(--font-${config.font})`,
                 }}
               >
                 {tCommon("actions.or")}
@@ -259,7 +241,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                 className="text-sm font-medium"
                 style={{
                   color: "var(--color-text)",
-                  fontFamily: `var(--font-${config.font})`,
                 }}
               >
                 {t("calendarModal.customUrl.label")}
@@ -282,7 +263,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                     backgroundColor: "var(--color-surface-secondary)",
                     borderColor: "var(--color-border)",
                     color: "var(--color-text)",
-                    fontFamily: `var(--font-${config.font})`,
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
@@ -296,7 +276,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                   className="flex items-center gap-2 text-sm"
                   style={{
                     color: "var(--color-error)",
-                    fontFamily: `var(--font-${config.font})`,
                   }}
                 >
                   <AlertCircle className="h-4 w-4" />
@@ -307,15 +286,11 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
 
             <div
               className="p-3 rounded-md text-sm"
-              style={{
-                fontFamily: `var(--font-${config.font})`,
-              }}
             >
               <p
                 className="font-medium mb-1"
                 style={{
                   color: "var(--color-text)",
-                  fontFamily: `var(--font-${config.font})`,
                 }}
               >
                 Oma ryhmä/kalenteri?
@@ -324,7 +299,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                 className="mb-2"
                 style={{
                   color: "var(--color-text-secondary)",
-                  fontFamily: `var(--font-${config.font})`,
                 }}
               >
                 1. Kirjaudu Turku AMK:n lukkarikoneeseen
@@ -333,7 +307,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                 className="mb-2"
                 style={{
                   color: "var(--color-text-secondary)",
-                  fontFamily: `var(--font-${config.font})`,
                 }}
               >
                 2. Lukujärjestysten hallinta &gt; Luo uusi lukujärjestys
@@ -342,7 +315,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                 className="mb-2"
                 style={{
                   color: "var(--color-text-secondary)",
-                  fontFamily: `var(--font-${config.font})`,
                 }}
               >
                 3. Konfiguroi kalenteriin haluamasi tunnit / ryhmät
@@ -351,7 +323,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                 className="mb-2"
                 style={{
                   color: "var(--color-text-secondary)",
-                  fontFamily: `var(--font-${config.font})`,
                 }}
               >
                 4. Napauta kalenteria &gt; Luo iCal-linkki &gt; Kopioi
@@ -368,7 +339,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                 borderColor: "var(--color-border)",
                 color: "var(--color-text)",
                 backgroundColor: "transparent",
-                fontFamily: `var(--font-${config.font})`,
               }}
             >
               {t("calendarModal.actions.cancel")}
@@ -379,7 +349,6 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
                 backgroundColor: "var(--color-accent)",
                 color: "white",
                 border: "none",
-                fontFamily: `var(--font-${config.font})`,
               }}
             >
               {t("calendarModal.actions.save")}

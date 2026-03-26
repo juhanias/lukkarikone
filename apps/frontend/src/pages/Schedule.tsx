@@ -7,7 +7,7 @@ import {
   subWeeks,
 } from "date-fns";
 import { motion } from "framer-motion";
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, Calendar1, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
@@ -26,10 +26,7 @@ import { CalendarUrlModal } from "../components/CalendarUrlModal";
 import { ScheduleDay, WeekView } from "../components/schedule";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { useDateParam, useViewModeParam } from "../hooks/useScheduleParams";
-import useConfigStore, {
-  useCalendarStore,
-  useScheduleStore,
-} from "../state/state-management";
+import { useCalendarStore, useScheduleStore } from "../state/state-management";
 
 const VIEW_MODES = ["day", "week"] as const;
 
@@ -63,7 +60,6 @@ export default function Schedule() {
     clearError,
     lastUpdated,
   } = useScheduleStore();
-  const { config } = useConfigStore();
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Validate and set active calendar from URL
@@ -317,7 +313,6 @@ export default function Schedule() {
           <DialogContent
             showCloseButton={false}
             className="sm:max-w-[425px]"
-            style={{ fontFamily: `var(--font-${config.font})` }}
           >
             <DialogHeader className="text-center">
               <div className="flex justify-center mb-4">
@@ -330,7 +325,6 @@ export default function Schedule() {
                 className="text-center"
                 style={{
                   color: "var(--color-text)",
-                  fontFamily: `var(--font-${config.font})`,
                 }}
               >
                 {t("calendar.urlMissing")}
@@ -339,7 +333,6 @@ export default function Schedule() {
                 className="text-center"
                 style={{
                   color: "var(--color-text-secondary)",
-                  fontFamily: `var(--font-${config.font})`,
                 }}
               >
                 {t("calendar.urlMissingDescription")}
@@ -353,7 +346,6 @@ export default function Schedule() {
                     backgroundColor: "var(--color-accent)",
                     color: "white",
                     border: "none",
-                    fontFamily: `var(--font-${config.font})`,
                   }}
                 >
                   <Calendar className="h-4 w-4" />
@@ -397,8 +389,8 @@ export default function Schedule() {
           borderColor: "var(--color-border-alpha-30)",
         }}
       >
-        {/* View Tabs */}
-        <div className="w-full max-w-7xl mx-auto px-4 pt-4">
+        {/* View Tabs (mobile) */}
+        <div className="w-full max-w-7xl mx-auto px-4 pt-4 md:hidden">
           <div
             className="flex rounded-lg p-1"
             style={{
@@ -409,24 +401,26 @@ export default function Schedule() {
               onClick={() => setViewMode("day")}
               variant={viewMode === "day" ? "default" : "ghost"}
               size="sm"
-              className="flex-1"
+              className="flex-1 gap-1.5 min-h-9"
             >
-              {t("navigation.day")}
+              <Calendar1 className="h-4 w-4" />
+              <span>{t("navigation.day")}</span>
             </Button>
             <Button
               onClick={() => setViewMode("week")}
               variant={viewMode === "week" ? "default" : "ghost"}
               size="sm"
-              className="flex-1"
+              className="flex-1 gap-1.5 min-h-9"
             >
-              {t("navigation.week")}
+              <Calendar className="h-4 w-4" />
+              <span>{t("navigation.week")}</span>
             </Button>
           </div>
         </div>
 
         {/* Navigation Controls */}
         <div className="flex justify-between items-center p-4">
-          <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
+          <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-3">
             <Button
               onClick={() => handleSwipe("right")}
               disabled={isTransitioning}
@@ -442,27 +436,55 @@ export default function Schedule() {
               <ChevronLeft size={20} />
             </Button>
 
-            <Button
-              onClick={() => {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                if (currentDate.getTime() !== today.getTime()) {
-                  setIsTransitioning(true);
-                  setTimeout(() => {
-                    setDateParam(null); // null means use today
-                    setIsTransitioning(false);
-                  }, 2);
-                }
-              }}
-              size="sm"
-              className="px-4 py-2 rounded-full text-sm font-medium transition-colors"
-              style={{
-                backgroundColor: "var(--color-accent-alpha-20)",
-                color: "var(--color-accent)",
-              }}
-            >
-              {t("navigation.today")}
-            </Button>
+            <div className="flex items-center gap-2 min-w-0">
+              <div
+                className="hidden md:flex rounded-lg p-1"
+                style={{
+                  backgroundColor: "var(--color-surface-secondary-alpha-30)",
+                }}
+              >
+                <Button
+                  onClick={() => setViewMode("day")}
+                  variant={viewMode === "day" ? "default" : "ghost"}
+                  size="sm"
+                  className="gap-1.5 min-w-28 min-h-9"
+                >
+                  <Calendar1 className="h-4 w-4" />
+                  <span>{t("navigation.day")}</span>
+                </Button>
+                <Button
+                  onClick={() => setViewMode("week")}
+                  variant={viewMode === "week" ? "default" : "ghost"}
+                  size="sm"
+                  className="gap-1.5 min-w-28 min-h-9"
+                >
+                  <Calendar className="h-4 w-4" />
+                  <span>{t("navigation.week")}</span>
+                </Button>
+              </div>
+
+              <Button
+                onClick={() => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  if (currentDate.getTime() !== today.getTime()) {
+                    setIsTransitioning(true);
+                    setTimeout(() => {
+                      setDateParam(null); // null means use today
+                      setIsTransitioning(false);
+                    }, 2);
+                  }
+                }}
+                size="sm"
+                className="px-3 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap"
+                style={{
+                  backgroundColor: "var(--color-accent-alpha-20)",
+                  color: "var(--color-accent)",
+                }}
+              >
+                {t("navigation.today")}
+              </Button>
+            </div>
 
             <Button
               onClick={() => handleSwipe("left")}

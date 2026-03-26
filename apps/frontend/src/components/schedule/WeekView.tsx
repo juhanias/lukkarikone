@@ -32,7 +32,6 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuSeparator,
   ContextMenuTrigger,
 } from "../ui/context-menu";
 
@@ -596,7 +595,7 @@ const WeekView = memo(
                                       <ContextMenuTrigger asChild>
                                         <button
                                           type="button"
-                                          className={`absolute rounded text-white text-xs p-1 cursor-pointer overflow-hidden hover:z-20 hover:scale-101 transition-all duration-500 schedule-event-gradient border-none text-left appearance-none flex flex-col items-start justify-start`}
+                                          className={`absolute rounded text-white text-xs p-1 cursor-pointer overflow-hidden schedule-event-gradient schedule-event-gradient-week border-none text-left appearance-none flex flex-col items-start justify-start`}
                                           style={
                                             {
                                               top: `${topOffset}px`,
@@ -611,11 +610,8 @@ const WeekView = memo(
                                                 : 1,
                                               "--normal-gradient":
                                                 colorPair.normal,
-                                              "--hover-gradient":
-                                                colorPair.flipped,
                                             } as React.CSSProperties & {
                                               "--normal-gradient": string;
-                                              "--hover-gradient": string;
                                             }
                                           }
                                           onClick={(e) => {
@@ -657,7 +653,6 @@ const WeekView = memo(
                                           <Calendar className="mr-2 h-4 w-4" />
                                           {tColor("contextMenu.eventDetails")}
                                         </ContextMenuItem>
-                                        <ContextMenuSeparator />
                                         <ContextMenuItem
                                           onClick={() =>
                                             toggleEventVisibility(event)
@@ -675,7 +670,6 @@ const WeekView = memo(
                                             </>
                                           )}
                                         </ContextMenuItem>
-                                        <ContextMenuSeparator />
                                         <ContextMenuItem
                                           onClick={() =>
                                             openColorCustomizer(event)

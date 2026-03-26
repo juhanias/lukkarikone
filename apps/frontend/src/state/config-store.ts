@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Font } from "../types/config";
+import { FONT_OPTIONS, type Font } from "../types/config";
 
 // Color theme definitions
 export interface Theme {
@@ -176,6 +176,16 @@ const sanitizeThemeId = (themeId?: string): string => {
   return themeId;
 };
 
+const isValidFont = (fontId: string): fontId is Font =>
+  FONT_OPTIONS.some((option) => option.value === fontId);
+
+const sanitizeFontId = (fontId?: string): Font => {
+  if (!fontId || !isValidFont(fontId)) {
+    return "gabarito-open-sans";
+  }
+  return fontId;
+};
+
 const isLightTheme = (theme: Theme): boolean => {
   const match = theme.colors.background.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
   if (match) {
@@ -214,7 +224,7 @@ export interface ConfigState {
 }
 
 const defaultConfig: Config = {
-  font: "system",
+  font: "gabarito-open-sans",
   theme: "default",
   showWeekends: false,
   hiddenEventOpacity: 25,
@@ -298,6 +308,7 @@ const mergeConfigWithDefaults = (config?: Partial<Config>): Config => {
   };
 
   mergedConfig.theme = sanitizeThemeId(mergedConfig.theme);
+  mergedConfig.font = sanitizeFontId(mergedConfig.font);
 
   return mergedConfig;
 };

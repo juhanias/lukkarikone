@@ -31,7 +31,6 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuSeparator,
   ContextMenuTrigger,
 } from "../ui/context-menu";
 
@@ -243,7 +242,7 @@ const ScheduleDay = memo(
         </div>
 
         {/* Schedule Container */}
-        <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full">
+        <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
           <div className="flex-1 flex flex-col px-4">
             {events.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center min-h-96 text-muted-foreground">
@@ -352,7 +351,7 @@ const ScheduleDay = memo(
                         <ContextMenuTrigger asChild>
                           <button
                             type="button"
-                            className={`absolute rounded-lg text-white shadow-lg cursor-pointer overflow-hidden transition-colors duration-200 schedule-event-gradient border-none p-0 text-left appearance-none flex flex-col items-start justify-start`}
+                            className={`absolute rounded-lg text-white cursor-pointer overflow-hidden transition-colors duration-200 schedule-event-gradient schedule-event-gradient-day border-none p-0 text-left appearance-none flex flex-col items-start justify-start`}
                             style={
                               {
                                 top: `${(event.startHour - START_HOUR) * DAY_HOUR_HEIGHT}px`,
@@ -367,10 +366,8 @@ const ScheduleDay = memo(
                                   ? config.hiddenEventOpacity / 100
                                   : 1,
                                 "--normal-gradient": colorPair.normal,
-                                "--hover-gradient": colorPair.flipped,
                               } as React.CSSProperties & {
                                 "--normal-gradient": string;
-                                "--hover-gradient": string;
                               }
                             }
                             onClick={() => {
@@ -435,7 +432,6 @@ const ScheduleDay = memo(
                             <Calendar className="mr-2 h-4 w-4" />
                             {tColor("contextMenu.eventDetails")}
                           </ContextMenuItem>
-                          <ContextMenuSeparator />
                           <ContextMenuItem
                             onClick={() => toggleEventVisibility(event)}
                           >
@@ -451,7 +447,6 @@ const ScheduleDay = memo(
                               </>
                             )}
                           </ContextMenuItem>
-                          <ContextMenuSeparator />
                           <ContextMenuItem
                             onClick={() => openColorCustomizer(event)}
                           >
