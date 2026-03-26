@@ -8,6 +8,7 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
+import { cn } from "../lib/utils";
 import { useSettingsDialogParam } from "../hooks/useDialogParams";
 import useConfigStore, { useCalendarStore } from "../state/state-management";
 import { SettingsPanel } from "./SettingsPanel";
@@ -34,6 +35,8 @@ export default function Layout() {
   const isSettingsRoute = location.pathname === "/app/settings";
   const isSettingsModalOpen =
     isDesktop && settingsDialogParam === "true" && !isSettingsRoute;
+  const isCalendarRouteActive =
+    location.pathname.startsWith("/app/") && location.pathname !== "/app/settings";
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -69,33 +72,26 @@ export default function Layout() {
 
   return (
     <div
-      className="w-full h-full flex flex-col min-w-[320px]"
-      style={{
-        fontFamily:
-          config.font === "lexend"
-            ? "'Lexend', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-            : "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-        backgroundColor: "var(--color-background)",
-        color: "var(--color-text)",
-      }}
+      className={cn(
+        "bg-background text-foreground w-full h-full flex flex-col min-w-[320px]",
+        config.font === "lexend"
+          ? "font-[var(--font-lexend)]"
+          : "font-[var(--font-system)]",
+      )}
     >
       {/* Header */}
       <header
-        className="p-4 flex gap-4 justify-between items-center flex-shrink-0"
-        style={{
-          backgroundColor: isCurrentThemeLight()
-            ? "var(--color-header-background)"
-            : "var(--color-surface-alpha-40)", // Match day/week switcher background for dark themes
-          borderBottom: "1px solid var(--color-border-alpha-30)",
-        }}
+        className={cn(
+          "p-4 flex gap-4 justify-between items-center flex-shrink-0 border-b border-[var(--color-border-alpha-30)]",
+          isCurrentThemeLight()
+            ? "bg-[var(--color-header-background)]"
+            : "bg-[var(--color-surface-alpha-40)]",
+        )}
       >
         <div className="w-full max-w-7xl mx-auto flex gap-4 justify-between items-center">
           <Link
             to="/?landing"
-            className="text-xl font-medium transition-colors hover:opacity-80"
-            style={{
-              color: "var(--color-header-text)",
-            }}
+            className="text-xl font-medium transition-colors hover:opacity-80 text-[var(--color-header-text)]"
           >
             juh.fi/lukkari
           </Link>
@@ -106,24 +102,12 @@ export default function Layout() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150"
-                  style={{
-                    backgroundColor:
-                      location.pathname.startsWith("/app/") &&
-                      location.pathname !== "/app/settings"
-                        ? "var(--color-header-accent)"
-                        : "transparent",
-                    color:
-                      location.pathname.startsWith("/app/") &&
-                      location.pathname !== "/app/settings"
-                        ? "white"
-                        : "var(--color-header-text)",
-                    border:
-                      location.pathname.startsWith("/app/") &&
-                      location.pathname !== "/app/settings"
-                        ? "none"
-                        : "1px solid var(--color-border-alpha-30)",
-                  }}
+                  className={cn(
+                    "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150",
+                    isCalendarRouteActive
+                      ? "bg-[var(--color-header-accent)] text-white hover:brightness-95"
+                      : "text-[var(--color-header-text)] border border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-20)]",
+                  )}
                 >
                   <Calendar size={18} />
                 </Button>
@@ -133,23 +117,14 @@ export default function Layout() {
               onClick={handleSettingsClick}
               variant="ghost"
               size="sm"
-                className="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150"
-                style={{
-                  backgroundColor:
-                    isSettingsRoute || isSettingsModalOpen
-                      ? "var(--color-header-accent)"
-                      : "transparent",
-                  color:
-                    isSettingsRoute || isSettingsModalOpen
-                      ? "white"
-                      : "var(--color-header-text)",
-                  border:
-                    isSettingsRoute || isSettingsModalOpen
-                      ? "none"
-                      : "1px solid var(--color-border-alpha-30)",
-                }}
-              >
-                <Settings size={18} />
+              className={cn(
+                "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150",
+                isSettingsRoute || isSettingsModalOpen
+                  ? "bg-[var(--color-header-accent)] text-white hover:brightness-95"
+                  : "text-[var(--color-header-text)] border border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-20)]",
+              )}
+            >
+              <Settings size={18} />
             </Button>
           </nav>
         </div>

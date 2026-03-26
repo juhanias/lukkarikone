@@ -203,7 +203,7 @@ export const CalendarManagementDialog = ({
                       : "transparent",
                 boxShadow:
                   calendar.id === newlyCreatedId
-                    ? "0 4px 12px rgba(var(--color-accent-rgb, 99, 102, 241), 0.2)"
+                    ? "0 4px 12px color-mix(in srgb, var(--color-accent) 20%, transparent)"
                     : "none",
               }}
             >

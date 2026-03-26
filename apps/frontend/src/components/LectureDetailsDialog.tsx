@@ -350,17 +350,14 @@ const LectureDetailsDialog = ({
           <DialogHeader>
             {headerTitle && (
               <DialogTitle
-                className="text-xl font-bold flex items-center gap-2"
-                style={{ color: "var(--color-text)" }}
+                className="text-xl font-bold flex items-center gap-2 text-foreground"
               >
                 <BookOpen className="h-6 w-6 shrink-0" />
                 {headerTitle}
               </DialogTitle>
             )}
             {headerDescription && (
-              <DialogDescription
-                style={{ color: "var(--color-text-secondary)" }}
-              >
+              <DialogDescription className="text-muted-foreground">
                 {headerDescription}
               </DialogDescription>
             )}
@@ -378,19 +375,10 @@ const LectureDetailsDialog = ({
                 style={{ willChange: "transform, opacity" }}
               >
                 {/* Date & Schedule */}
-                <div
-                  className="rounded-lg border overflow-hidden"
-                  style={{
-                    backgroundColor: "var(--color-surface-alpha-40)",
-                    borderColor: "var(--color-border-alpha-30)",
-                  }}
-                >
+                <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h4
-                        className="text-sm font-semibold flex items-center gap-1.5"
-                        style={{ color: "var(--color-text-secondary)" }}
-                      >
+                      <h4 className="text-sm font-semibold flex items-center gap-1.5 text-muted-foreground">
                         <Calendar className="h-4 w-4" />
                         {t("lectureDetailsDialog.schedule")}
                       </h4>
@@ -410,23 +398,14 @@ const LectureDetailsDialog = ({
                       originalEndTime ? (
                         <>
                           {hasDateOverrideChange && (
-                            <p
-                              className="text-sm line-through"
-                              style={{ color: "var(--color-text-secondary)" }}
-                            >
+                            <p className="text-sm line-through text-muted-foreground">
                               {formatDate(originalStartTime)}
                             </p>
                           )}
-                          <p
-                            className="text-sm"
-                            style={{ color: "var(--color-text)" }}
-                          >
+                          <p className="text-sm text-foreground">
                             {formatDate(event.startTime)}
                           </p>
-                          <p
-                            className="text-sm line-through"
-                            style={{ color: "var(--color-text-secondary)" }}
-                          >
+                          <p className="text-sm line-through text-muted-foreground">
                             {formatTime(originalStartTime)} –{" "}
                             {formatTime(originalEndTime)}
                             {typeof originalDuration === "number" && (
@@ -435,38 +414,23 @@ const LectureDetailsDialog = ({
                               </span>
                             )}
                           </p>
-                          <p
-                            className="text-sm"
-                            style={{ color: "var(--color-text)" }}
-                          >
+                          <p className="text-sm text-foreground">
                             {formatTime(event.startTime)} –{" "}
                             {formatTime(event.endTime)}
-                            <span
-                              className="ml-2 text-xs"
-                              style={{ color: "var(--color-text-secondary)" }}
-                            >
+                            <span className="ml-2 text-xs text-muted-foreground">
                               ({getDurationString(event.duration)})
                             </span>
                           </p>
                         </>
                       ) : (
                         <>
-                          <p
-                            className="text-sm"
-                            style={{ color: "var(--color-text)" }}
-                          >
+                          <p className="text-sm text-foreground">
                             {formatDate(event.startTime)}
                           </p>
-                          <p
-                            className="text-sm"
-                            style={{ color: "var(--color-text)" }}
-                          >
+                          <p className="text-sm text-foreground">
                             {formatTime(event.startTime)} –{" "}
                             {formatTime(event.endTime)}
-                            <span
-                              className="ml-2 text-xs"
-                              style={{ color: "var(--color-text-secondary)" }}
-                            >
+                            <span className="ml-2 text-xs text-muted-foreground">
                               ({getDurationString(event.duration)})
                             </span>
                           </p>
@@ -478,25 +442,13 @@ const LectureDetailsDialog = ({
 
                 {/* Location */}
                 {event.location && (
-                  <div
-                    className="rounded-lg border overflow-hidden"
-                    style={{
-                      backgroundColor: "var(--color-surface-alpha-40)",
-                      borderColor: "var(--color-border-alpha-30)",
-                    }}
-                  >
+                  <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
                     <div className="p-4">
-                      <h4
-                        className="text-sm font-semibold mb-2 flex items-center gap-1.5"
-                        style={{ color: "var(--color-text-secondary)" }}
-                      >
+                      <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
                         <MapPin className="h-4 w-4" />
                         {t("lectureDetailsDialog.location")}
                       </h4>
-                      <p
-                        className="text-sm"
-                        style={{ color: "var(--color-text)" }}
-                      >
+                      <p className="text-sm text-foreground">
                         {event.location}
                       </p>
                     </div>
@@ -505,13 +457,7 @@ const LectureDetailsDialog = ({
 
                 {/* People & teachers */}
                 {(hasTeachers || hasGroups) && (
-                  <div
-                    className="rounded-lg border overflow-hidden"
-                    style={{
-                      backgroundColor: "var(--color-surface-alpha-40)",
-                      borderColor: "var(--color-border-alpha-30)",
-                    }}
-                  >
+                  <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
                     <div className="flex flex-col">
                       {hasTeachers && (
                         <div
@@ -523,23 +469,16 @@ const LectureDetailsDialog = ({
                           }
                         >
                           <h4
-                            className="text-sm font-semibold mb-2 flex items-center gap-1.5"
-                            style={{ color: "var(--color-text-secondary)" }}
+                            className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground"
                           >
                             <GraduationCap className="h-4 w-4" />
                             {t("lectureDetailsDialog.teachers")}
                           </h4>
                           <div className="flex flex-wrap gap-1.5">
-                            {teachers.map((teacher, index) => (
+                            {teachers.map((teacher) => (
                               <span
-                                key={`${teacher}-${index}`}
-                                className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
-                                style={{
-                                  backgroundColor: "var(--color-surface)",
-                                  color: "var(--color-text)",
-                                  border:
-                                    "1px solid var(--color-border-alpha-30)",
-                                }}
+                                key={`${event.id}-teacher-${teacher}`}
+                                className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-[var(--color-surface)] text-foreground border border-[var(--color-border-alpha-30)]"
                               >
                                 {teacher}
                               </span>
@@ -551,23 +490,16 @@ const LectureDetailsDialog = ({
                       {hasGroups && (
                         <div className="p-4">
                           <h4
-                            className="text-sm font-semibold mb-2 flex items-center gap-1.5"
-                            style={{ color: "var(--color-text-secondary)" }}
+                            className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground"
                           >
                             <Users className="h-4 w-4" />
                             {t("lectureDetailsDialog.studentGroups")}
                           </h4>
                           <div className="flex flex-wrap gap-1.5">
-                            {groups.map((group, index) => (
+                            {groups.map((group) => (
                               <span
-                                key={`${group}-${index}`}
-                                className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
-                                style={{
-                                  backgroundColor: "var(--color-surface)",
-                                  color: "var(--color-text)",
-                                  border:
-                                    "1px solid var(--color-border-alpha-30)",
-                                }}
+                                key={`${event.id}-group-${group}`}
+                                className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-[var(--color-surface)] text-foreground border border-[var(--color-border-alpha-30)]"
                               >
                                 {group}
                               </span>
@@ -681,17 +613,8 @@ const LectureDetailsDialog = ({
 
                 {/* Info about missing realization data */}
                 {event.title && !hasEffectiveRealizationCode && (
-                  <div
-                    className="rounded-lg p-4 border"
-                    style={{
-                      backgroundColor: "var(--color-surface-alpha-40)",
-                      borderColor: "var(--color-border-alpha-30)",
-                    }}
-                  >
-                    <div
-                      className="flex items-center gap-2"
-                      style={{ color: "var(--color-text-secondary)" }}
-                    >
+                  <div className="rounded-lg p-4 border bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Info className="h-4 w-4 shrink-0" />
                       <span className="text-sm">
                         {t("lectureDetailsDialog.noRealizationData")}{" "}

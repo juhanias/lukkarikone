@@ -11,16 +11,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-[var(--color-accent)] text-white hover:brightness-90 border-none shadow-sm",
+          "bg-primary text-primary-foreground hover:brightness-90 border-none shadow-sm",
         destructive:
-          "bg-[var(--color-error)] text-white hover:brightness-90 border-none shadow-sm",
+          "bg-destructive text-white hover:brightness-90 border-none shadow-sm",
         outline:
-          "bg-transparent text-[var(--color-text)] border border-[var(--color-border)] hover:bg-[var(--color-surface-secondary-alpha-30)] hover:brightness-95 hover:border-[var(--color-accent)] shadow-sm",
+          "bg-transparent text-foreground border border-border hover:bg-secondary/30 hover:brightness-95 hover:border-primary shadow-sm",
         secondary:
-          "bg-[var(--color-surface-secondary)] text-[var(--color-text)] hover:brightness-90 border-none shadow-sm",
+          "bg-secondary text-secondary-foreground hover:brightness-90 border-none shadow-sm",
         ghost:
-          "bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary-alpha-30)] border-none",
-        link: "bg-transparent text-[var(--color-accent)] hover:opacity-80 border-none p-0 h-auto underline-offset-4 hover:underline",
+          "bg-transparent text-muted-foreground hover:bg-secondary/30 hover:text-foreground border-none",
+        link: "bg-transparent text-primary hover:opacity-80 border-none p-0 h-auto underline-offset-4 hover:underline",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

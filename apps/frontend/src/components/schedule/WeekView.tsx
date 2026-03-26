@@ -3,6 +3,7 @@ import { Calendar, Clock, Eye, EyeOff, Palette, Pencil } from "lucide-react";
 import { memo, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RealizationColorCustomizer } from "@/components/RealizationColorCustomizer";
+import { cn } from "@/lib/utils";
 import {
   SCHEDULE_LAYOUT,
   START_HOUR,
@@ -353,12 +354,7 @@ const WeekView = memo(
     return (
       <div className="w-full h-full flex flex-col">
         {/* Week Header */}
-        <div
-          className="w-full flex-shrink-0"
-          style={{
-            background: `linear-gradient(to bottom, var(--color-surface-alpha-40), transparent)`,
-          }}
-        >
+        <div className="w-full flex-shrink-0 bg-[linear-gradient(to_bottom,var(--color-surface-alpha-40),transparent)]">
           <div className="max-w-7xl mx-auto px-4 py-6 relative">
             {/* Mobile Icon Buttons - Top corners */}
             <div className="absolute left-4 top-4 md:hidden">
@@ -376,16 +372,10 @@ const WeekView = memo(
               </div>
             )}
             <div className="text-center">
-              <div
-                className="text-sm mb-1"
-                style={{ color: "var(--color-text-secondary)" }}
-              >
+              <div className="text-sm mb-1 text-muted-foreground">
                 {t("weekView.week")} {formatWeekIndicator()}
               </div>
-              <h2
-                className="text-2xl font-medium"
-                style={{ color: "var(--color-text)" }}
-              >
+              <h2 className="text-2xl font-medium text-foreground">
                 {formatWeekHeader()}
               </h2>
             </div>
@@ -428,10 +418,7 @@ const WeekView = memo(
         <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full">
           <div className="flex-1 flex flex-col px-4">
             {totalEventsThisWeek === 0 ? (
-              <div
-                className="flex-1 flex flex-col items-center justify-center min-h-96"
-                style={{ color: "var(--color-text-secondary)" }}
-              >
+              <div className="flex-1 flex flex-col items-center justify-center min-h-96 text-muted-foreground">
                 <Calendar size={48} className="mb-4 opacity-50" />
                 <p className="text-lg font-medium">{t("weekView.noEvents")}</p>
                 <p className="text-sm opacity-75 mt-1 text-center">
@@ -449,15 +436,9 @@ const WeekView = memo(
                   }}
                 >
                   {/* Day Headers */}
-                  <div
-                    className="sticky top-0 z-50"
-                    style={{ backgroundColor: "var(--color-surface)" }}
-                  >
+                  <div className="sticky top-0 z-50 bg-[var(--color-surface)]">
                     <div className="flex">
-                      <div
-                        className="w-12 flex-shrink-0 border-r"
-                        style={{ borderColor: "var(--color-border-alpha-30)" }}
-                      ></div>
+                      <div className="w-12 flex-shrink-0 border-r border-[var(--color-border-alpha-30)]"></div>
                       {filteredWeekDates.map((date, index) => {
                         const isToday =
                           date.toDateString() === new Date().toDateString();
@@ -465,33 +446,29 @@ const WeekView = memo(
                         return (
                           <div
                             key={date.toDateString()}
-                            className={`flex-1 ${config.squeezeWeekOnMobile ? "" : "min-w-24"} p-2 text-center border-r last:border-r-0`}
-                            style={{
-                              borderColor: "var(--color-border-alpha-30)",
-                              backgroundColor: isLight
-                                ? isToday
-                                  ? "var(--color-header-accent)"
-                                  : "var(--color-accent-alpha-20)"
-                                : isToday
-                                  ? "var(--color-header-accent)"
-                                  : "transparent",
-                            }}
+                            className={cn(
+                              "flex-1 p-2 text-center border-r border-[var(--color-border-alpha-30)] last:border-r-0",
+                              config.squeezeWeekOnMobile ? "" : "min-w-24",
+                              isToday
+                                ? "bg-[var(--color-header-accent)]"
+                                : isLight
+                                  ? "bg-[var(--color-accent-alpha-20)]"
+                                  : "bg-transparent",
+                            )}
                           >
                             <div
-                              className="text-xs font-medium"
-                              style={{
-                                color: isToday
-                                  ? "white"
-                                  : "var(--color-text-secondary)",
-                              }}
+                              className={cn(
+                                "text-xs font-medium",
+                                isToday ? "text-white" : "text-muted-foreground",
+                              )}
                             >
                               {filteredDayNames[index]}
                             </div>
                             <div
-                              className="text-sm font-bold mt-1"
-                              style={{
-                                color: isToday ? "white" : "var(--color-text)",
-                              }}
+                              className={cn(
+                                "text-sm font-bold mt-1",
+                                isToday ? "text-white" : "text-foreground",
+                              )}
                             >
                               {date.getDate()}
                             </div>
@@ -515,8 +492,7 @@ const WeekView = memo(
                       >
                         {/* Time label */}
                         <div
-                          className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1 z-40"
-                          style={{ textShadow: "0 1px 2px rgba(0, 0, 0, 0.8)" }}
+                          className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1 z-40 [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]"
                         >
                           <Clock size={10} />
                           {currentTimeString}
@@ -557,26 +533,20 @@ const WeekView = memo(
                           }}
                         />
 
-                        <div
-                          className="w-12 flex-shrink-0 p-2 text-xs font-medium border-r"
-                          style={{
-                            borderColor: "var(--color-border-alpha-30)",
-                            color: "var(--color-text-secondary)",
-                          }}
-                        >
+                        <div className="w-12 flex-shrink-0 p-2 text-xs font-medium border-r border-[var(--color-border-alpha-30)] text-muted-foreground">
                           {time}
                         </div>
 
                         {filteredWeekDates.map((date) => (
                           <div
                             key={date.toDateString()}
-                            className={`flex-1 ${config.squeezeWeekOnMobile ? "" : "min-w-24"} relative border-r last:border-r-0`}
-                            style={{
-                              borderColor: "var(--color-border-alpha-30)",
-                              backgroundColor: DateFormatUtils.isToday(date)
-                                ? "var(--color-accent-alpha-5)"
-                                : "transparent",
-                            }}
+                            className={cn(
+                              "flex-1 relative border-r border-[var(--color-border-alpha-30)] last:border-r-0",
+                              config.squeezeWeekOnMobile ? "" : "min-w-24",
+                              DateFormatUtils.isToday(date)
+                                ? "bg-[var(--color-accent-alpha-5)]"
+                                : "bg-transparent",
+                            )}
                           >
                             {/* Events for this time slot (includes debug events) */}
                             {mergedWeekEvents[date.toDateString()]?.map(
@@ -678,34 +648,20 @@ const WeekView = memo(
                                           )}
                                         </button>
                                       </ContextMenuTrigger>
-                                      <ContextMenuContent
-                                        style={{
-                                          backgroundColor:
-                                            "var(--color-surface)",
-                                          borderColor: "var(--color-border)",
-                                          color: "var(--color-text)",
-                                        }}
-                                      >
+                                      <ContextMenuContent>
                                         <ContextMenuItem
                                           onClick={() =>
                                             openLectureDetailsDialog(event)
                                           }
-                                          style={{ color: "var(--color-text)" }}
                                         >
                                           <Calendar className="mr-2 h-4 w-4" />
                                           {tColor("contextMenu.eventDetails")}
                                         </ContextMenuItem>
-                                        <ContextMenuSeparator
-                                          style={{
-                                            backgroundColor:
-                                              "var(--color-border)",
-                                          }}
-                                        />
+                                        <ContextMenuSeparator />
                                         <ContextMenuItem
                                           onClick={() =>
                                             toggleEventVisibility(event)
                                           }
-                                          style={{ color: "var(--color-text)" }}
                                         >
                                           {isHidden ? (
                                             <>
@@ -719,19 +675,11 @@ const WeekView = memo(
                                             </>
                                           )}
                                         </ContextMenuItem>
-                                        <ContextMenuSeparator
-                                          style={{
-                                            backgroundColor:
-                                              "var(--color-border)",
-                                          }}
-                                        />
+                                        <ContextMenuSeparator />
                                         <ContextMenuItem
                                           onClick={() =>
                                             openColorCustomizer(event)
                                           }
-                                          style={{
-                                            color: "var(--color-text)",
-                                          }}
                                         >
                                           <Palette className="mr-2 h-4 w-4" />
                                           {tColor("contextMenu.customizeColor")}
