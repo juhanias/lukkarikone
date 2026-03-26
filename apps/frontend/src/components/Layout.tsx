@@ -1,4 +1,6 @@
 import { Calendar, Settings } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Link,
   Outlet,
@@ -6,22 +8,57 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
+import { useSettingsDialogParam } from "../hooks/useDialogParams";
 import useConfigStore, { useCalendarStore } from "../state/state-management";
+import { SettingsPanel } from "./SettingsPanel";
 import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
 
 export default function Layout() {
+  const { t } = useTranslation("settings");
   const location = useLocation();
   const navigate = useNavigate();
   const { calendarId } = useParams<{ calendarId: string }>();
   const { getActiveCalendar } = useCalendarStore();
   const { config, isCurrentThemeLight } = useConfigStore();
+  const [settingsDialogParam, setSettingsDialogParam] = useSettingsDialogParam();
+  const [isDesktop, setIsDesktop] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    return window.matchMedia("(min-width: 1024px)").matches;
+  });
 
   const activeCalendar = getActiveCalendar();
   const calendarPath = calendarId || activeCalendar?.id || "";
+  const isSettingsRoute = location.pathname === "/app/settings";
+  const isSettingsModalOpen =
+    isDesktop && settingsDialogParam === "true" && !isSettingsRoute;
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const updateDesktopState = (event?: MediaQueryListEvent) => {
+      setIsDesktop(event ? event.matches : mediaQuery.matches);
+    };
+
+    updateDesktopState();
+    mediaQuery.addEventListener("change", updateDesktopState);
+
+    return () => mediaQuery.removeEventListener("change", updateDesktopState);
+  }, []);
 
   const handleSettingsClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (location.pathname === "/app/settings") {
+    if (isDesktop && !isSettingsRoute) {
+      setSettingsDialogParam(settingsDialogParam === "true" ? null : "true");
+      return;
+    }
+
+    if (isSettingsRoute) {
       if (calendarPath) {
         navigate(`/app/${calendarPath}`);
       }
@@ -96,23 +133,23 @@ export default function Layout() {
               onClick={handleSettingsClick}
               variant="ghost"
               size="sm"
-              className="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150"
-              style={{
-                backgroundColor:
-                  location.pathname === "/app/settings"
-                    ? "var(--color-header-accent)"
-                    : "transparent",
-                color:
-                  location.pathname === "/app/settings"
-                    ? "white"
-                    : "var(--color-header-text)",
-                border:
-                  location.pathname === "/app/settings"
-                    ? "none"
-                    : "1px solid var(--color-border-alpha-30)",
-              }}
-            >
-              <Settings size={18} />
+                className="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150"
+                style={{
+                  backgroundColor:
+                    isSettingsRoute || isSettingsModalOpen
+                      ? "var(--color-header-accent)"
+                      : "transparent",
+                  color:
+                    isSettingsRoute || isSettingsModalOpen
+                      ? "white"
+                      : "var(--color-header-text)",
+                  border:
+                    isSettingsRoute || isSettingsModalOpen
+                      ? "none"
+                      : "1px solid var(--color-border-alpha-30)",
+                }}
+              >
+                <Settings size={18} />
             </Button>
           </nav>
         </div>
@@ -122,6 +159,18 @@ export default function Layout() {
       <main className="flex-1 flex flex-col overflow-hidden">
         <Outlet />
       </main>
+
+      <Dialog
+        open={isSettingsModalOpen}
+        onOpenChange={(open) => setSettingsDialogParam(open ? "true" : null)}
+      >
+        <DialogContent
+          className="w-[calc(100vw-2rem)] max-w-[1200px] h-[88vh] sm:max-w-[1200px] p-0 overflow-hidden rounded-lg bg-[var(--color-surface-alpha-40)] backdrop-blur-sm"
+        >
+          <DialogTitle className="sr-only">{t("title")}</DialogTitle>
+          <SettingsPanel mode="modal" />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -59,6 +59,7 @@ export function SettingsNavigation({
           return (
             <button
               key={section.id}
+              type="button"
               onClick={() => onSectionClick(section.id)}
               className="w-full text-left px-3 py-2 rounded-lg relative group cursor-pointer transition-colors"
               style={{
@@ -149,15 +150,6 @@ export function SettingsNavigation({
           {formatCommitDate(__GIT_COMMIT_DATE__)}
         </p>
       </div>
-
-      {/* Decorative gradient fade at bottom */}
-      <div
-        className="h-12 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(to bottom, transparent, var(--color-background))",
-        }}
-      />
     </div>
   );
 }
