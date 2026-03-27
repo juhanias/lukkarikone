@@ -21,6 +21,10 @@
       "title": "Font Settings",
       "subtitle": "Choose application font",
       "options": {
+        "gabarito-open-sans": {
+          "label": "Gabarito (default)",
+          "subtitle": "The default branding of Open Lukkari"
+        },
         "system": {
           "label": "System Font",
           "subtitle": "Uses device default font"
@@ -92,7 +96,49 @@
     },
     "theme": {
       "title": "Theme Settings",
-      "subtitle": "Choose application color scheme"
+      "subtitle": "Choose application color scheme",
+      "themes": {
+        "default": {
+          "name": "Blue",
+          "description": "-"
+        },
+        "purple": {
+          "name": "Purple",
+          "description": "-"
+        },
+        "dark-pink": {
+          "name": "Dark Pink",
+          "description": "-"
+        },
+        "boring": {
+          "name": "Boring",
+          "description": "-"
+        },
+        "frog": {
+          "name": "Frog (don't use this one)",
+          "description": "-"
+        },
+        "forest": {
+          "name": "Forest",
+          "description": "-"
+        },
+        "muted-coral": {
+          "name": "Coral",
+          "description": "-"
+        },
+        "casual-ruby": {
+          "name": "Kind of Red",
+          "description": "-"
+        },
+        "olive": {
+          "name": "Olive",
+          "description": "-"
+        },
+        "gold-rush": {
+          "name": "Gold",
+          "description": "-"
+        }
+      }
     },
     "actions": {
       "title": "Actions",

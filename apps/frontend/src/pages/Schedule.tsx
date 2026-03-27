@@ -1,37 +1,34 @@
 import {
   addDays,
+  addMonths,
   addWeeks,
   isToday,
+  startOfMonth,
   startOfWeek,
   subDays,
+  subMonths,
   subWeeks,
 } from "date-fns";
 import { motion } from "framer-motion";
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Calendar,
+  Calendar1,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
+import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { CalendarUrlModal } from "../components/CalendarUrlModal";
-import { ScheduleDay, WeekView } from "../components/schedule";
+import { MonthView, ScheduleDay, WeekView } from "../components/schedule";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { useDateParam, useViewModeParam } from "../hooks/useScheduleParams";
-import useConfigStore, {
-  useCalendarStore,
-  useScheduleStore,
-} from "../state/state-management";
+import { useCalendarStore, useScheduleStore } from "../state/state-management";
 
-const VIEW_MODES = ["day", "week"] as const;
+const VIEW_MODES = ["day", "week", "month"] as const;
 
 export default function Schedule() {
   const { t, i18n } = useTranslation("schedule");
@@ -48,7 +45,7 @@ export default function Schedule() {
   const currentDate = useMemo(() => {
     if (dateParam) {
       const parsed = new Date(dateParam);
-      return isNaN(parsed.getTime()) ? new Date() : parsed;
+      return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
     }
     return new Date();
   }, [dateParam]);
@@ -63,7 +60,6 @@ export default function Schedule() {
     clearError,
     lastUpdated,
   } = useScheduleStore();
-  const { config } = useConfigStore();
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Validate and set active calendar from URL
@@ -88,6 +84,13 @@ export default function Schedule() {
   }, [calendarId, getCalendar, getActiveCalendar, setActiveCalendar, navigate]);
 
   const activeCalendar = getActiveCalendar();
+  const [isOnboardingActive, setIsOnboardingActive] = useState(!activeCalendar);
+
+  useEffect(() => {
+    if (!activeCalendar) {
+      setIsOnboardingActive(true);
+    }
+  }, [activeCalendar]);
 
   const getWeekStart = useCallback((date: Date) => {
     return startOfWeek(date, { weekStartsOn: 1 }); // Monday
@@ -111,6 +114,16 @@ export default function Schedule() {
   const goToPreviousWeek = useCallback(() => {
     const prevWeek = subWeeks(currentDate, 1);
     setDateParam(prevWeek.toISOString().split("T")[0]);
+  }, [currentDate, setDateParam]);
+
+  const goToNextMonth = useCallback(() => {
+    const nextMonth = addMonths(currentDate, 1);
+    setDateParam(nextMonth.toISOString().split("T")[0]);
+  }, [currentDate, setDateParam]);
+
+  const goToPreviousMonth = useCallback(() => {
+    const prevMonth = subMonths(currentDate, 1);
+    setDateParam(prevMonth.toISOString().split("T")[0]);
   }, [currentDate, setDateParam]);
 
   const rotateViewMode = useCallback(
@@ -153,9 +166,12 @@ export default function Schedule() {
   // Get events for the current date (only for day view)
   const currentEvents = viewMode === "day" ? getEventsForDate(currentDate) : [];
   const isWeekView = viewMode === "week";
-  const viewKey = isWeekView
-    ? getWeekStart(currentDate).toDateString()
-    : currentDate.toDateString();
+  const isMonthView = viewMode === "month";
+  const viewKey = isMonthView
+    ? startOfMonth(currentDate).toDateString()
+    : isWeekView
+      ? getWeekStart(currentDate).toDateString()
+      : currentDate.toDateString();
 
   const lastUpdatedDisplay = useMemo(() => {
     if (!lastUpdated) {
@@ -167,7 +183,7 @@ export default function Schedule() {
       lastUpdated instanceof Date ? lastUpdated : new Date(lastUpdated);
 
     // Validate the date
-    if (isNaN(lastUpdatedDate.getTime())) {
+    if (Number.isNaN(lastUpdatedDate.getTime())) {
       return null;
     }
 
@@ -211,11 +227,17 @@ export default function Schedule() {
         } else {
           goToPreviousDay();
         }
-      } else {
+      } else if (viewMode === "week") {
         if (direction === "left") {
           goToNextWeek();
         } else {
           goToPreviousWeek();
+        }
+      } else {
+        if (direction === "left") {
+          goToNextMonth();
+        } else {
+          goToPreviousMonth();
         }
       }
 
@@ -230,6 +252,8 @@ export default function Schedule() {
       goToPreviousDay,
       goToNextWeek,
       goToPreviousWeek,
+      goToNextMonth,
+      goToPreviousMonth,
     ],
   );
 
@@ -302,69 +326,22 @@ export default function Schedule() {
     };
   }, [handleSwipe, rotateViewMode]);
 
+  if (isOnboardingActive) {
+    return (
+      <OnboardingFlow
+        onComplete={() => {
+          setIsOnboardingActive(false);
+          fetchSchedule();
+        }}
+      />
+    );
+  }
+
   return (
     <div
       className="h-full flex flex-col"
       style={{ backgroundColor: "var(--color-background)" }}
     >
-      {/* Calendar Configuration Dialog */}
-      <Dialog open={!activeCalendar} onOpenChange={() => {}}>
-        <DialogPortal>
-          <DialogOverlay
-            className="backdrop-blur-[20px]"
-            style={{ backgroundColor: "var(--color-background-alpha-80)" }}
-          />
-          <DialogContent
-            showCloseButton={false}
-            className="sm:max-w-[425px]"
-            style={{ fontFamily: `var(--font-${config.font})` }}
-          >
-            <DialogHeader className="text-center">
-              <div className="flex justify-center mb-4">
-                <Calendar
-                  className="h-12 w-12"
-                  style={{ color: "var(--color-accent)" }}
-                />
-              </div>
-              <DialogTitle
-                className="text-center"
-                style={{
-                  color: "var(--color-text)",
-                  fontFamily: `var(--font-${config.font})`,
-                }}
-              >
-                {t("calendar.urlMissing")}
-              </DialogTitle>
-              <DialogDescription
-                className="text-center"
-                style={{
-                  color: "var(--color-text-secondary)",
-                  fontFamily: `var(--font-${config.font})`,
-                }}
-              >
-                {t("calendar.urlMissingDescription")}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex gap-3 justify-center pt-4">
-              <CalendarUrlModal>
-                <Button
-                  className="flex items-center gap-2"
-                  style={{
-                    backgroundColor: "var(--color-accent)",
-                    color: "white",
-                    border: "none",
-                    fontFamily: `var(--font-${config.font})`,
-                  }}
-                >
-                  <Calendar className="h-4 w-4" />
-                  {t("calendar.linkCalendar")}
-                </Button>
-              </CalendarUrlModal>
-            </div>
-          </DialogContent>
-        </DialogPortal>
-      </Dialog>
-
       {/* Loading and Error States */}
       {isLoading && (
         <div
@@ -397,8 +374,8 @@ export default function Schedule() {
           borderColor: "var(--color-border-alpha-30)",
         }}
       >
-        {/* View Tabs */}
-        <div className="w-full max-w-7xl mx-auto px-4 pt-4">
+        {/* View Tabs (mobile) */}
+        <div className="w-full max-w-7xl mx-auto px-4 pt-4 md:hidden">
           <div
             className="flex rounded-lg p-1"
             style={{
@@ -409,24 +386,35 @@ export default function Schedule() {
               onClick={() => setViewMode("day")}
               variant={viewMode === "day" ? "default" : "ghost"}
               size="sm"
-              className="flex-1"
+              className="flex-1 gap-1.5 min-h-9"
             >
-              {t("navigation.day")}
+              <Calendar1 className="h-4 w-4" />
+              <span>{t("navigation.day")}</span>
             </Button>
             <Button
               onClick={() => setViewMode("week")}
               variant={viewMode === "week" ? "default" : "ghost"}
               size="sm"
-              className="flex-1"
+              className="flex-1 gap-1.5 min-h-9"
             >
-              {t("navigation.week")}
+              <Calendar className="h-4 w-4" />
+              <span>{t("navigation.week")}</span>
+            </Button>
+            <Button
+              onClick={() => setViewMode("month")}
+              variant={viewMode === "month" ? "default" : "ghost"}
+              size="sm"
+              className="flex-1 gap-1.5 min-h-9"
+            >
+              <CalendarDays className="h-4 w-4" />
+              <span>{t("navigation.month")}</span>
             </Button>
           </div>
         </div>
 
         {/* Navigation Controls */}
         <div className="flex justify-between items-center p-4">
-          <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
+          <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-3">
             <Button
               onClick={() => handleSwipe("right")}
               disabled={isTransitioning}
@@ -442,27 +430,64 @@ export default function Schedule() {
               <ChevronLeft size={20} />
             </Button>
 
-            <Button
-              onClick={() => {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                if (currentDate.getTime() !== today.getTime()) {
-                  setIsTransitioning(true);
-                  setTimeout(() => {
-                    setDateParam(null); // null means use today
-                    setIsTransitioning(false);
-                  }, 2);
-                }
-              }}
-              size="sm"
-              className="px-4 py-2 rounded-full text-sm font-medium transition-colors"
-              style={{
-                backgroundColor: "var(--color-accent-alpha-20)",
-                color: "var(--color-accent)",
-              }}
-            >
-              {t("navigation.today")}
-            </Button>
+            <div className="flex items-center gap-2 min-w-0">
+              <div
+                className="hidden md:flex rounded-lg p-1"
+                style={{
+                  backgroundColor: "var(--color-surface-secondary-alpha-30)",
+                }}
+              >
+                <Button
+                  onClick={() => setViewMode("day")}
+                  variant={viewMode === "day" ? "default" : "ghost"}
+                  size="sm"
+                  className="gap-1.5 min-w-28 min-h-9"
+                >
+                  <Calendar1 className="h-4 w-4" />
+                  <span>{t("navigation.day")}</span>
+                </Button>
+                <Button
+                  onClick={() => setViewMode("week")}
+                  variant={viewMode === "week" ? "default" : "ghost"}
+                  size="sm"
+                  className="gap-1.5 min-w-28 min-h-9"
+                >
+                  <Calendar className="h-4 w-4" />
+                  <span>{t("navigation.week")}</span>
+                </Button>
+                <Button
+                  onClick={() => setViewMode("month")}
+                  variant={viewMode === "month" ? "default" : "ghost"}
+                  size="sm"
+                  className="gap-1.5 min-w-28 min-h-9"
+                >
+                  <CalendarDays className="h-4 w-4" />
+                  <span>{t("navigation.month")}</span>
+                </Button>
+              </div>
+
+              <Button
+                onClick={() => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  if (currentDate.getTime() !== today.getTime()) {
+                    setIsTransitioning(true);
+                    setTimeout(() => {
+                      setDateParam(null); // null means use today
+                      setIsTransitioning(false);
+                    }, 2);
+                  }
+                }}
+                size="sm"
+                className="px-3 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap"
+                style={{
+                  backgroundColor: "var(--color-accent-alpha-20)",
+                  color: "var(--color-accent)",
+                }}
+              >
+                {t("navigation.today")}
+              </Button>
+            </div>
 
             <Button
               onClick={() => handleSwipe("left")}
@@ -505,8 +530,17 @@ export default function Schedule() {
                 isFetchingCalendar={isFetchingCalendar}
                 hasError={!!error}
               />
-            ) : (
+            ) : viewMode === "week" ? (
               <WeekView
+                currentDate={currentDate}
+                setViewMode={setViewMode}
+                lastUpdatedLabel={lastUpdatedDisplay}
+                isCheckingHash={isCheckingHash}
+                isFetchingCalendar={isFetchingCalendar}
+                hasError={!!error}
+              />
+            ) : (
+              <MonthView
                 currentDate={currentDate}
                 setViewMode={setViewMode}
                 lastUpdatedLabel={lastUpdatedDisplay}

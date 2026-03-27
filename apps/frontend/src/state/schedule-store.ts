@@ -270,11 +270,7 @@ export const useScheduleStore = create<ScheduleState>()(
 
       clearError: () => set({ error: null }),
 
-      applyEventTimeOverride: (
-        eventId,
-        override,
-        fallbackOriginal,
-      ) => {
+      applyEventTimeOverride: (eventId, override, fallbackOriginal) => {
         set((state) => {
           const existing = state.events.find((event) => event.id === eventId);
           if (!existing) {
@@ -292,8 +288,9 @@ export const useScheduleStore = create<ScheduleState>()(
               ),
             };
           }
-          const metadataOverride =
-            useEventMetadataStore.getState().getEventTimeOverride(eventId);
+          const metadataOverride = useEventMetadataStore
+            .getState()
+            .getEventTimeOverride(eventId);
           const original = metadataOverride
             ? {
                 startTimeIso: metadataOverride.originalStartTimeIso,

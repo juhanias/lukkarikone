@@ -21,5 +21,5 @@
 
 .opacity-slider-themed [data-slot="slider-thumb"]:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(var(--color-accent-rgb), 0.5);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 50%, transparent);
 }

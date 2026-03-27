@@ -54,19 +54,15 @@ function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
 }) {
-  /** Effective font family that either inherits from browser default, or uses the "cool" font depending on which is set in settings. */
-  const effectiveFontFamily = useConfigStore((state) =>
-    state.config.font !== "system" ? state.config.font : "inherit",
-  );
   const useEnhancedDialogs = useConfigStore(
     (state) => state.config.enhancedDialogs,
   );
   const isLightTheme = useConfigStore((state) => state.isCurrentThemeLight());
 
   const enhancedClasses =
-    "bg-transparent backdrop-blur-xl border-[var(--color-border-alpha-30)] text-[var(--color-text)]";
+    "bg-transparent backdrop-blur-xl border-[var(--color-border-alpha-30)] text-foreground";
   const basicClasses =
-    "bg-[var(--color-surface)] border-[var(--color-border-alpha-30)] text-[var(--color-text)]";
+    "bg-[var(--color-surface)] border-[var(--color-border-alpha-30)] text-foreground";
 
   const enhancedStyle: React.CSSProperties = useEnhancedDialogs
     ? {
@@ -101,7 +97,6 @@ function DialogContent({
         )}
         style={{
           ...(useEnhancedDialogs ? enhancedStyle : {}),
-          fontFamily: effectiveFontFamily,
           ...style,
         }}
         {...props}

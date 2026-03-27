@@ -1,4 +1,4 @@
-export type Font = "system" | "lexend";
+export type Font = "gabarito-open-sans" | "system" | "lexend";
 
 export interface FontOption {
   value: Font;
@@ -8,13 +8,18 @@ export interface FontOption {
 
 export const FONT_OPTIONS: FontOption[] = [
   {
+    value: "gabarito-open-sans",
+    label: "Gabarito (default)",
+    subtitle: "The default branding of Open Lukkari",
+  },
+  {
     value: "system",
-    label: "Järjestelmäfontti",
-    subtitle: "Käyttää laitteen oletusfonttia",
+    label: "System Font",
+    subtitle: "Uses device default font",
   },
   {
     value: "lexend",
-    label: "Lexend-fontti",
-    subtitle: "Optimoitu luettavuudelle",
+    label: "Lexend Font",
+    subtitle: "Optimized for readability and accessibility",
   },
 ] as const;
