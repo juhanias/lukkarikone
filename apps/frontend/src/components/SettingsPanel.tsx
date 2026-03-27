@@ -214,7 +214,7 @@ export function SettingsPanel({ mode = "page" }: SettingsPanelProps) {
                 className="text-xs"
                 style={{ color: "var(--color-text-secondary)", opacity: 0.6 }}
               >
-                Open Lukkarikone by Juhani Astikainen
+                Avoin Lukkari by Juhani Astikainen
               </p>
               <div
                 className="flex items-center justify-center gap-1.5 text-xs"

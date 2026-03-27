@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { RealizationApiService } from "../services/realizationApi";
 import {
   useEventMetadataStore,
@@ -34,6 +35,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "./ui/drawer";
 import {
   Sheet,
   SheetContent,
@@ -70,6 +77,7 @@ const LectureDetailsDialog = ({
 }: LectureDetailsDialogProps) => {
   const { t } = useTranslation("dialogs");
   const { t: tColor } = useTranslation("colorCustomization");
+  const isMobile = useIsMobile();
   const {
     clearEventHidden,
     getEventMetadata,
@@ -343,35 +351,18 @@ const LectureDetailsDialog = ({
   const hasTeachers = teachers.length > 0;
   const hasGroups = groups.length > 0;
 
-  return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-          <DialogHeader>
-            {headerTitle && (
-              <DialogTitle className="text-xl font-bold flex items-center gap-2 text-foreground">
-                <BookOpen className="h-6 w-6 shrink-0" />
-                {headerTitle}
-              </DialogTitle>
-            )}
-            {headerDescription && (
-              <DialogDescription className="text-muted-foreground">
-                {headerDescription}
-              </DialogDescription>
-            )}
-          </DialogHeader>
-
-          <AnimatePresence mode="wait">
-            {event && (
-              <motion.div
-                key="lecture-details"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                className="space-y-4"
-                style={{ willChange: "transform, opacity" }}
-              >
+  const detailsBody = (
+    <AnimatePresence mode="wait">
+      {event && (
+        <motion.div
+          key="lecture-details"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="space-y-4"
+          style={{ willChange: "transform, opacity" }}
+        >
                 {/* Date & Schedule */}
                 <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
                   <div className="p-4">
@@ -654,11 +645,53 @@ const LectureDetailsDialog = ({
                     </div>
                   </div>
                 )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </DialogContent>
-      </Dialog>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
+  return (
+    <>
+      {isMobile ? (
+        <Drawer open={open} onOpenChange={onOpenChange}>
+          <DrawerContent className="h-[90dvh] max-h-[90dvh] border-[var(--color-border-alpha-30)] bg-[var(--color-surface)] p-0 text-foreground">
+            <DrawerHeader className="shrink-0 items-start px-6 pb-3 !text-left group-data-[vaul-drawer-direction=bottom]/drawer-content:!text-left">
+              {headerTitle && (
+                <DrawerTitle className="w-full text-left text-xl font-bold text-foreground">
+                  {headerTitle}
+                </DrawerTitle>
+              )}
+              {headerDescription && (
+                <p className="w-full text-sm text-muted-foreground text-left">
+                  {headerDescription}
+                </p>
+              )}
+            </DrawerHeader>
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
+              {detailsBody}
+            </div>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+            <DialogHeader>
+              {headerTitle && (
+                <DialogTitle className="text-xl font-bold flex items-center gap-2 text-foreground">
+                  <BookOpen className="h-6 w-6 shrink-0" />
+                  {headerTitle}
+                </DialogTitle>
+              )}
+              {headerDescription && (
+                <DialogDescription className="text-muted-foreground">
+                  {headerDescription}
+                </DialogDescription>
+              )}
+            </DialogHeader>
+            {detailsBody}
+          </DialogContent>
+        </Dialog>
+      )}
 
       <AttachRealizationDialog
         open={attachDialogOpen}

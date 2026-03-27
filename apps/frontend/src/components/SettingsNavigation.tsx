@@ -107,7 +107,7 @@ export function SettingsNavigation({
       {/* Author credit and version info */}
       <div className="px-3 mt-4 space-y-1">
         <p className="text-xs text-muted-foreground/60">
-          Open Lukkarikone by Juhani Astikainen
+          Avoin Lukkari by Juhani Astikainen
         </p>
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground/50">
           <GitBranch size={12} />

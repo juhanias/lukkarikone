@@ -12,11 +12,18 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { RealizationApiService } from "../services/realizationApi";
 import { useScheduleStore } from "../state/schedule-store";
 import { useEventMetadataStore } from "../state/state-management";
 import type { ScheduleEvent } from "../types/schedule";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "./ui/drawer";
 
 interface RealizationData {
   name: string;
@@ -127,6 +134,7 @@ const RealizationDialog = ({
   error,
 }: RealizationDialogProps) => {
   const { t, i18n } = useTranslation("dialogs");
+  const isMobile = useIsMobile();
   const [lastRealization, setLastRealization] =
     useState<RealizationData | null>(null);
   const calendarEvents = useScheduleStore((s) => s.events);
@@ -301,34 +309,22 @@ const RealizationDialog = ({
       .map((g) => g.trim())
       .filter(Boolean) ?? [];
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-        <DialogHeader>
-          {headerTitle && (
-            <DialogTitle
-              className="text-xl font-bold flex items-center gap-2"
-              style={{ color: "var(--color-text)" }}
-            >
-              <GraduationCap className="h-6 w-6 shrink-0" />
-              {headerTitle}
-            </DialogTitle>
-          )}
-          {metaBadges.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-1">
-              {metaBadges.map((badge) => (
-                <MetaBadge
-                  key={badge.label}
-                  icon={badge.icon}
-                  label={badge.label}
-                  value={badge.value}
-                />
-              ))}
-            </div>
-          )}
-        </DialogHeader>
+  const detailsBody = (
+    <>
+      {metaBadges.length > 0 && (
+        <div className="flex flex-wrap gap-2 pt-1">
+          {metaBadges.map((badge) => (
+            <MetaBadge
+              key={badge.label}
+              icon={badge.icon}
+              label={badge.label}
+              value={badge.value}
+            />
+          ))}
+        </div>
+      )}
 
-        <AnimatePresence>
+      <AnimatePresence>
           {isLoading && (
             <motion.div
               key="loading"
@@ -774,7 +770,44 @@ const RealizationDialog = ({
               )}
             </motion.div>
           )}
-        </AnimatePresence>
+      </AnimatePresence>
+    </>
+  );
+
+  return isMobile ? (
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="h-[90dvh] max-h-[90dvh] border-[var(--color-border-alpha-30)] bg-[var(--color-surface)] p-0 text-foreground">
+        <DrawerHeader className="shrink-0 px-6 pb-3 text-left">
+          {headerTitle && (
+            <DrawerTitle
+              className="text-xl font-bold flex items-center gap-2"
+              style={{ color: "var(--color-text)" }}
+            >
+              <GraduationCap className="h-6 w-6 shrink-0" />
+              {headerTitle}
+            </DrawerTitle>
+          )}
+        </DrawerHeader>
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
+          {detailsBody}
+        </div>
+      </DrawerContent>
+    </Drawer>
+  ) : (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          {headerTitle && (
+            <DialogTitle
+              className="text-xl font-bold flex items-center gap-2"
+              style={{ color: "var(--color-text)" }}
+            >
+              <GraduationCap className="h-6 w-6 shrink-0" />
+              {headerTitle}
+            </DialogTitle>
+          )}
+        </DialogHeader>
+        {detailsBody}
       </DialogContent>
     </Dialog>
   );
