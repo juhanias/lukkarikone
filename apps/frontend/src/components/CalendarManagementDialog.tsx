@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { PRESET_CALENDARS } from "@/lib/preset-calendars";
 import { useCalendarStore } from "../state/state-management";
 import type { Calendar as CalendarType } from "../types/calendar";
 import { Button } from "./ui/button";
@@ -21,39 +22,6 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Input } from "./ui/input";
-
-const PRESET_ICAL_URLS = [
-  {
-    id: "ptivis25a",
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=9385A6CBC6B79C3DDCE6B2738B5C1B882A6D64CA",
-    label: "PTIVIS25A",
-  },
-  {
-    id: "ptivis25b",
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8",
-    label: "PTIVIS25B",
-  },
-  {
-    id: "ptivis25c",
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=E4AC87D135AF921A83B677DD15A19E6119DDF0BB",
-    label: "PTIVIS25C",
-  },
-  {
-    id: "ptivis25d",
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=E8F13D455EA82E8A7D0990CF6983BBE61AD839A7",
-    label: "PTIVIS25D",
-  },
-  {
-    id: "ptivis25e",
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=346C225AD26BD6966FC656F8E77B5A3EA38A73B5",
-    label: "PTIVIS25E",
-  },
-  {
-    id: "ptivis25f",
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=6EAF3A6D4FC2B07836C2B742EC923629839CA0B7",
-    label: "PTIVIS25F",
-  },
-] as const;
 
 interface CalendarManagementDialogProps {
   open: boolean;
@@ -128,14 +96,14 @@ export const CalendarManagementDialog = ({
   };
 
   const handleAddUrl = (calendarId: string) => {
-    if (newUrlState && newUrlState.url.trim()) {
+    if (newUrlState?.url.trim()) {
       addIcalUrl(calendarId, newUrlState.url.trim());
       setNewUrlState(null);
     }
   };
 
   const handleUpdateUrl = () => {
-    if (editingUrlState && editingUrlState.newUrl.trim()) {
+    if (editingUrlState?.newUrl.trim()) {
       updateIcalUrl(
         editingUrlState.calendarId,
         editingUrlState.oldUrl,
@@ -156,7 +124,7 @@ export const CalendarManagementDialog = ({
 
   // Helper function to get preset name if URL matches a preset
   const getPresetName = (url: string): string | null => {
-    const preset = PRESET_ICAL_URLS.find((p) => p.url === url);
+    const preset = PRESET_CALENDARS.find((p) => p.url === url);
     return preset ? preset.label : null;
   };
 
@@ -329,9 +297,9 @@ export const CalendarManagementDialog = ({
                   </Button>
                 </div>
 
-                {calendar.icalUrls.map((url, index) => (
+                {calendar.icalUrls.map((url) => (
                   <div
-                    key={index}
+                    key={url}
                     className="flex items-center gap-2 p-2 rounded"
                     style={{
                       backgroundColor:
@@ -435,7 +403,7 @@ export const CalendarManagementDialog = ({
                         {t("calendars.quickAdd") || "Quick Add"}
                       </p>
                       <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-                        {PRESET_ICAL_URLS.map((preset) => (
+                        {PRESET_CALENDARS.map((preset) => (
                           <Button
                             key={preset.id}
                             type="button"
@@ -546,6 +514,7 @@ export const CalendarManagementDialog = ({
 
           {/* Create New Calendar */}
           <button
+            type="button"
             onClick={handleCreateCalendar}
             className="w-full border-2 border-dashed rounded-lg p-4 flex items-center justify-center gap-2 hover:opacity-80 transition-opacity"
             style={{

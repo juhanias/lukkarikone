@@ -37,7 +37,7 @@ import {
 
 interface WeekViewProps {
   currentDate: Date;
-  setViewMode: (mode: "day" | "week") => void;
+  setViewMode: (mode: "day" | "week" | "month") => void;
   lastUpdatedLabel?: string | null;
   isCheckingHash?: boolean;
   isFetchingCalendar?: boolean;
@@ -458,7 +458,9 @@ const WeekView = memo(
                             <div
                               className={cn(
                                 "text-xs font-medium",
-                                isToday ? "text-white" : "text-muted-foreground",
+                                isToday
+                                  ? "text-white"
+                                  : "text-muted-foreground",
                               )}
                             >
                               {filteredDayNames[index]}
@@ -490,9 +492,7 @@ const WeekView = memo(
                         }}
                       >
                         {/* Time label */}
-                        <div
-                          className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1 z-40 [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]"
-                        >
+                        <div className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1 z-40 [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
                           <Clock size={10} />
                           {currentTimeString}
                         </div>

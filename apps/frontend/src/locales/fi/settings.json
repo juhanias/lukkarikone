@@ -96,7 +96,49 @@
     },
     "theme": {
       "title": "Teema-asetukset",
-      "subtitle": "Valitse sovelluksen värimaailma"
+      "subtitle": "Valitse sovelluksen värimaailma",
+      "themes": {
+        "default": {
+          "name": "Sininen",
+          "description": "-"
+        },
+        "purple": {
+          "name": "Violetti",
+          "description": "-"
+        },
+        "dark-pink": {
+          "name": "Tummanpinkki",
+          "description": "-"
+        },
+        "boring": {
+          "name": "Boring",
+          "description": "-"
+        },
+        "frog": {
+          "name": "Sammakko (älä käytä tätä)",
+          "description": "-"
+        },
+        "forest": {
+          "name": "Metsä",
+          "description": "-"
+        },
+        "muted-coral": {
+          "name": "Koralli",
+          "description": "-"
+        },
+        "casual-ruby": {
+          "name": "Vähän punainen",
+          "description": "-"
+        },
+        "olive": {
+          "name": "Oliivi",
+          "description": "-"
+        },
+        "gold-rush": {
+          "name": "Kulta",
+          "description": "-"
+        }
+      }
     },
     "actions": {
       "title": "Toiminnot",

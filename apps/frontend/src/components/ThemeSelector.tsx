@@ -29,6 +29,8 @@ export function ThemeSelector({
 }: ThemeSelectorProps) {
   const { getCurrentTheme } = useConfigStore();
   const currentTheme = getCurrentTheme();
+  const normalThemes = themes.filter((theme) => theme.id !== "frog");
+  const uhohThemes = themes.filter((theme) => theme.id === "frog");
 
   // Helper function to convert rgb to rgba with opacity
   const rgbToRgba = (rgb: string, opacity: number): string => {
@@ -39,17 +41,18 @@ export function ThemeSelector({
     return rgb; // fallback if format doesn't match
   };
 
-  return (
+  const renderThemeButtons = (groupThemes: Theme[]) => (
     <div className="flex flex-wrap gap-3">
-      {themes.map((theme) => {
+      {groupThemes.map((theme) => {
         const borderColor = theme.colors.accentSecondary || theme.colors.accent;
 
         return (
           <button
             key={theme.id}
+            type="button"
             className="relative cursor-pointer focus:outline-none"
             onClick={() => onThemeSelect(theme.id)}
-            aria-label={`Select ${theme.id} theme`}
+            aria-label={`Select ${theme.name ?? theme.id} theme`}
           >
             <div
               className="w-12 h-12 rounded-full relative overflow-hidden border-2 transition-colors duration-150"
@@ -90,6 +93,26 @@ export function ThemeSelector({
           </button>
         );
       })}
+    </div>
+  );
+
+  return (
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <p className="text-xs font-semibold text-[var(--color-text-secondary)]">
+          Themes
+        </p>
+        {renderThemeButtons(normalThemes)}
+      </div>
+
+      {uhohThemes.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs font-semibold text-[var(--color-text-secondary)]">
+            uhoh
+          </p>
+          {renderThemeButtons(uhohThemes)}
+        </div>
+      )}
     </div>
   );
 }

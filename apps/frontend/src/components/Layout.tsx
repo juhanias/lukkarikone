@@ -8,8 +8,8 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
-import { cn } from "../lib/utils";
 import { useSettingsDialogParam } from "../hooks/useDialogParams";
+import { cn } from "../lib/utils";
 import useConfigStore, { useCalendarStore } from "../state/state-management";
 import { SettingsPanel } from "./SettingsPanel";
 import { Button } from "./ui/button";
@@ -21,8 +21,11 @@ export default function Layout() {
   const navigate = useNavigate();
   const { calendarId } = useParams<{ calendarId: string }>();
   const { getActiveCalendar } = useCalendarStore();
-  const isCurrentThemeLight = useConfigStore((state) => state.isCurrentThemeLight);
-  const [settingsDialogParam, setSettingsDialogParam] = useSettingsDialogParam();
+  const isCurrentThemeLight = useConfigStore(
+    (state) => state.isCurrentThemeLight,
+  );
+  const [settingsDialogParam, setSettingsDialogParam] =
+    useSettingsDialogParam();
   const [isDesktop, setIsDesktop] = useState(() => {
     if (typeof window === "undefined") {
       return false;
@@ -36,7 +39,8 @@ export default function Layout() {
   const isSettingsModalOpen =
     isDesktop && settingsDialogParam === "true" && !isSettingsRoute;
   const isCalendarRouteActive =
-    location.pathname.startsWith("/app/") && location.pathname !== "/app/settings";
+    location.pathname.startsWith("/app/") &&
+    location.pathname !== "/app/settings";
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -71,9 +75,7 @@ export default function Layout() {
   };
 
   return (
-    <div
-      className="bg-background text-foreground w-full h-full flex flex-col min-w-[320px]"
-    >
+    <div className="bg-background text-foreground w-full h-full flex flex-col min-w-[320px]">
       {/* Header */}
       <header
         className={cn(
@@ -88,7 +90,7 @@ export default function Layout() {
             to="/?landing"
             className="text-xl font-medium transition-colors hover:opacity-80 text-[var(--color-header-text)]"
           >
-            juh.fi/lukkari
+            Avoin Lukkari
           </Link>
           <nav className="flex gap-4 items-center">
             {/* Calendar and Settings buttons (menu placed last) */}
@@ -134,9 +136,7 @@ export default function Layout() {
         open={isSettingsModalOpen}
         onOpenChange={(open) => setSettingsDialogParam(open ? "true" : null)}
       >
-        <DialogContent
-          className="w-[calc(100vw-2rem)] max-w-[1200px] h-[88vh] sm:max-w-[1200px] p-0 overflow-hidden rounded-lg bg-[var(--color-surface-alpha-40)] backdrop-blur-sm"
-        >
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-[1200px] h-[88vh] sm:max-w-[1200px] p-0 overflow-hidden rounded-lg bg-[var(--color-surface-alpha-40)] backdrop-blur-sm">
           <DialogTitle className="sr-only">{t("title")}</DialogTitle>
           <SettingsPanel mode="modal" />
         </DialogContent>

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { PRESET_CALENDARS } from "../lib/preset-calendars";
 import { FONT_OPTIONS, type Font } from "../types/config";
 
 // Color theme definitions
@@ -35,21 +36,21 @@ const getThemes = (): Theme[] => [
     nameKey: "sections.theme.themes.default.name",
     descriptionKey: "sections.theme.themes.default.description",
     colors: {
-      background: "rgb(15, 23, 42)",
-      surface: "rgb(30, 41, 59)",
-      surfaceSecondary: "rgb(51, 65, 85)",
-      border: "rgb(71, 85, 105)",
-      text: "rgb(248, 250, 252)",
-      textSecondary: "rgb(148, 163, 184)",
-      accent: "rgb(59, 130, 246)",
-      accentSecondary: "rgb(37, 99, 235)",
+      background: "rgb(17, 20, 35)",
+      surface: "rgb(28, 33, 52)",
+      surfaceSecondary: "rgb(43, 50, 74)",
+      border: "rgb(82, 92, 130)",
+      text: "rgb(244, 247, 255)",
+      textSecondary: "rgb(167, 177, 211)",
+      accent: "rgb(104, 125, 255)",
+      accentSecondary: "rgb(84, 103, 232)",
       success: "rgb(34, 197, 94)",
       warning: "rgb(245, 158, 11)",
       error: "rgb(239, 68, 68)",
-      headerAccent: "rgb(59, 130, 246)",
-      headerAccentSecondary: "rgb(37, 99, 235)",
-      headerText: "rgb(148, 163, 184)",
-      headerBackground: "rgb(30, 41, 59)",
+      headerAccent: "rgb(104, 125, 255)",
+      headerAccentSecondary: "rgb(84, 103, 232)",
+      headerText: "rgb(167, 177, 211)",
+      headerBackground: "rgb(28, 33, 52)",
     },
   },
   {
@@ -162,6 +163,94 @@ const getThemes = (): Theme[] => [
       headerBackground: "rgb(38, 38, 38)",
     },
   },
+  {
+    id: "muted-coral",
+    nameKey: "sections.theme.themes.muted-coral.name",
+    descriptionKey: "sections.theme.themes.muted-coral.description",
+    colors: {
+      background: "rgb(28, 24, 24)",
+      surface: "rgb(42, 35, 35)",
+      surfaceSecondary: "rgb(60, 50, 50)",
+      border: "rgb(112, 90, 90)",
+      text: "rgb(250, 244, 242)",
+      textSecondary: "rgb(201, 170, 164)",
+      accent: "rgb(214, 128, 112)",
+      accentSecondary: "rgb(190, 104, 90)",
+      success: "rgb(34, 197, 94)",
+      warning: "rgb(245, 158, 11)",
+      error: "rgb(239, 68, 68)",
+      headerAccent: "rgb(214, 128, 112)",
+      headerAccentSecondary: "rgb(190, 104, 90)",
+      headerText: "rgb(201, 170, 164)",
+      headerBackground: "rgb(42, 35, 35)",
+    },
+  },
+  {
+    id: "casual-ruby",
+    nameKey: "sections.theme.themes.casual-ruby.name",
+    descriptionKey: "sections.theme.themes.casual-ruby.description",
+    colors: {
+      background: "rgb(31, 17, 20)",
+      surface: "rgb(48, 25, 30)",
+      surfaceSecondary: "rgb(68, 37, 43)",
+      border: "rgb(119, 68, 77)",
+      text: "rgb(255, 242, 244)",
+      textSecondary: "rgb(224, 172, 180)",
+      accent: "rgb(214, 84, 96)",
+      accentSecondary: "rgb(187, 64, 76)",
+      success: "rgb(34, 197, 94)",
+      warning: "rgb(245, 158, 11)",
+      error: "rgb(239, 68, 68)",
+      headerAccent: "rgb(214, 84, 96)",
+      headerAccentSecondary: "rgb(187, 64, 76)",
+      headerText: "rgb(224, 172, 180)",
+      headerBackground: "rgb(48, 25, 30)",
+    },
+  },
+  {
+    id: "olive",
+    nameKey: "sections.theme.themes.olive.name",
+    descriptionKey: "sections.theme.themes.olive.description",
+    colors: {
+      background: "rgb(24, 28, 20)",
+      surface: "rgb(37, 43, 30)",
+      surfaceSecondary: "rgb(56, 64, 46)",
+      border: "rgb(98, 110, 80)",
+      text: "rgb(246, 248, 240)",
+      textSecondary: "rgb(178, 188, 159)",
+      accent: "rgb(156, 182, 90)",
+      accentSecondary: "rgb(132, 158, 68)",
+      success: "rgb(34, 197, 94)",
+      warning: "rgb(245, 158, 11)",
+      error: "rgb(239, 68, 68)",
+      headerAccent: "rgb(156, 182, 90)",
+      headerAccentSecondary: "rgb(132, 158, 68)",
+      headerText: "rgb(178, 188, 159)",
+      headerBackground: "rgb(37, 43, 30)",
+    },
+  },
+  {
+    id: "gold-rush",
+    nameKey: "sections.theme.themes.gold-rush.name",
+    descriptionKey: "sections.theme.themes.gold-rush.description",
+    colors: {
+      background: "rgb(29, 24, 20)",
+      surface: "rgb(44, 35, 30)",
+      surfaceSecondary: "rgb(63, 50, 42)",
+      border: "rgb(117, 94, 78)",
+      text: "rgb(252, 246, 236)",
+      textSecondary: "rgb(216, 188, 160)",
+      accent: "rgb(220, 170, 96)",
+      accentSecondary: "rgb(194, 144, 73)",
+      success: "rgb(34, 197, 94)",
+      warning: "rgb(245, 158, 11)",
+      error: "rgb(239, 68, 68)",
+      headerAccent: "rgb(220, 170, 96)",
+      headerAccentSecondary: "rgb(194, 144, 73)",
+      headerText: "rgb(216, 188, 160)",
+      headerBackground: "rgb(44, 35, 30)",
+    },
+  },
 ];
 
 export const getListedThemes = (): Theme[] =>
@@ -225,7 +314,7 @@ export interface ConfigState {
 
 const defaultConfig: Config = {
   font: "gabarito-open-sans",
-  theme: "default",
+  theme: "muted-coral",
   showWeekends: false,
   hiddenEventOpacity: 25,
   showCourseIdInSchedule: false,
@@ -242,38 +331,11 @@ export const LEGACY_PTIVIS25B_URL =
 export const UPDATED_PTIVIS25B_URL =
   "http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8";
 
-const PRESET_CALENDARS = [
-  {
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=9385A6CBC6B79C3DDCE6B2738B5C1B882A6D64CA",
-    name: "PTIVIS25A",
-  },
-  {
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8",
-    name: "PTIVIS25B",
-  },
-  {
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=E4AC87D135AF921A83B677DD15A19E6119DDF0BB",
-    name: "PTIVIS25C",
-  },
-  {
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=E8F13D455EA82E8A7D0990CF6983BBE61AD839A7",
-    name: "PTIVIS25D",
-  },
-  {
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=346C225AD26BD6966FC656F8E77B5A3EA38A73B5",
-    name: "PTIVIS25E",
-  },
-  {
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=6EAF3A6D4FC2B07836C2B742EC923629839CA0B7",
-    name: "PTIVIS25F",
-  },
-] as const;
-
 const normalizeCalendarUrl = (url: string): string => url.trim();
 
 export const getPresetCalendarName = (url: string): string | null => {
   const preset = PRESET_CALENDARS.find((p) => p.url === url);
-  return preset ? preset.name : null;
+  return preset ? preset.label : null;
 };
 
 export const migrateCalendarUrl = (url: string): string => {
@@ -317,7 +379,7 @@ const useConfigStore = create<ConfigState>()(
   persist(
     (set, get) => ({
       config: mergeConfigWithDefaults(defaultConfig),
-      previousTheme: "default",
+      previousTheme: "muted-coral",
       getThemes,
       getListedThemes,
       getAllThemes,
@@ -326,7 +388,10 @@ const useConfigStore = create<ConfigState>()(
           config: mergeConfigWithDefaults({ ...state.config, ...partial }),
         })),
       resetConfig: () =>
-        set({ config: mergeConfigWithDefaults(), previousTheme: "default" }),
+        set({
+          config: mergeConfigWithDefaults(),
+          previousTheme: "muted-coral",
+        }),
       getCurrentTheme: () => {
         const { config } = get();
         const themes = getAllThemes();
@@ -338,8 +403,8 @@ const useConfigStore = create<ConfigState>()(
       },
       toggleLightDarkMode: () => {
         set((state) => ({
-          config: { ...state.config, theme: "default" },
-          previousTheme: "default",
+          config: { ...state.config, theme: "muted-coral" },
+          previousTheme: "muted-coral",
         }));
       },
     }),

@@ -65,7 +65,6 @@ export function ThemeDialog() {
               selectedThemeId={config.theme}
               onThemeSelect={(themeId) => {
                 setConfig({ theme: themeId });
-                setThemeParam(null);
               }}
             />
           </div>

@@ -11,44 +11,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { PRESET_CALENDARS } from "@/lib/preset-calendars";
 import { useCalendarStore, useScheduleStore } from "@/state/state-management";
 
 interface CalendarUrlModalProps {
   children: React.ReactNode;
 }
 
-const QUICK_SETUP_CALENDARS = [
-  {
-    id: "ptivis25a",
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=9385A6CBC6B79C3DDCE6B2738B5C1B882A6D64CA",
-    fallbackLabel: "PTIVIS25A",
-  },
-  {
-    id: "ptivis25b",
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=6DDA4ADC8FD96BC395D68B8B15340B543D74E3D8",
-    fallbackLabel: "PTIVIS25B",
-  },
-  {
-    id: "ptivis25c",
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=E4AC87D135AF921A83B677DD15A19E6119DDF0BB",
-    fallbackLabel: "PTIVIS25C",
-  },
-  {
-    id: "ptivis25d",
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=E8F13D455EA82E8A7D0990CF6983BBE61AD839A7",
-    fallbackLabel: "PTIVIS25D",
-  },
-  {
-    id: "ptivis25e",
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=346C225AD26BD6966FC656F8E77B5A3EA38A73B5",
-    fallbackLabel: "PTIVIS25E",
-  },
-  {
-    id: "ptivis25f",
-    url: "http://lukkari.turkuamk.fi/ical.php?hash=6EAF3A6D4FC2B07836C2B742EC923629839CA0B7",
-    fallbackLabel: "PTIVIS25F",
-  },
-] as const;
+const QUICK_SETUP_CALENDARS = PRESET_CALENDARS.map((preset) => ({
+  id: preset.id,
+  url: preset.url,
+  fallbackLabel: preset.label,
+}));
 
 export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
   const { t } = useTranslation("schedule");
@@ -157,9 +131,7 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
 
           <div className="space-y-4 py-4">
             {/* Quick Setup Options */}
-            <div
-              className="rounded-md"
-            >
+            <div className="rounded-md">
               <div className="mb-3">
                 <h4
                   className="font-medium mb-1"
@@ -284,9 +256,7 @@ export function CalendarUrlModal({ children }: CalendarUrlModalProps) {
               )}
             </div>
 
-            <div
-              className="p-3 rounded-md text-sm"
-            >
+            <div className="p-3 rounded-md text-sm">
               <p
                 className="font-medium mb-1"
                 style={{
