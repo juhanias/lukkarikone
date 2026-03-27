@@ -2,7 +2,10 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useEventMetadataStore, useScheduleStore } from "../state/state-management";
+import {
+  useEventMetadataStore,
+  useScheduleStore,
+} from "../state/state-management";
 import type { ScheduleEvent } from "../types/schedule";
 import { ScheduleUtils } from "../utils/schedule-utils";
 import { ActionButton } from "./ui/ActionButton";
@@ -159,10 +162,7 @@ const EventTimeEditDialog = ({
             </div>
             <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-between"
-                >
+                <Button variant="outline" className="w-full justify-between">
                   <span>
                     {selectedDate
                       ? format(selectedDate, "PPP")
@@ -234,7 +234,9 @@ const EventTimeEditDialog = ({
                 type="time"
                 ref={endTimeRef}
                 value={endTimeValue}
-                onChange={(eventInput) => setEndTimeValue(eventInput.target.value)}
+                onChange={(eventInput) =>
+                  setEndTimeValue(eventInput.target.value)
+                }
                 className="bg-[var(--color-surface)] border-[var(--color-border-alpha-30)] text-[var(--color-text)] focus-visible:border-[var(--color-accent)] focus-visible:ring-[var(--color-accent)]/30 [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-calendar-picker-indicator]:invert"
               />
             </div>

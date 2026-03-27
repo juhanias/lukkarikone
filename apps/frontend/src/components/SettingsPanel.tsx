@@ -25,7 +25,10 @@ function SettingGroup({ group }: { group: SettingComponentGroup }) {
         className="w-full flex items-center justify-between p-4 hover:bg-[var(--color-surface-secondary-alpha-20)] transition-colors"
       >
         <div className="flex-1 text-left">
-          <div className="font-medium text-sm" style={{ color: "var(--color-text)" }}>
+          <div
+            className="font-medium text-sm"
+            style={{ color: "var(--color-text)" }}
+          >
             {group.groupName}
           </div>
           {group.groupDescription && (
@@ -46,7 +49,10 @@ function SettingGroup({ group }: { group: SettingComponentGroup }) {
       {isExpanded && (
         <div className="px-4 pb-4 pt-0 space-y-4 border-t border-[var(--color-border-alpha-20)]">
           {group.components.map((component) => (
-            <SettingsComponentRenderer key={component.id} component={component} />
+            <SettingsComponentRenderer
+              key={component.id}
+              component={component}
+            />
           ))}
         </div>
       )}

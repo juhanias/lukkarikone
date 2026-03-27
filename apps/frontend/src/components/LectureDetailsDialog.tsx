@@ -349,9 +349,7 @@ const LectureDetailsDialog = ({
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             {headerTitle && (
-              <DialogTitle
-                className="text-xl font-bold flex items-center gap-2 text-foreground"
-              >
+              <DialogTitle className="text-xl font-bold flex items-center gap-2 text-foreground">
                 <BookOpen className="h-6 w-6 shrink-0" />
                 {headerTitle}
               </DialogTitle>
@@ -468,9 +466,7 @@ const LectureDetailsDialog = ({
                               : undefined
                           }
                         >
-                          <h4
-                            className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground"
-                          >
+                          <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
                             <GraduationCap className="h-4 w-4" />
                             {t("lectureDetailsDialog.teachers")}
                           </h4>
@@ -489,9 +485,7 @@ const LectureDetailsDialog = ({
 
                       {hasGroups && (
                         <div className="p-4">
-                          <h4
-                            className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground"
-                          >
+                          <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
                             <Users className="h-4 w-4" />
                             {t("lectureDetailsDialog.studentGroups")}
                           </h4>
