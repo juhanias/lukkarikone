@@ -251,6 +251,28 @@ const getThemes = (): Theme[] => [
       headerBackground: "rgb(44, 35, 30)",
     },
   },
+  {
+    id: "dyne",
+    nameKey: "sections.theme.themes.dyne.name",
+    descriptionKey: "sections.theme.themes.dyne.description",
+    colors: {
+      background: "rgb(16, 20, 39)",
+      surface: "rgb(26, 33, 57)",
+      surfaceSecondary: "rgb(40, 50, 80)",
+      border: "rgb(86, 98, 142)",
+      text: "rgb(244, 247, 255)",
+      textSecondary: "rgb(179, 184, 204)",
+      accent: "rgb(242, 162, 51)",
+      accentSecondary: "rgb(238, 147, 45)",
+      success: "rgb(34, 197, 94)",
+      warning: "rgb(245, 158, 11)",
+      error: "rgb(239, 68, 68)",
+      headerAccent: "rgb(242, 162, 51)",
+      headerAccentSecondary: "rgb(238, 147, 45)",
+      headerText: "rgb(179, 184, 204)",
+      headerBackground: "rgb(26, 33, 57)",
+    },
+  },
 ];
 
 export const getListedThemes = (): Theme[] =>

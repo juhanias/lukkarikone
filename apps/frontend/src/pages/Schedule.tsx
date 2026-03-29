@@ -387,7 +387,7 @@ export default function Schedule() {
               onClick={() => setViewMode("day")}
               variant={viewMode === "day" ? "default" : "ghost"}
               size="sm"
-              className="flex-1 gap-1.5 min-h-9"
+              className="flex-1 gap-1.5 min-h-9 [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]"
             >
               <Calendar1 className="h-4 w-4" />
               <span>{t("navigation.day")}</span>
@@ -396,7 +396,7 @@ export default function Schedule() {
               onClick={() => setViewMode("week")}
               variant={viewMode === "week" ? "default" : "ghost"}
               size="sm"
-              className="flex-1 gap-1.5 min-h-9"
+              className="flex-1 gap-1.5 min-h-9 [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]"
             >
               <Calendar className="h-4 w-4" />
               <span>{t("navigation.week")}</span>
@@ -405,7 +405,7 @@ export default function Schedule() {
               onClick={() => setViewMode("month")}
               variant={viewMode === "month" ? "default" : "ghost"}
               size="sm"
-              className="flex-1 gap-1.5 min-h-9"
+              className="flex-1 gap-1.5 min-h-9 [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]"
             >
               <CalendarDays className="h-4 w-4" />
               <span>{t("navigation.month")}</span>
@@ -442,7 +442,7 @@ export default function Schedule() {
                   onClick={() => setViewMode("day")}
                   variant={viewMode === "day" ? "default" : "ghost"}
                   size="sm"
-                  className="gap-1.5 min-w-28 min-h-9"
+                  className="gap-1.5 min-w-28 min-h-9 [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]"
                 >
                   <Calendar1 className="h-4 w-4" />
                   <span>{t("navigation.day")}</span>
@@ -451,7 +451,7 @@ export default function Schedule() {
                   onClick={() => setViewMode("week")}
                   variant={viewMode === "week" ? "default" : "ghost"}
                   size="sm"
-                  className="gap-1.5 min-w-28 min-h-9"
+                  className="gap-1.5 min-w-28 min-h-9 [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]"
                 >
                   <Calendar className="h-4 w-4" />
                   <span>{t("navigation.week")}</span>
@@ -460,7 +460,7 @@ export default function Schedule() {
                   onClick={() => setViewMode("month")}
                   variant={viewMode === "month" ? "default" : "ghost"}
                   size="sm"
-                  className="gap-1.5 min-w-28 min-h-9"
+                  className="gap-1.5 min-w-28 min-h-9 [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]"
                 >
                   <CalendarDays className="h-4 w-4" />
                   <span>{t("navigation.month")}</span>

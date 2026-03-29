@@ -137,6 +137,10 @@
         "gold-rush": {
           "name": "Gold",
           "description": "-"
+        },
+        "dyne": {
+          "name": "Dyne",
+          "description": "-"
         }
       }
     },

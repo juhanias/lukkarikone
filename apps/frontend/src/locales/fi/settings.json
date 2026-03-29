@@ -137,6 +137,10 @@
         "gold-rush": {
           "name": "Kulta",
           "description": "-"
+        },
+        "dyne": {
+          "name": "Dyne",
+          "description": "-"
         }
       }
     },

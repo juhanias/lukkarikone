@@ -331,6 +331,24 @@
   --color-header-background: rgb(44, 35, 30);
 }
 
+:root[data-theme="dyne"] {
+  --color-background: rgb(16, 20, 39);
+  --color-surface: rgb(26, 33, 57);
+  --color-surface-secondary: rgb(40, 50, 80);
+  --color-border: rgb(86, 98, 142);
+  --color-text: rgb(244, 247, 255);
+  --color-text-secondary: rgb(179, 184, 204);
+  --color-accent: rgb(242, 162, 51);
+  --color-accent-secondary: rgb(238, 147, 45);
+  --color-success: rgb(34, 197, 94);
+  --color-warning: rgb(245, 158, 11);
+  --color-error: rgb(239, 68, 68);
+  --color-header-accent: rgb(242, 162, 51);
+  --color-header-accent-secondary: rgb(238, 147, 45);
+  --color-header-text: rgb(179, 184, 204);
+  --color-header-background: rgb(26, 33, 57);
+}
+
 @layer base {
   html,
   body,
