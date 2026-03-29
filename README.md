@@ -2,8 +2,8 @@
     <br/>
     <p>
         <img src="apps/frontend/public/icon.svg"
-            title="Open Lukkarikone" alt="Open Lukkarikone logo" width="100" />
-        <h1>Open Lukkarikone Monorepository</h1>
+            title="Avoin Lukkari" alt="Avoin Lukkari logo" width="100" />
+        <h1>Avoin Lukkari Monorepository</h1>
     </p>
     <p width="120">
         An open-source alternative to the widely used Lukkarikone 4
@@ -21,7 +21,7 @@
 > Currently only supports the Lukkarikone instance of Turku UAS.
 
 ## Development & Components
-`juhanias/lukkarikone` is structured as a monorepo. It contains the relevant service components for Open Lukkarikone.
+`juhanias/lukkarikone` is structured as a monorepo. It contains the relevant service components for Avoin Lukkari.
 
 ### `apps/frontend`
 This is a pretty barebones React Router based project bootstrapped with Vite. Bun, TS, Tailwind, Zustand are the main technologies used.

@@ -31,7 +31,7 @@
   },
   "calendars": {
     "title": "Calendars",
-    "description": "View multiple calendars overlayed together. Add iCal URLs to see all events in one place.",
+    "description": "Need to switch between schedules or overlay them? Create additional calendars here!",
     "active": "Active",
     "setActive": "Switch to this calendar",
     "confirmDelete": "Delete this calendar?",

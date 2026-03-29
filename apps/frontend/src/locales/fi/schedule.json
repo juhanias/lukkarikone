@@ -15,13 +15,74 @@
   "navigation": {
     "day": "Päivä",
     "week": "Viikko",
+    "month": "Kuukausi",
     "today": "Tänään"
+  },
+  "monthView": {
+    "subtitle": "Kuukauden yleisnäkymä",
+    "highlights": "Nostoja",
+    "scheduledHours": "Aikataulutettu",
+    "hidden": "Piilotettu",
+    "gapHours": "Hyppytunnit",
+    "timeConsumption": "Aikajakauma",
+    "noEvents": "Ei tapahtumia tässä kuussa"
   },
   "title": "Lukujärjestys",
   "calendar": {
-    "urlMissing": "Laitetaan kalenteri pystyyn!",
-    "urlMissingDescription": "Et ole vielä yhdistänyt lukujärjestystäsi näkymään. Tämä on nopea prosessi!",
+    "urlMissing": "Yhdistä kalenteri",
+    "urlMissingDescription": "Lisää Turku AMK:n iCal-lähde, jotta lukujärjestys voidaan näyttää.",
     "linkCalendar": "Linkkaa kalenteri"
+  },
+  "onboarding": {
+    "title": "Lukujärjestyksen käyttöönotto",
+    "description": "Valitse ryhmä tai lisää iCal.",
+    "progress": {
+      "label": "Vaihe {{current}} / {{total}}"
+    },
+    "steps": {
+      "calendar": "Kalenteri",
+      "theme": "Teema"
+    },
+    "calendarStep": {
+      "title": "Yhdistä kalenteri",
+      "description": "Valitse valmis ryhmä tai liitä oma iCal-osoitteesi.",
+      "selectTitle": "Valitse ryhmä",
+      "subtitle": "Mihin ryhmään kuulut? Jos sinulla on erillisiä tunteja, joita ei ole muun ryhmän lukujärjestyksessä, harkitse oman kalenterin käyttöä.",
+      "quickSetup": {
+        "title": "Pika-asetus",
+        "description": "Valitse ryhmä, niin kalenterilähde asetetaan automaattisesti."
+      },
+      "custom": {
+        "title": "Käytä omaa iCal-osoitetta",
+        "description": "Liitä Turku AMK:n iCal-osoite.",
+        "label": "Kalenterin URL",
+        "placeholder": "https://lukkari.turkuamk.fi/ical.php?hash=...",
+        "save": "Jatka",
+        "back": "Takaisin ryhmiin"
+      },
+      "customNotFound": "En löydä ryhmääni! / Haluan käyttää omaa kalenteria",
+      "guide": {
+        "title": "Miten saat iCal-linkin",
+        "step1": "Kirjaudu Turku AMK:n Lukkarikoneeseen.",
+        "step2": "Avaa lukujärjestysten hallinta ja luo tai muokkaa lukujärjestystä.",
+        "step3": "Valitse haluamasi ryhmät ja tapahtumat.",
+        "step4": "Avaa lukujärjestys, luo iCal-linkki ja kopioi se."
+      }
+    },
+    "themeStep": {
+      "title": "Valitse teema",
+      "description": "Valinnainen",
+      "subtitle": "Meillä ei ole värisuunnittelijoita. Lähetä timanttiset teemaideasi osoitteeseen avoinlukkari@juh.fi.",
+      "actions": {
+        "back": "Takaisin",
+        "done": "Viimeistele"
+      }
+    },
+    "validation": {
+      "required": "Kalenterin URL on pakollinen",
+      "invalid": "Anna kelvollinen URL-osoite",
+      "mustBeTurkuAmk": "URL:n tulee olla Turku AMK:n kalenterijärjestelmästä"
+    }
   },
   "loading": {
     "schedule": "Ladataan lukkaria..."
@@ -99,17 +160,23 @@
   },
   "calendarModal": {
     "title": "Määritä kalenterin URL",
-    "description": "Valitse PTIVIS25-ryhmäsi pikasetupilla tai anna oma kalenterisi URL-osoite.",
+    "description": "Käytä pika-asetusta yleisille ryhmille tai anna oma Turku AMK -iCal-osoitteesi.",
     "quickSetup": {
-      "title": "PTIVIS25 pikasetup",
-      "description": "Valitse ryhmäsi, niin kalenterin URL asetetaan automaattisesti.",
+      "title": "Pika-asetus",
+      "description": "Valitse ryhmä, niin kalenterin URL asetetaan automaattisesti.",
       "groups": {
         "ptivis25a": "PTIVIS25A",
         "ptivis25b": "PTIVIS25B",
         "ptivis25c": "PTIVIS25C",
         "ptivis25d": "PTIVIS25D",
         "ptivis25e": "PTIVIS25E",
-        "ptivis25f": "PTIVIS25F"
+        "ptivis25f": "PTIVIS25F",
+        "ptivis26a": "PTIVIS26A",
+        "ptivis26b": "PTIVIS26B",
+        "ptivis26c": "PTIVIS26C",
+        "ptivis26d": "PTIVIS26D",
+        "ptivis26e": "PTIVIS26E",
+        "ptivis26f": "PTIVIS26F"
       }
     },
     "customUrl": {

@@ -1,4 +1,4 @@
-﻿export { default as useCalendarStore } from "./calendar-store";
+export { default as useCalendarStore } from "./calendar-store";
 export { type ConfigState, default as useConfigStore } from "./config-store";
 export { useEventMetadataStore } from "./event-metadata-store";
 export { useRealizationMetadataStore } from "./realization-metadata-store";

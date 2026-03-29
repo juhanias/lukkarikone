@@ -86,3 +86,18 @@ export function useColorCustomizerDialogParam() {
     parse: (value) => value || null,
   });
 }
+
+/**
+ * Hook for managing settings modal state via URL query params
+ * Usage: ?settings=true
+ */
+export function useSettingsDialogParam() {
+  return useQueryState<"true" | null>("settings", {
+    defaultValue: null,
+    clearOnDefault: true,
+    history: "push",
+    throttleMs: 50,
+    parse: (value) => (value === "true" ? "true" : null),
+    serialize: (value) => (value === "true" ? "true" : ""),
+  });
+}

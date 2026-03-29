@@ -83,7 +83,7 @@
     },
     "noRealizationData": "Tälle tapahtumalle ei ole saatavilla yksityiskohtaisia toteutustietoja.",
     "noRealizationWhyNot": "Miksi ei?",
-    "noRealizationWhyNotExplanation": "Open Lukkarikone liittää tapahtumat toteutuksiin nimen toteutuskoodin perusteella (esim. kh00cz65-3020). Jos tämä toteutuskoodi puuttuu, sovellus ei voi tietää, mihin toteutukseen tapahtuma kuuluu. Jokaisessa kalenterisi tapahtumassa pitäisi oletuksena olla toteutuskoodi.",
+    "noRealizationWhyNotExplanation": "Avoin Lukkari liittää tapahtumat toteutuksiin nimen toteutuskoodin perusteella (esim. kh00cz65-3020). Jos tämä toteutuskoodi puuttuu, sovellus ei voi tietää, mihin toteutukseen tapahtuma kuuluu. Jokaisessa kalenterisi tapahtumassa pitäisi oletuksena olla toteutuskoodi.",
     "hideCourse": "Piilota toteutus",
     "showCourse": "Näytä toteutus",
     "hideCourseDialog": {

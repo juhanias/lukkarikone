@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
  * Sets document.title while the component using this hook is mounted.
  * Restores the previous title on unmount.
  *
- * Usage: useDocumentTitle('Page — lukkari.juh.fi')
+ * Usage: useDocumentTitle('Page — Avoin Lukkari')
  */
 export default function useDocumentTitle(title?: string) {
   const previousTitleRef = useRef<string | null>(null);

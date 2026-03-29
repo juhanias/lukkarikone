@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { RealizationApiService } from "../services/realizationApi";
 import {
   useEventMetadataStore,
@@ -34,6 +35,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "./ui/drawer";
 import {
   Sheet,
   SheetContent,
@@ -70,6 +77,7 @@ const LectureDetailsDialog = ({
 }: LectureDetailsDialogProps) => {
   const { t } = useTranslation("dialogs");
   const { t: tColor } = useTranslation("colorCustomization");
+  const isMobile = useIsMobile();
   const {
     clearEventHidden,
     getEventMetadata,
@@ -343,54 +351,23 @@ const LectureDetailsDialog = ({
   const hasTeachers = teachers.length > 0;
   const hasGroups = groups.length > 0;
 
-  return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-          <DialogHeader>
-            {headerTitle && (
-              <DialogTitle
-                className="text-xl font-bold flex items-center gap-2"
-                style={{ color: "var(--color-text)" }}
-              >
-                <BookOpen className="h-6 w-6 shrink-0" />
-                {headerTitle}
-              </DialogTitle>
-            )}
-            {headerDescription && (
-              <DialogDescription
-                style={{ color: "var(--color-text-secondary)" }}
-              >
-                {headerDescription}
-              </DialogDescription>
-            )}
-          </DialogHeader>
-
-          <AnimatePresence mode="wait">
-            {event && (
-              <motion.div
-                key="lecture-details"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                className="space-y-4"
-                style={{ willChange: "transform, opacity" }}
-              >
+  const detailsBody = (
+    <AnimatePresence mode="wait">
+      {event && (
+        <motion.div
+          key="lecture-details"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="space-y-4"
+          style={{ willChange: "transform, opacity" }}
+        >
                 {/* Date & Schedule */}
-                <div
-                  className="rounded-lg border overflow-hidden"
-                  style={{
-                    backgroundColor: "var(--color-surface-alpha-40)",
-                    borderColor: "var(--color-border-alpha-30)",
-                  }}
-                >
+                <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h4
-                        className="text-sm font-semibold flex items-center gap-1.5"
-                        style={{ color: "var(--color-text-secondary)" }}
-                      >
+                      <h4 className="text-sm font-semibold flex items-center gap-1.5 text-muted-foreground">
                         <Calendar className="h-4 w-4" />
                         {t("lectureDetailsDialog.schedule")}
                       </h4>
@@ -410,23 +387,14 @@ const LectureDetailsDialog = ({
                       originalEndTime ? (
                         <>
                           {hasDateOverrideChange && (
-                            <p
-                              className="text-sm line-through"
-                              style={{ color: "var(--color-text-secondary)" }}
-                            >
+                            <p className="text-sm line-through text-muted-foreground">
                               {formatDate(originalStartTime)}
                             </p>
                           )}
-                          <p
-                            className="text-sm"
-                            style={{ color: "var(--color-text)" }}
-                          >
+                          <p className="text-sm text-foreground">
                             {formatDate(event.startTime)}
                           </p>
-                          <p
-                            className="text-sm line-through"
-                            style={{ color: "var(--color-text-secondary)" }}
-                          >
+                          <p className="text-sm line-through text-muted-foreground">
                             {formatTime(originalStartTime)} –{" "}
                             {formatTime(originalEndTime)}
                             {typeof originalDuration === "number" && (
@@ -435,38 +403,23 @@ const LectureDetailsDialog = ({
                               </span>
                             )}
                           </p>
-                          <p
-                            className="text-sm"
-                            style={{ color: "var(--color-text)" }}
-                          >
+                          <p className="text-sm text-foreground">
                             {formatTime(event.startTime)} –{" "}
                             {formatTime(event.endTime)}
-                            <span
-                              className="ml-2 text-xs"
-                              style={{ color: "var(--color-text-secondary)" }}
-                            >
+                            <span className="ml-2 text-xs text-muted-foreground">
                               ({getDurationString(event.duration)})
                             </span>
                           </p>
                         </>
                       ) : (
                         <>
-                          <p
-                            className="text-sm"
-                            style={{ color: "var(--color-text)" }}
-                          >
+                          <p className="text-sm text-foreground">
                             {formatDate(event.startTime)}
                           </p>
-                          <p
-                            className="text-sm"
-                            style={{ color: "var(--color-text)" }}
-                          >
+                          <p className="text-sm text-foreground">
                             {formatTime(event.startTime)} –{" "}
                             {formatTime(event.endTime)}
-                            <span
-                              className="ml-2 text-xs"
-                              style={{ color: "var(--color-text-secondary)" }}
-                            >
+                            <span className="ml-2 text-xs text-muted-foreground">
                               ({getDurationString(event.duration)})
                             </span>
                           </p>
@@ -478,25 +431,13 @@ const LectureDetailsDialog = ({
 
                 {/* Location */}
                 {event.location && (
-                  <div
-                    className="rounded-lg border overflow-hidden"
-                    style={{
-                      backgroundColor: "var(--color-surface-alpha-40)",
-                      borderColor: "var(--color-border-alpha-30)",
-                    }}
-                  >
+                  <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
                     <div className="p-4">
-                      <h4
-                        className="text-sm font-semibold mb-2 flex items-center gap-1.5"
-                        style={{ color: "var(--color-text-secondary)" }}
-                      >
+                      <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
                         <MapPin className="h-4 w-4" />
                         {t("lectureDetailsDialog.location")}
                       </h4>
-                      <p
-                        className="text-sm"
-                        style={{ color: "var(--color-text)" }}
-                      >
+                      <p className="text-sm text-foreground">
                         {event.location}
                       </p>
                     </div>
@@ -505,13 +446,7 @@ const LectureDetailsDialog = ({
 
                 {/* People & teachers */}
                 {(hasTeachers || hasGroups) && (
-                  <div
-                    className="rounded-lg border overflow-hidden"
-                    style={{
-                      backgroundColor: "var(--color-surface-alpha-40)",
-                      borderColor: "var(--color-border-alpha-30)",
-                    }}
-                  >
+                  <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
                     <div className="flex flex-col">
                       {hasTeachers && (
                         <div
@@ -522,24 +457,15 @@ const LectureDetailsDialog = ({
                               : undefined
                           }
                         >
-                          <h4
-                            className="text-sm font-semibold mb-2 flex items-center gap-1.5"
-                            style={{ color: "var(--color-text-secondary)" }}
-                          >
+                          <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
                             <GraduationCap className="h-4 w-4" />
                             {t("lectureDetailsDialog.teachers")}
                           </h4>
                           <div className="flex flex-wrap gap-1.5">
-                            {teachers.map((teacher, index) => (
+                            {teachers.map((teacher) => (
                               <span
-                                key={`${teacher}-${index}`}
-                                className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
-                                style={{
-                                  backgroundColor: "var(--color-surface)",
-                                  color: "var(--color-text)",
-                                  border:
-                                    "1px solid var(--color-border-alpha-30)",
-                                }}
+                                key={`${event.id}-teacher-${teacher}`}
+                                className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-[var(--color-surface)] text-foreground border border-[var(--color-border-alpha-30)]"
                               >
                                 {teacher}
                               </span>
@@ -550,24 +476,15 @@ const LectureDetailsDialog = ({
 
                       {hasGroups && (
                         <div className="p-4">
-                          <h4
-                            className="text-sm font-semibold mb-2 flex items-center gap-1.5"
-                            style={{ color: "var(--color-text-secondary)" }}
-                          >
+                          <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
                             <Users className="h-4 w-4" />
                             {t("lectureDetailsDialog.studentGroups")}
                           </h4>
                           <div className="flex flex-wrap gap-1.5">
-                            {groups.map((group, index) => (
+                            {groups.map((group) => (
                               <span
-                                key={`${group}-${index}`}
-                                className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
-                                style={{
-                                  backgroundColor: "var(--color-surface)",
-                                  color: "var(--color-text)",
-                                  border:
-                                    "1px solid var(--color-border-alpha-30)",
-                                }}
+                                key={`${event.id}-group-${group}`}
+                                className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-[var(--color-surface)] text-foreground border border-[var(--color-border-alpha-30)]"
                               >
                                 {group}
                               </span>
@@ -681,17 +598,8 @@ const LectureDetailsDialog = ({
 
                 {/* Info about missing realization data */}
                 {event.title && !hasEffectiveRealizationCode && (
-                  <div
-                    className="rounded-lg p-4 border"
-                    style={{
-                      backgroundColor: "var(--color-surface-alpha-40)",
-                      borderColor: "var(--color-border-alpha-30)",
-                    }}
-                  >
-                    <div
-                      className="flex items-center gap-2"
-                      style={{ color: "var(--color-text-secondary)" }}
-                    >
+                  <div className="rounded-lg p-4 border bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Info className="h-4 w-4 shrink-0" />
                       <span className="text-sm">
                         {t("lectureDetailsDialog.noRealizationData")}{" "}
@@ -737,11 +645,53 @@ const LectureDetailsDialog = ({
                     </div>
                   </div>
                 )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </DialogContent>
-      </Dialog>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
+  return (
+    <>
+      {isMobile ? (
+        <Drawer open={open} onOpenChange={onOpenChange}>
+          <DrawerContent className="h-[90dvh] max-h-[90dvh] border-[var(--color-border-alpha-30)] bg-[var(--color-surface)] p-0 text-foreground">
+            <DrawerHeader className="shrink-0 items-start px-6 pb-3 !text-left group-data-[vaul-drawer-direction=bottom]/drawer-content:!text-left">
+              {headerTitle && (
+                <DrawerTitle className="w-full text-left text-xl font-bold text-foreground">
+                  {headerTitle}
+                </DrawerTitle>
+              )}
+              {headerDescription && (
+                <p className="w-full text-sm text-muted-foreground text-left">
+                  {headerDescription}
+                </p>
+              )}
+            </DrawerHeader>
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
+              {detailsBody}
+            </div>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+            <DialogHeader>
+              {headerTitle && (
+                <DialogTitle className="text-xl font-bold flex items-center gap-2 text-foreground">
+                  <BookOpen className="h-6 w-6 shrink-0" />
+                  {headerTitle}
+                </DialogTitle>
+              )}
+              {headerDescription && (
+                <DialogDescription className="text-muted-foreground">
+                  {headerDescription}
+                </DialogDescription>
+              )}
+            </DialogHeader>
+            {detailsBody}
+          </DialogContent>
+        </Dialog>
+      )}
 
       <AttachRealizationDialog
         open={attachDialogOpen}

@@ -34,26 +34,30 @@ export class ScheduleUtils {
   }
 
   private static readonly EVENT_COLORS = [
-    "rgb(30, 64, 175)", // blue
-    "rgb(88, 28, 135)", // purple
-    "rgb(22, 101, 52)", // green
-    "rgb(194, 65, 12)", // orange
-    "rgb(13, 148, 136)", // teal
-    "rgb(67, 56, 202)", // indigo
-    "rgb(185, 28, 28)", // red
-    "rgb(180, 83, 9)", // amber
-    "rgb(71, 85, 105)", // slate
-    "rgb(75, 85, 99)", // gray
-    "rgb(5, 150, 105)", // emerald
-    "rgb(190, 18, 60)", // rose
-    "rgb(8, 145, 178)", // cyan
-    "rgb(124, 58, 237)", // violet
-    "rgb(101, 163, 13)", // lime
-    "rgb(7, 89, 133)", // sky
+    "rgb(34, 62, 132)", // blue
+    "rgb(78, 40, 118)", // purple
+    "rgb(36, 92, 60)", // green
+    "rgb(140, 72, 28)", // orange
+    "rgb(24, 106, 102)", // teal
+    "rgb(63, 57, 150)", // indigo
+    "rgb(132, 42, 46)", // red
+    "rgb(131, 83, 26)", // amber
+    "rgb(69, 80, 96)", // slate
+    "rgb(73, 81, 92)", // gray
+    "rgb(26, 108, 80)", // emerald
+    "rgb(136, 35, 66)", // rose
+    "rgb(30, 106, 132)", // cyan
+    "rgb(94, 61, 172)", // violet
+    "rgb(94, 124, 34)", // lime
+    "rgb(34, 84, 118)", // sky
   ];
 
+  static getPresetEventColors(): readonly string[] {
+    return ScheduleUtils.EVENT_COLORS;
+  }
+
   // Utility function to lighten an RGB color by a given factor (0-1)
-  static lightenRgbColor(rgbString: string, factor: number = 0.1): string {
+  static lightenRgbColor(rgbString: string, factor: number = 0.06): string {
     const rgbMatch = rgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
     if (!rgbMatch) return rgbString;
 

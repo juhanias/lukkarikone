@@ -151,6 +151,15 @@ const useCalendarStore = create<CalendarState>()(
           }, 0);
         }
       },
+
+      clearCalendars: () => {
+        set({ calendars: [], activeCalendarId: null });
+        setTimeout(() => {
+          import("./schedule-store").then((m) =>
+            m.useScheduleStore.getState().refreshSchedule(),
+          );
+        }, 0);
+      },
     }),
     {
       name: "calendars",

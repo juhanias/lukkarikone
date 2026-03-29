@@ -13,7 +13,7 @@ export default function ErrorPage() {
   const error = useRouteError() as RouteError;
   const { t } = useTranslation("common");
 
-  useDocumentTitle(`${t("labels.error")} — lukkari.juh.fi`);
+  useDocumentTitle(`${t("labels.error")} — Avoin Lukkari`);
 
   return (
     <div className="w-full h-full bg-slate-800 text-white flex items-center justify-center">

@@ -25,4 +25,5 @@ export interface CalendarState {
   addIcalUrl: (calendarId: string, url: string) => void;
   removeIcalUrl: (calendarId: string, url: string) => void;
   updateIcalUrl: (calendarId: string, oldUrl: string, newUrl: string) => void;
+  clearCalendars: () => void;
 }

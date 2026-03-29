@@ -31,7 +31,6 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuSeparator,
   ContextMenuTrigger,
 } from "../ui/context-menu";
 
@@ -203,12 +202,7 @@ const ScheduleDay = memo(
     return (
       <div className="w-full h-full flex flex-col">
         {/* Date Header - Full Width Gradient */}
-        <div
-          className="w-full flex-shrink-0"
-          style={{
-            background: `linear-gradient(to bottom, var(--color-surface-alpha-40), transparent)`,
-          }}
-        >
+        <div className="w-full flex-shrink-0 bg-[linear-gradient(to_bottom,var(--color-surface-alpha-40),transparent)]">
           <div className="max-w-7xl mx-auto px-4 py-6 text-center relative">
             {/* Mobile Icon Buttons - Top corners */}
             <div className="absolute left-4 top-4 md:hidden flex gap-2">
@@ -225,16 +219,10 @@ const ScheduleDay = memo(
                 />
               </div>
             )}
-            <div
-              className="text-sm mb-1"
-              style={{ color: "var(--color-text-secondary)" }}
-            >
+            <div className="text-sm mb-1 text-muted-foreground">
               {dateInfo.dayWeek}
             </div>
-            <h2
-              className="text-2xl font-medium"
-              style={{ color: "var(--color-text)" }}
-            >
+            <h2 className="text-2xl font-medium text-foreground">
               {dateInfo.fullDate}
             </h2>
             {/* Desktop badges - Stacked vertically, right-aligned */}
@@ -254,13 +242,10 @@ const ScheduleDay = memo(
         </div>
 
         {/* Schedule Container */}
-        <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full">
+        <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
           <div className="flex-1 flex flex-col px-4">
             {events.length === 0 ? (
-              <div
-                className="flex-1 flex flex-col items-center justify-center min-h-96"
-                style={{ color: "var(--color-text-secondary)" }}
-              >
+              <div className="flex-1 flex flex-col items-center justify-center min-h-96 text-muted-foreground">
                 <Calendar size={48} className="mb-4 opacity-50" />
                 <p className="text-lg font-medium">{t("dayView.noEvents")}</p>
                 <p className="text-sm opacity-75 mt-1 text-center">
@@ -283,28 +268,17 @@ const ScheduleDay = memo(
                   {timeSlots.map((time, index) => (
                     <div
                       key={time}
-                      className="relative border-b last:border-b-0"
+                      className="relative border-b border-[var(--color-border-alpha-30)] last:border-b-0"
                       style={{
                         height: `${DAY_HOUR_HEIGHT}px`,
-                        borderColor: "var(--color-border-alpha-30)",
                       }}
                     >
-                      <div
-                        className="absolute left-0 top-2 w-14 text-xs font-medium"
-                        style={{
-                          color: "var(--color-text-secondary)",
-                        }}
-                      >
+                      <div className="absolute left-0 top-2 w-14 text-xs font-medium text-muted-foreground">
                         {time}
                       </div>
                       <div className="ml-16 h-full relative">
                         {index < timeSlots.length - 1 && (
-                          <div
-                            className="absolute left-0 top-0 bottom-0 border-l"
-                            style={{
-                              borderColor: "var(--color-border-alpha-30)",
-                            }}
-                          ></div>
+                          <div className="absolute left-0 top-0 bottom-0 border-l border-[var(--color-border-alpha-30)]"></div>
                         )}
                       </div>
                     </div>
@@ -344,23 +318,16 @@ const ScheduleDay = memo(
                   {gapPeriods.map((gap) => (
                     <div
                       key={gap.id}
-                      className="absolute flex items-center justify-center text-xs"
+                      className="absolute flex items-center justify-center text-xs text-muted-foreground"
                       style={{
                         top: `${(gap.startHour - START_HOUR) * DAY_HOUR_HEIGHT}px`,
                         height: `${gap.duration * DAY_HOUR_HEIGHT}px`,
                         width: "100%",
                         left: "0%",
                         zIndex: 0,
-                        color: "var(--color-text-secondary)",
                       }}
                     >
-                      <div
-                        className="px-2 py-1 rounded text-xs border"
-                        style={{
-                          backgroundColor: "var(--color-surface-alpha-40)",
-                          borderColor: "var(--color-border-alpha-30)",
-                        }}
-                      >
+                      <div className="px-2 py-1 rounded text-xs border bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
                         {gap.duration.toFixed(1)}h {t("dayView.breakDuration")}
                       </div>
                     </div>
@@ -384,7 +351,7 @@ const ScheduleDay = memo(
                         <ContextMenuTrigger asChild>
                           <button
                             type="button"
-                            className={`absolute rounded-lg text-white shadow-lg cursor-pointer overflow-hidden transition-colors duration-200 schedule-event-gradient border-none p-0 text-left appearance-none flex flex-col items-start justify-start`}
+                            className={`absolute rounded-lg text-white cursor-pointer overflow-hidden transition-colors duration-200 schedule-event-gradient schedule-event-gradient-day border-none p-0 text-left appearance-none flex flex-col items-start justify-start`}
                             style={
                               {
                                 top: `${(event.startHour - START_HOUR) * DAY_HOUR_HEIGHT}px`,
@@ -399,10 +366,8 @@ const ScheduleDay = memo(
                                   ? config.hiddenEventOpacity / 100
                                   : 1,
                                 "--normal-gradient": colorPair.normal,
-                                "--hover-gradient": colorPair.flipped,
                               } as React.CSSProperties & {
                                 "--normal-gradient": string;
-                                "--hover-gradient": string;
                               }
                             }
                             onClick={() => {
@@ -460,26 +425,15 @@ const ScheduleDay = memo(
                             )}
                           </button>
                         </ContextMenuTrigger>
-                        <ContextMenuContent
-                          style={{
-                            backgroundColor: "var(--color-surface)",
-                            borderColor: "var(--color-border)",
-                            color: "var(--color-text)",
-                          }}
-                        >
+                        <ContextMenuContent>
                           <ContextMenuItem
                             onClick={() => openLectureDetailsDialog(event)}
-                            style={{ color: "var(--color-text)" }}
                           >
                             <Calendar className="mr-2 h-4 w-4" />
                             {tColor("contextMenu.eventDetails")}
                           </ContextMenuItem>
-                          <ContextMenuSeparator
-                            style={{ backgroundColor: "var(--color-border)" }}
-                          />
                           <ContextMenuItem
                             onClick={() => toggleEventVisibility(event)}
-                            style={{ color: "var(--color-text)" }}
                           >
                             {isHidden ? (
                               <>
@@ -493,14 +447,8 @@ const ScheduleDay = memo(
                               </>
                             )}
                           </ContextMenuItem>
-                          <ContextMenuSeparator
-                            style={{
-                              backgroundColor: "var(--color-border)",
-                            }}
-                          />
                           <ContextMenuItem
                             onClick={() => openColorCustomizer(event)}
-                            style={{ color: "var(--color-text)" }}
                           >
                             <Palette className="mr-2 h-4 w-4" />
                             {tColor("contextMenu.customizeColor")}

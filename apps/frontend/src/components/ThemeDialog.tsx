@@ -37,13 +37,9 @@ export function ThemeDialog() {
   return (
     <>
       <button
+        type="button"
         onClick={() => setThemeParam("true")}
-        className="flex items-center justify-between gap-2 h-9 px-3 rounded-md border transition-colors w-full sm:w-auto sm:min-w-[180px] cursor-pointer hover:opacity-90"
-        style={{
-          borderColor: "var(--color-border)",
-          color: "var(--color-text)",
-          backgroundColor: "var(--color-surface)",
-        }}
+        className="border-border bg-card text-foreground hover:bg-secondary/30 focus-visible:ring-ring/50 flex items-center justify-between gap-2 h-9 px-3 rounded-md border transition-colors w-full sm:w-auto sm:min-w-[180px] cursor-pointer focus-visible:ring-[3px] outline-none"
       >
         <span className="flex items-center gap-2 text-sm whitespace-nowrap">
           <Palette className="w-4 h-4" />
@@ -69,7 +65,6 @@ export function ThemeDialog() {
               selectedThemeId={config.theme}
               onThemeSelect={(themeId) => {
                 setConfig({ theme: themeId });
-                setThemeParam(null);
               }}
             />
           </div>
