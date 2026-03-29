@@ -432,7 +432,7 @@ const useConfigStore = create<ConfigState>()(
     }),
     {
       name: "app-config",
-      version: 2,
+      version: 3,
       migrate: (persistedState: unknown, version: number) => {
         const state = persistedState as
           | { config?: Record<string, unknown> }
@@ -446,6 +446,17 @@ const useConfigStore = create<ConfigState>()(
           return {
             ...state,
             config: configWithoutUrl,
+          };
+        }
+
+        if (version < 3 && state?.config?.font === "system") {
+          console.log("Migrating system font users to gabarito-open-sans");
+          return {
+            ...state,
+            config: {
+              ...state.config,
+              font: "gabarito-open-sans",
+            },
           };
         }
 
