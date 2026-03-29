@@ -140,7 +140,12 @@ export function SettingsPanel({ mode = "page" }: SettingsPanelProps) {
         >
           <div className="space-y-6 pb-4">
             {visibleBlocks.map((block) => (
-              <motion.div key={block.id} id={block.id} variants={itemVariants}>
+              <motion.div
+                key={block.id}
+                id={block.id}
+                variants={itemVariants}
+                className={block.id === "styling-settings" ? "mb-64" : undefined}
+              >
                 <SettingsSection
                   icon={block.icon}
                   iconColor={block.iconColor}
@@ -184,9 +189,14 @@ export function SettingsPanel({ mode = "page" }: SettingsPanelProps) {
           variants={containerVariants}
           {...motionProps}
         >
-          <div className="space-y-6 mb-24">
+          <div className="space-y-6">
             {visibleBlocks.map((block) => (
-              <motion.div key={block.id} id={block.id} variants={itemVariants}>
+              <motion.div
+                key={block.id}
+                id={block.id}
+                variants={itemVariants}
+                className={block.id === "styling-settings" ? "mb-64" : undefined}
+              >
                 <SettingsSection
                   icon={block.icon}
                   iconColor={block.iconColor}
