@@ -175,6 +175,7 @@ export const LastUpdatedBadge = ({
           side="bottom"
           align="end"
           className="w-80 p-3 shadow-lg"
+          hideArrow
           style={{
             backgroundColor: "var(--color-surface)",
             borderColor: "var(--color-border)",
