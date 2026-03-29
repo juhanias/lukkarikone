@@ -184,7 +184,7 @@ export function SettingsPanel({ mode = "page" }: SettingsPanelProps) {
           variants={containerVariants}
           {...motionProps}
         >
-          <div className="space-y-6">
+          <div className="space-y-6 mb-24">
             {visibleBlocks.map((block) => (
               <motion.div key={block.id} id={block.id} variants={itemVariants}>
                 <SettingsSection

@@ -148,7 +148,13 @@
       "title": "Actions",
       "subtitle": "Restore default settings",
       "resetButton": "Restore default settings",
-      "resetSubtitle": "Reset all settings to their default values"
+      "resetSubtitle": "Reset all settings to their default values",
+      "resetAllButton": "Reset entire application",
+      "resetAllSubtitle": "Clear all saved settings and all calendars from this device",
+      "resetAllConfirmTitle": "Reset entire application?",
+      "resetAllConfirmDescription": "This will clear your saved settings and remove all calendars from this device. This action cannot be undone.",
+      "resetAllCancel": "Cancel",
+      "resetAllConfirm": "Reset everything"
     },
     "debug": {
       "title": "Configuration",

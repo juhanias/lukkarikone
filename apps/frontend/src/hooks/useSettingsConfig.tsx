@@ -1,9 +1,20 @@
-import { Code, RotateCcw, Settings, Sparkles } from "lucide-react";
-import { useMemo } from "react";
+import { Code, RotateCcw, Settings, Sparkles, Trash2 } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
 import { CalendarDialog } from "../components/CalendarDialog";
 import { ThemeDialog } from "../components/ThemeDialog";
+import { useSettingsDialogParam } from "../hooks/useDialogParams";
 import useConfigStore, {
+  useCalendarStore,
   useEventMetadataStore,
   useRealizationMetadataStore,
   useSeenCommitsStore,
@@ -13,11 +24,32 @@ import type { SettingsConfig } from "../types/settings-config";
 
 export function useSettingsConfig(): SettingsConfig {
   const { t, i18n } = useTranslation("settings");
+  const navigate = useNavigate();
+  const [, setSettingsDialogParam] = useSettingsDialogParam();
+  const [isWipeDialogOpen, setIsWipeDialogOpen] = useState(false);
   const { config, setConfig, resetConfig } = useConfigStore();
+  const { clearCalendars } = useCalendarStore();
   const { metadataByRealization, clearAllRealizationMetadata } =
     useRealizationMetadataStore();
   const { metadataByEvent, clearAllEventMetadata } = useEventMetadataStore();
   const { clearSeenCommits, seenCommits } = useSeenCommitsStore();
+
+  const handleWipeApplication = useCallback(() => {
+    resetConfig();
+    clearCalendars();
+    clearAllRealizationMetadata();
+    clearAllEventMetadata();
+    setSettingsDialogParam(null);
+    navigate("/app/cal-1", { replace: true });
+    setIsWipeDialogOpen(false);
+  }, [
+    navigate,
+    resetConfig,
+    clearCalendars,
+    clearAllRealizationMetadata,
+    clearAllEventMetadata,
+    setSettingsDialogParam,
+  ]);
 
   return useMemo(() => {
     const settingsConfig: SettingsConfig = [
@@ -36,9 +68,9 @@ export function useSettingsConfig(): SettingsConfig {
               render: () => (
                 <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]">
                   <div className="flex-1 min-w-0">
-                    <label className="text-sm font-medium text-[var(--color-text)] block">
+                    <p className="text-sm font-medium text-[var(--color-text)] block">
                       {t("sections.calendar.title")}
-                    </label>
+                    </p>
                     <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
                       {t("sections.calendar.subtitle")}
                     </p>
@@ -111,6 +143,86 @@ export function useSettingsConfig(): SettingsConfig {
               onChange: (checked) => setConfig({ showTotalHours: checked }),
             },
           },
+          {
+            componentType: "custom",
+            id: "wipe-application",
+            data: {
+              render: () => (
+                <>
+                  <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]">
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className="text-sm font-medium block"
+                        style={{ color: "var(--color-text)" }}
+                      >
+                        {t("sections.actions.resetAllButton")}
+                      </p>
+                      <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
+                        {t("sections.actions.resetAllSubtitle")}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsWipeDialogOpen(true)}
+                      className="flex items-center justify-center gap-2 h-9 px-3 rounded-md border transition-colors w-full sm:w-auto sm:min-w-[180px] cursor-pointer hover:opacity-90"
+                      style={{
+                        borderColor: "#ef4444",
+                        color: "#ef4444",
+                        backgroundColor: "rgba(239,68,68,0.15)",
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span className="text-sm whitespace-nowrap">
+                        {t("sections.actions.resetAllButton")}
+                      </span>
+                    </button>
+                  </div>
+
+                  <Dialog
+                    open={isWipeDialogOpen}
+                    onOpenChange={setIsWipeDialogOpen}
+                  >
+                    <DialogContent className="sm:max-w-md" showCloseButton={false}>
+                      <DialogHeader>
+                        <DialogTitle>
+                          {t("sections.actions.resetAllConfirmTitle")}
+                        </DialogTitle>
+                        <DialogDescription>
+                          {t("sections.actions.resetAllConfirmDescription")}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <button
+                          type="button"
+                          onClick={() => setIsWipeDialogOpen(false)}
+                          className="h-9 px-3 rounded-md border transition-colors cursor-pointer"
+                          style={{
+                            borderColor: "var(--color-border)",
+                            color: "var(--color-text)",
+                            backgroundColor: "var(--color-surface)",
+                          }}
+                        >
+                          {t("sections.actions.resetAllCancel")}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleWipeApplication}
+                          className="h-9 px-3 rounded-md border transition-colors cursor-pointer"
+                          style={{
+                            borderColor: "#ef4444",
+                            color: "#ef4444",
+                            backgroundColor: "rgba(239,68,68,0.15)",
+                          }}
+                        >
+                          {t("sections.actions.resetAllConfirm")}
+                        </button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </>
+              ),
+            },
+          },
         ],
         groups: [
           {
@@ -178,9 +290,9 @@ export function useSettingsConfig(): SettingsConfig {
               render: () => (
                 <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg mt-4 border transition-colors bg-[var(--color-surface-secondary-alpha-30)] border-[var(--color-border-alpha-30)] hover:bg-[var(--color-surface-secondary-alpha-40)]">
                   <div className="flex-1 min-w-0">
-                    <label className="text-sm font-medium text-[var(--color-text)] block">
+                    <p className="text-sm font-medium text-[var(--color-text)] block">
                       {t("sections.styling.theme.label")}
-                    </label>
+                    </p>
                     <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
                       {t("sections.styling.theme.subtitle")}
                     </p>
@@ -267,6 +379,7 @@ export function useSettingsConfig(): SettingsConfig {
                       </h4>
                       {Object.keys(metadataByRealization).length > 0 && (
                         <button
+                          type="button"
                           onClick={clearAllRealizationMetadata}
                           className="px-3 py-1 text-sm rounded transition-colors"
                           style={{
@@ -308,6 +421,7 @@ export function useSettingsConfig(): SettingsConfig {
                       </h4>
                       {Object.keys(metadataByEvent).length > 0 && (
                         <button
+                          type="button"
                           onClick={clearAllEventMetadata}
                           className="px-3 py-1 text-sm rounded transition-colors"
                           style={{
@@ -396,6 +510,7 @@ export function useSettingsConfig(): SettingsConfig {
                     </p>
                   </div>
                   <button
+                    type="button"
                     onClick={clearSeenCommits}
                     className="px-3 py-1.5 text-sm rounded transition-colors"
                     style={{
@@ -422,6 +537,8 @@ export function useSettingsConfig(): SettingsConfig {
     config,
     setConfig,
     resetConfig,
+    isWipeDialogOpen,
+    handleWipeApplication,
     metadataByRealization,
     clearAllRealizationMetadata,
     metadataByEvent,

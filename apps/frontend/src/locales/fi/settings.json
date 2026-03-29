@@ -148,7 +148,13 @@
       "title": "Toiminnot",
       "subtitle": "Palauta oletusasetukset",
       "resetButton": "Palauta oletusasetukset",
-      "resetSubtitle": "Palauta kaikki asetukset niiden oletusarvoihin"
+      "resetSubtitle": "Palauta kaikki asetukset niiden oletusarvoihin",
+      "resetAllButton": "Nollaa koko sovellus",
+      "resetAllSubtitle": "Poista kaikki tallennetut asetukset ja kalenterit tältä laitteelta",
+      "resetAllConfirmTitle": "Nollataanko koko sovellus?",
+      "resetAllConfirmDescription": "Tämä poistaa tallennetut asetuksesi ja kaikki kalenterit tältä laitteelta. Toimintoa ei voi perua.",
+      "resetAllCancel": "Peruuta",
+      "resetAllConfirm": "Nollaa kaikki"
     },
     "debug": {
       "title": "Konfiguraatio",
