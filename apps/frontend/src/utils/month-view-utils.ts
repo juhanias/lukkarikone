@@ -49,6 +49,7 @@ export interface MonthWeekRowData {
 export interface MonthRealizationSummary {
   key: string;
   label: string;
+  titles: string[];
   color: string;
   hours: number;
 }
@@ -293,6 +294,7 @@ export const buildMonthViewData = ({
     {
       key: string;
       label: string;
+      titlesMap: Map<string, number>;
       color: string;
       hours: number;
     }
@@ -320,12 +322,18 @@ export const buildMonthViewData = ({
       const existing = realizationsByKey.get(key);
       if (existing) {
         existing.hours += event.duration;
+        const count = existing.titlesMap.get(strippedTitle) || 0;
+        existing.titlesMap.set(strippedTitle, count + 1);
         return;
       }
+
+      const titlesMap = new Map<string, number>();
+      titlesMap.set(strippedTitle, 1);
 
       realizationsByKey.set(key, {
         key,
         label: realizationCode ? realizationCode.toUpperCase() : strippedTitle,
+        titlesMap,
         color: colorPair.normal,
         hours: event.duration,
       });
@@ -334,12 +342,19 @@ export const buildMonthViewData = ({
 
   const realizations = Array.from(realizationsByKey.values())
     .sort((a, b) => b.hours - a.hours)
-    .map((item) => ({
-      key: item.key,
-      label: item.label,
-      color: item.color,
-      hours: item.hours,
-    }));
+    .map((item) => {
+      const sortedTitlesCommonFirst = Array.from(item.titlesMap.entries())
+        .sort((a, b) => b[1] - a[1])
+        .map(([title]) => title);
+
+      return {
+        key: item.key,
+        label: item.label,
+        titles: sortedTitlesCommonFirst,
+        color: item.color,
+        hours: item.hours,
+      };
+    });
 
   return {
     weeks,

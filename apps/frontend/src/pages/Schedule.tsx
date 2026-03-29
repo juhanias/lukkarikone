@@ -2,6 +2,7 @@ import {
   addDays,
   addMonths,
   addWeeks,
+  format,
   isToday,
   startOfMonth,
   startOfWeek,
@@ -98,32 +99,32 @@ export default function Schedule() {
 
   const goToNextDay = useCallback(() => {
     const nextDate = addDays(currentDate, 1);
-    setDateParam(nextDate.toISOString().split("T")[0]);
+    setDateParam(format(nextDate, "yyyy-MM-dd"));
   }, [currentDate, setDateParam]);
 
   const goToPreviousDay = useCallback(() => {
     const prevDate = subDays(currentDate, 1);
-    setDateParam(prevDate.toISOString().split("T")[0]);
+    setDateParam(format(prevDate, "yyyy-MM-dd"));
   }, [currentDate, setDateParam]);
 
   const goToNextWeek = useCallback(() => {
     const nextWeek = addWeeks(currentDate, 1);
-    setDateParam(nextWeek.toISOString().split("T")[0]);
+    setDateParam(format(nextWeek, "yyyy-MM-dd"));
   }, [currentDate, setDateParam]);
 
   const goToPreviousWeek = useCallback(() => {
     const prevWeek = subWeeks(currentDate, 1);
-    setDateParam(prevWeek.toISOString().split("T")[0]);
+    setDateParam(format(prevWeek, "yyyy-MM-dd"));
   }, [currentDate, setDateParam]);
 
   const goToNextMonth = useCallback(() => {
     const nextMonth = addMonths(currentDate, 1);
-    setDateParam(nextMonth.toISOString().split("T")[0]);
+    setDateParam(format(nextMonth, "yyyy-MM-dd"));
   }, [currentDate, setDateParam]);
 
   const goToPreviousMonth = useCallback(() => {
     const prevMonth = subMonths(currentDate, 1);
-    setDateParam(prevMonth.toISOString().split("T")[0]);
+    setDateParam(format(prevMonth, "yyyy-MM-dd"));
   }, [currentDate, setDateParam]);
 
   const rotateViewMode = useCallback(
@@ -148,7 +149,7 @@ export default function Schedule() {
     fetchSchedule();
   }, [fetchSchedule]);
 
-  useDocumentTitle(`${t("title")} — lukkari.juh.fi`);
+  useDocumentTitle(`${t("title")} — Avoin Lukkari`);
 
   // Show toast notification on error
   useEffect(() => {
@@ -277,7 +278,7 @@ export default function Schedule() {
   const viewTransition = {
     initial: { opacity: 0.96, scale: 0.99 },
     animate: { opacity: 1, scale: 1 },
-    transition: { duration: 0.18, ease: "easeOut" as const },
+    transition: { duration: 0.12, ease: "easeOut" as const },
   };
 
   // Keyboard navigation

@@ -5,7 +5,7 @@ import useDocumentTitle from "../hooks/useDocumentTitle";
 export default function Settings() {
   const { t } = useTranslation("settings");
 
-  useDocumentTitle(`${t("title")} — lukkari.juh.fi`);
+  useDocumentTitle(`${t("title")} — Avoin Lukkari`);
 
   return (
     <div

@@ -1,69 +1,27 @@
 {
-  "header": {
-    "title": "juh.fi/lukkari",
-    "nav": {
-      "app": "App",
-      "github": "GitHub",
-      "updates": "Updates"
-    }
-  },
-  "title": "Unofficial timetable viewer for Turku UAS - juh.fi",
   "hero": {
-    "title": "lukkari",
-    "titleSite": ".juh.fi",
-    "subtitle": "A functional, customizable, and fast alternative schedule viewer for Turku University of Applied Sciences students. Free and ad-free.",
-    "disclaimer": "This is an unofficial application and is not approved or supported by Turku UAS.<br />Data is based on the official Lukkarikone iCal service.",
-    "cta": "Get Started"
+    "title": "avoin lukkari",
+    "subtitle": "An open & highly customizable timetable service for students at Turku University of Applied Sciences",
+    "cta": "Get Started",
+    "githubText": "Avoin Lukkari @ github.com"
   },
-  "features": {
-    "colorful": {
-      "title": "Colorful",
-      "description": "The site's color scheme can be customized to your liking in the settings. Multiple presets available. You can also customize the course colors to your taste."
-    },
-    "fast": {
-      "title": "Unnecessarily Fast",
-      "description": "The application does not require login or user accounts. Schedule pages switch lightning-fast without unnecessary loading."
-    },
-    "manageable": {
-      "title": "Manageable",
-      "description": "You can hide individual lectures or courses from view according to your needs."
+  "about": {
+    "title": "what, why, how?",
+    "p1": "Avoin Lukkari offers a faster and more visually modern alternative to view your schedule and studies. Built for learning purposes, it is open source and completely free forever.",
+    "p2": "The entire project code is publicly available & open for contributions. Help improve the schedule for everyone!",
+    "p3": "The site is available without logging in and your device remembers your settings :)"
+  },
+  "gallery": {
+    "title": "gallery",
+    "subtitle": "A few showcase images! You can explore the app yourself to find more surprises.",
+    "items": {
+      "settings": "Highly controllable",
+      "hiding": "Hide individual lectures & courses",
+      "fast": "Faster than you need it to be!",
+      "calendars": "Switch between multiple calendars instantly!",
+      "colorful": "Colorful <3",
+      "details": "Shows all necessary info - and why not some unnecessary too",
+      "config": "Colorize a bit of everything (if you want)"
     }
-  },
-  "comparison": {
-    "title": "Honest Comparison",
-    "subtitle": "lukkari.juh.fi is based on the Lukkarikone iCal service, which must be accessed through the official lukkarikone.",
-    "headers": {
-      "feature": "Feature",
-      "lukkari": "lukkari.juh.fi",
-      "official": "Lukkarikone 4"
-    },
-    "features": {
-      "extremelyFast": "Extremely fast",
-      "darkTheme": "Dark theme",
-      "customColors": "Customizable colors",
-      "openSource": "Open source",
-      "hideLectures": "Hide lectures",
-      "lectureDetails": "Lecture details",
-      "courseDetails": "Course details",
-      "calendarExport": "Calendar export",
-      "freeHourSearch": "Free hour search",
-      "officialService": "Official service",
-      "languageSupport": "Language support",
-      "dataUpdateFrequency": "Data update frequency"
-    },
-    "values": {
-      "finEng": "Fin/Eng",
-      "hourly": "~hourly",
-      "immediate": "Immediate"
-    }
-  },
-  "development": {
-    "title": "Development",
-    "description": "Suggest and participate. lukkari.juh.fi is an open-source project you can contribute to via GitHub. If you're interested in development and have free time, comment or create issues on GitHub.",
-    "cta": "Alright !!!"
-  },
-  "footer": {
-    "copyright": "© 2025 lukkari.juh.fi",
-    "author": "Avoin Lukkari by Juhani Astikainen"
   }
 }

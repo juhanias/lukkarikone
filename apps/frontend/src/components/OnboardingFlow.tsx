@@ -487,9 +487,6 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 <ArrowLeft className="h-4 w-4" />
                 {t("onboarding.themeStep.actions.back")}
               </Button>
-              <Button type="button" variant="outline" onClick={onComplete}>
-                {t("onboarding.themeStep.actions.skip")}
-              </Button>
               <Button
                 type="button"
                 onClick={onComplete}

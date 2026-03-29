@@ -40,7 +40,8 @@ export default function Layout() {
     isDesktop && settingsDialogParam === "true" && !isSettingsRoute;
   const isCalendarRouteActive =
     location.pathname.startsWith("/app/") &&
-    location.pathname !== "/app/settings";
+    location.pathname !== "/app/settings" &&
+    !isSettingsModalOpen;
 
   useEffect(() => {
     if (typeof window === "undefined") {

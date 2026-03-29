@@ -1,6 +1,6 @@
-import { startOfMonth } from "date-fns";
+import { format, startOfMonth } from "date-fns";
 import { Calendar } from "lucide-react";
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDateParam } from "../../hooks/useScheduleParams";
 import { RealizationApiService } from "../../services/realizationApi";
@@ -40,9 +40,38 @@ const formatHours = (hours: number) => {
   return Number.isInteger(hours) ? `${hours}` : hours.toFixed(1);
 };
 
-const toDateParam = (date: Date) => date.toISOString().split("T")[0];
+const toDateParam = (date: Date) => format(date, "yyyy-MM-dd");
 
 const timelineRangeHours = MONTH_TIMELINE_END_HOUR - MONTH_TIMELINE_START_HOUR;
+
+const CourseTitleDisplay = ({ titles }: { titles: string[] }) => {
+  const [index, setIndex] = useState(0);
+  const [isFading, setIsFading] = useState(false);
+
+  useEffect(() => {
+    if (titles.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setIsFading(true);
+      setTimeout(() => {
+        setIndex((prev: number) => (prev + 1) % titles.length);
+        setIsFading(false);
+      }, 500); // match duration
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [titles.length]);
+
+  return (
+    <span
+      className={`text-xs text-foreground truncate transition-opacity duration-500 ${
+        isFading ? "opacity-0" : "opacity-100"
+      }`}
+    >
+      {titles[index]}
+    </span>
+  );
+};
 
 const MonthView = memo(
   ({
@@ -414,9 +443,7 @@ const MonthView = memo(
                                     className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0"
                                     style={{ background: item.color }}
                                   />
-                                  <span className="text-xs text-foreground truncate">
-                                    {item.label}
-                                  </span>
+                                  <CourseTitleDisplay titles={item.titles} />
                                 </div>
                                 <span className="text-xs font-medium text-foreground">
                                   {formatHours(item.hours)}h
