@@ -17,17 +17,23 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  Plus,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
+import CreateEventDialog from "@/components/CreateEventDialog";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { Button } from "@/components/ui/button";
 import { MonthView, ScheduleDay, WeekView } from "../components/schedule";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { useDateParam, useViewModeParam } from "../hooks/useScheduleParams";
-import { useCalendarStore, useScheduleStore } from "../state/state-management";
+import {
+  useCalendarStore,
+  useConfigStore,
+  useScheduleStore,
+} from "../state/state-management";
 
 const VIEW_MODES = ["day", "week", "month"] as const;
 
@@ -62,6 +68,8 @@ export default function Schedule() {
     lastUpdated,
   } = useScheduleStore();
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
+  const { config } = useConfigStore();
 
   // Validate and set active calendar from URL
   useEffect(() => {
@@ -165,7 +173,18 @@ export default function Schedule() {
   }, [error, clearError, t]);
 
   // Get events for the current date (only for day view)
-  const currentEvents = viewMode === "day" ? getEventsForDate(currentDate) : [];
+  const currentEvents = useMemo(() => {
+    if (viewMode !== "day") {
+      return [];
+    }
+
+    const dayEvents = getEventsForDate(currentDate);
+    if (config.allowCustomEvents) {
+      return dayEvents;
+    }
+
+    return dayEvents.filter((event) => !event.id.startsWith("meow-"));
+  }, [viewMode, getEventsForDate, currentDate, config.allowCustomEvents]);
   const isWeekView = viewMode === "week";
   const isMonthView = viewMode === "month";
   const viewKey = isMonthView
@@ -552,7 +571,31 @@ export default function Schedule() {
             )}
           </div>
         </motion.div>
+
+        {config.allowCustomEvents && (
+          <button
+            type="button"
+            onClick={() => setIsCreateEventOpen(true)}
+            className="fixed right-5 bottom-5 md:right-8 md:bottom-8 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full shadow-lg cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            style={{
+              backgroundColor: "var(--color-accent)",
+              color: "var(--color-text-on-accent, white)",
+              boxShadow: "0 12px 28px var(--color-accent-alpha-30)",
+            }}
+            aria-label={t("navigation.createEvent")}
+          >
+            <Plus className="h-6 w-6" />
+          </button>
+        )}
       </div>
+
+      {config.allowCustomEvents && (
+        <CreateEventDialog
+          open={isCreateEventOpen}
+          onOpenChange={setIsCreateEventOpen}
+          initialDate={currentDate}
+        />
+      )}
     </div>
   );
 }

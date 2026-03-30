@@ -10,6 +10,8 @@ import {
   MapPin,
   Palette,
   Pencil,
+  SquarePen,
+  Trash2,
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -24,6 +26,7 @@ import {
 } from "../state/state-management";
 import type { ScheduleEvent } from "../types/schedule";
 import AttachRealizationDialog from "./AttachRealizationDialog";
+import EventLocationEditDialog from "./EventLocationEditDialog";
 import EventTimeEditDialog from "./EventTimeEditDialog";
 import { ActionButton } from "./ui/ActionButton";
 import { Button } from "./ui/button";
@@ -55,6 +58,9 @@ interface EventDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   event: ScheduleEvent | null;
+  hideNoRealizationIdWarning?: boolean;
+  allowNameEditing?: boolean;
+  allowLocationEditing?: boolean;
   onOpenRealizationDialog?: (eventTitle: string) => void;
   onOpenRealizationDialogByCode?: (realizationCode: string) => void;
   onOpenColorCustomizer?: (event: ScheduleEvent) => void;
@@ -65,6 +71,9 @@ const EventDetailsDialog = ({
   open,
   onOpenChange,
   event,
+  hideNoRealizationIdWarning = false,
+  allowNameEditing = false,
+  allowLocationEditing = false,
   onOpenRealizationDialog,
   onOpenRealizationDialogByCode,
   onOpenColorCustomizer,
@@ -84,15 +93,14 @@ const EventDetailsDialog = ({
   } = useEventMetadataStore();
   const { hideRealization, isRealizationHidden, showRealization } =
     useRealizationMetadataStore();
-  const { events } = useScheduleStore();
+  const { deleteCustomEvent, events } = useScheduleStore();
   const [lastEvent, setLastEvent] = useState<ScheduleEvent | null>(null);
   const [hideCourseDialogOpen, setHideCourseDialogOpen] = useState(false);
   const [attachDialogOpen, setAttachDialogOpen] = useState(false);
   const [editWarningOpen, setEditWarningOpen] = useState(false);
+  const [locationEditDialogOpen, setLocationEditDialogOpen] = useState(false);
   const [editTimeParam, setEditTimeParam] = useEventTimeEditDialogParam();
-  const noRealizationWhyNotLabel = t(
-    "eventDetailsDialog.noRealizationWhyNot",
-  );
+  const noRealizationWhyNotLabel = t("eventDetailsDialog.noRealizationWhyNot");
   const noRealizationWhyNotExplanation = t(
     "eventDetailsDialog.noRealizationWhyNotExplanation",
   );
@@ -155,6 +163,8 @@ const EventDetailsDialog = ({
     if (!event) {
       return;
     }
+    const eventTitleForActions =
+      getEventMetadata(event.id)?.name || event.title;
     const attachedRealizationId =
       getEventMetadata(event.id)?.attachedRealizationId ?? null;
     if (attachedRealizationId && onOpenRealizationDialogByCode) {
@@ -162,7 +172,7 @@ const EventDetailsDialog = ({
       return;
     }
     if (onOpenRealizationDialog) {
-      onOpenRealizationDialog(event.title);
+      onOpenRealizationDialog(eventTitleForActions);
     }
   };
 
@@ -174,7 +184,7 @@ const EventDetailsDialog = ({
     const attachedRealizationId =
       getEventMetadata(event.id)?.attachedRealizationId ?? null;
     const realizationCode = RealizationApiService.getEffectiveRealizationCode(
-      event.title,
+      getEventMetadata(event.id)?.name || event.title,
       attachedRealizationId,
     );
     const override = getEventMetadata(event.id)?.hidden;
@@ -202,7 +212,7 @@ const EventDetailsDialog = ({
     const attachedRealizationId =
       getEventMetadata(event.id)?.attachedRealizationId ?? null;
     const realizationCode = RealizationApiService.getEffectiveRealizationCode(
-      event.title,
+      getEventMetadata(event.id)?.name || event.title,
       attachedRealizationId,
     );
     if (!realizationCode) {
@@ -219,7 +229,7 @@ const EventDetailsDialog = ({
     const attachedRealizationId =
       getEventMetadata(event.id)?.attachedRealizationId ?? null;
     const realizationCode = RealizationApiService.getEffectiveRealizationCode(
-      event.title,
+      getEventMetadata(event.id)?.name || event.title,
       attachedRealizationId,
     );
     if (!realizationCode) {
@@ -258,19 +268,24 @@ const EventDetailsDialog = ({
   };
 
   const displayEvent = event ?? lastEvent;
+  const isManualCustomEvent =
+    event !== null && getEventMetadata(event.id)?.source === "manual";
+  const canEditName = allowNameEditing && isManualCustomEvent;
+  const canEditLocation = allowLocationEditing && isManualCustomEvent;
   const attachedRealizationId = displayEvent
     ? (getEventMetadata(displayEvent.id)?.attachedRealizationId ?? null)
     : null;
   const effectiveRealizationCode = displayEvent
     ? RealizationApiService.getEffectiveRealizationCode(
-        displayEvent.title,
+        getEventMetadata(displayEvent.id)?.name || displayEvent.title,
         attachedRealizationId,
       )
     : null;
   const displayTitle = displayEvent
     ? (() => {
+        const metadataName = getEventMetadata(displayEvent.id)?.name;
         const baseTitle = RealizationApiService.stripRealizationCode(
-          displayEvent.title,
+          metadataName || displayEvent.title,
         );
         if (!effectiveRealizationCode) {
           return baseTitle;
@@ -282,16 +297,21 @@ const EventDetailsDialog = ({
   const displayDescription = displayEvent
     ? getInterestingDescription(displayEvent.description)
     : null;
+  const displayLocation = displayEvent
+    ? (getEventMetadata(displayEvent.id)?.location ?? displayEvent.location)
+    : "";
   const headerTitle = displayEvent ? displayTitle : "";
   const headerDescription = displayEvent ? displayDescription : null;
   const realizationCode = event
     ? RealizationApiService.getEffectiveRealizationCode(
-        event.title,
+        getEventMetadata(event.id)?.name || event.title,
         attachedRealizationId,
       )
     : null;
   const hasRealizationCode = event
-    ? RealizationApiService.hasRealizationCode(event.title)
+    ? RealizationApiService.hasRealizationCode(
+        getEventMetadata(event.id)?.name || event.title,
+      )
     : false;
   const hasEffectiveRealizationCode = Boolean(realizationCode);
   const isHidden = event
@@ -306,9 +326,7 @@ const EventDetailsDialog = ({
   const isCourseHidden = realizationCode
     ? isRealizationHidden(realizationCode)
     : false;
-  const timeOverride = event
-    ? getEventMetadata(event.id)?.overrides?.time
-    : null;
+  const timeOverride = event ? getEventMetadata(event.id)?.time : null;
   const originalStartTime = timeOverride
     ? new Date(timeOverride.originalStartTimeIso)
     : null;
@@ -425,14 +443,27 @@ const EventDetailsDialog = ({
           </div>
 
           {/* Location */}
-          {event.location && (
+          {displayLocation && (
             <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
               <div className="p-4">
-                <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  {t("eventDetailsDialog.location")}
-                </h4>
-                <p className="text-sm text-foreground">{event.location}</p>
+                <div className="mb-2 flex items-center justify-between">
+                  <h4 className="text-sm font-semibold flex items-center gap-1.5 text-muted-foreground">
+                    <MapPin className="h-4 w-4" />
+                    {t("eventDetailsDialog.location")}
+                  </h4>
+                  {canEditLocation && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setLocationEditDialogOpen(true)}
+                      aria-label={t("eventDetailsDialog.editLocation")}
+                    >
+                      <SquarePen className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                <p className="text-sm text-foreground">{displayLocation}</p>
               </div>
             </div>
           )}
@@ -518,12 +549,27 @@ const EventDetailsDialog = ({
                   )}
                 <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-start">
                   <ActionButton
-                    onClick={handleToggleVisibility}
-                    variant="subtle"
+                    onClick={() => {
+                      if (!event) {
+                        return;
+                      }
+                      if (isManualCustomEvent) {
+                        deleteCustomEvent(event.id);
+                        onOpenChange(false);
+                        return;
+                      }
+                      handleToggleVisibility();
+                    }}
+                    variant={isManualCustomEvent ? "danger" : "subtle"}
                     className="w-full sm:w-auto"
                   >
                     <div className="flex items-center justify-center gap-2">
-                      {isHidden ? (
+                      {isManualCustomEvent ? (
+                        <>
+                          <Trash2 className="h-4 w-4" />
+                          {tColor("contextMenu.deleteEvent")}
+                        </>
+                      ) : isHidden ? (
                         <>
                           <Eye className="h-4 w-4" />
                           {tColor("contextMenu.showEvent")}
@@ -586,49 +632,51 @@ const EventDetailsDialog = ({
           )}
 
           {/* Info about missing realization data */}
-          {event.title && !hasEffectiveRealizationCode && (
-            <div className="rounded-lg p-4 border bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Info className="h-4 w-4 shrink-0" />
-                <span className="text-sm">
-                  {t("eventDetailsDialog.noRealizationData")}{" "}
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
+          {event.title &&
+            !hasEffectiveRealizationCode &&
+            !hideNoRealizationIdWarning && (
+              <div className="rounded-lg p-4 border bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Info className="h-4 w-4 shrink-0" />
+                  <span className="text-sm">
+                    {t("eventDetailsDialog.noRealizationData")}{" "}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            className="hidden md:inline-flex underline underline-offset-2"
+                          >
+                            {noRealizationWhyNotLabel}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs text-xs">
+                          {noRealizationWhyNotExplanation}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <Sheet>
+                      <SheetTrigger asChild>
                         <button
                           type="button"
-                          className="hidden md:inline-flex underline underline-offset-2"
+                          className="md:hidden underline underline-offset-2"
                         >
                           {noRealizationWhyNotLabel}
                         </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-xs text-xs">
-                        {noRealizationWhyNotExplanation}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <button
-                        type="button"
-                        className="md:hidden underline underline-offset-2"
-                      >
-                        {noRealizationWhyNotLabel}
-                      </button>
-                    </SheetTrigger>
-                    <SheetContent side="bottom">
-                      <SheetHeader>
-                        <SheetTitle>{noRealizationWhyNotLabel}</SheetTitle>
-                        <SheetDescription>
-                          {noRealizationWhyNotExplanation}
-                        </SheetDescription>
-                      </SheetHeader>
-                    </SheetContent>
-                  </Sheet>
-                </span>
+                      </SheetTrigger>
+                      <SheetContent side="bottom">
+                        <SheetHeader>
+                          <SheetTitle>{noRealizationWhyNotLabel}</SheetTitle>
+                          <SheetDescription>
+                            {noRealizationWhyNotExplanation}
+                          </SheetDescription>
+                        </SheetHeader>
+                      </SheetContent>
+                    </Sheet>
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </motion.div>
       )}
     </AnimatePresence>
@@ -641,8 +689,20 @@ const EventDetailsDialog = ({
           <DrawerContent className="h-[90dvh] max-h-[90dvh] border-[var(--color-border-alpha-30)] bg-[var(--color-surface)] p-0 text-foreground">
             <DrawerHeader className="shrink-0 items-start px-6 pb-3 !text-left group-data-[vaul-drawer-direction=bottom]/drawer-content:!text-left">
               {headerTitle && (
-                <DrawerTitle className="w-full text-left text-xl font-bold text-foreground">
-                  {headerTitle}
+                <DrawerTitle className="w-full text-left text-xl font-bold text-foreground flex items-center gap-1.5">
+                  <span>{headerTitle}</span>
+                  {canEditName && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleOpenTimeEdit}
+                      aria-label={t("eventDetailsDialog.editName")}
+                      className="h-7 w-7"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
                 </DrawerTitle>
               )}
               {headerDescription && (
@@ -663,7 +723,19 @@ const EventDetailsDialog = ({
               {headerTitle && (
                 <DialogTitle className="text-xl font-bold flex items-center gap-2 text-foreground">
                   <BookOpen className="h-6 w-6 shrink-0" />
-                  {headerTitle}
+                  <span>{headerTitle}</span>
+                  {canEditName && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleOpenTimeEdit}
+                      aria-label={t("eventDetailsDialog.editName")}
+                      className="h-7 w-7"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
                 </DialogTitle>
               )}
               {headerDescription && (
@@ -759,6 +831,13 @@ const EventDetailsDialog = ({
         onOpenChange={(nextOpen: boolean) =>
           setEditTimeParam(nextOpen ? "true" : null)
         }
+        event={event}
+        allowNameEditing={allowNameEditing && isManualCustomEvent}
+      />
+
+      <EventLocationEditDialog
+        open={locationEditDialogOpen}
+        onOpenChange={setLocationEditDialogOpen}
         event={event}
       />
     </>

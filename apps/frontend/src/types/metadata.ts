@@ -9,9 +9,10 @@ export interface EventMetadata {
   hidden?: boolean;
   color?: string;
   attachedRealizationId?: string;
-  overrides?: {
-    time?: EventTimeOverride;
-  };
+  name?: string;
+  location?: string;
+  source?: "manual" | "additional";
+  time?: EventTimeOverride;
 }
 
 export type EventMetadataMap = Record<string, EventMetadata>;

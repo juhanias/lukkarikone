@@ -4,6 +4,7 @@ import { memo, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDateParam } from "../../hooks/useScheduleParams";
 import { RealizationApiService } from "../../services/realizationApi";
+import { isCustomScheduleEventId } from "../../state/schedule-store";
 import {
   default as useConfigStore,
   useEventMetadataStore,
@@ -91,11 +92,19 @@ const MonthView = memo(
     const { metadataByRealization, isRealizationHidden } =
       useRealizationMetadataStore();
 
+    const visibleEvents = useMemo(
+      () =>
+        config.allowCustomEvents
+          ? events
+          : events.filter((event) => !isCustomScheduleEventId(event.id)),
+      [events, config.allowCustomEvents],
+    );
+
     const monthData = useMemo(
       () =>
         buildMonthViewData({
           monthDate: currentDate,
-          events,
+          events: visibleEvents,
           metadataByEvent,
           metadataByRealization,
           isEventHidden,
@@ -103,7 +112,7 @@ const MonthView = memo(
         }),
       [
         currentDate,
-        events,
+        visibleEvents,
         metadataByEvent,
         metadataByRealization,
         isEventHidden,
@@ -131,8 +140,8 @@ const MonthView = memo(
     const dayNames = DateFormatUtils.getDayNamesShort(true);
 
     const eventById = useMemo(
-      () => new Map(events.map((event) => [event.id, event])),
-      [events],
+      () => new Map(visibleEvents.map((event) => [event.id, event])),
+      [visibleEvents],
     );
 
     const navigateToDay = (date: Date) => {
@@ -233,9 +242,13 @@ const MonthView = memo(
                   metadataByEvent,
                   metadataByRealization,
                 );
+                const eventDisplayName =
+                  metadataByEvent[event.id]?.name || event.title;
                 const title = config.showCourseIdInSchedule
-                  ? event.title
-                  : RealizationApiService.stripRealizationCode(event.title);
+                  ? eventDisplayName
+                  : RealizationApiService.stripRealizationCode(
+                      eventDisplayName,
+                    );
 
                 return (
                   <Tooltip key={segment.id}>

@@ -1,6 +1,6 @@
 import { addDays, startOfWeek } from "date-fns";
 import { Calendar, Clock, Eye, EyeOff, Palette, Pencil } from "lucide-react";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { RealizationColorCustomizer } from "@/components/RealizationColorCustomizer";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ import { useColorCustomizerDialogParam } from "../../hooks/useDialogParams";
 import { useEventDetailsDialog } from "../../hooks/useEventDetailsDialog";
 import { useRealizationDialog } from "../../hooks/useRealizationDialog";
 import { RealizationApiService } from "../../services/realizationApi";
+import { isCustomScheduleEventId } from "../../state/schedule-store";
 import {
   default as useConfigStore,
   useEventMetadataStore,
@@ -25,8 +26,8 @@ import { DateFormatUtils } from "../../utils/date-format-utils";
 import { ScheduleLayoutUtils } from "../../utils/schedule-layout-utils";
 import { ScheduleUtils } from "../../utils/schedule-utils";
 import { CalendarViewBadge } from "../CalendarViewBadge";
-import { LastUpdatedBadge } from "../LastUpdatedBadge";
 import EventDetailsDialog from "../EventDetailsDialog";
+import { LastUpdatedBadge } from "../LastUpdatedBadge";
 import RealizationDialog from "../RealizationDialog";
 import {
   ContextMenu,
@@ -64,7 +65,12 @@ const WeekView = memo(
       return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
     };
 
-    const { getEventsForWeek, getEventById } = useScheduleStore();
+    const {
+      addCustomEvent,
+      clearCustomEvents,
+      getEventsForWeek,
+      getEventById,
+    } = useScheduleStore();
     const { config, isCurrentThemeLight } = useConfigStore();
     const { metadataByRealization, isRealizationHidden } =
       useRealizationMetadataStore();
@@ -72,15 +78,11 @@ const WeekView = memo(
       useEventMetadataStore();
 
     const [colorEventId, setColorEventId] = useColorCustomizerDialogParam();
-    // Temporary debug events for testing overlapping layout
-    const [debugEvents, setDebugEvents] = useState<ScheduleEvent[]>([]);
-
-    // Generate some temporary random events for quick testing
-    const generateRandomEvents = (count = 30, weekDates: Date[]) => {
+    // Generate additional events for quick testing
+    const generateAdditionalEvents = (count = 30, weekDates: Date[]) => {
       const filteredWeekDates = weekDates;
       if (filteredWeekDates.length === 0) return;
       const durations = [0.5, 1, 1.5, 2];
-      const newEvents: ScheduleEvent[] = [];
       for (let i = 0; i < count; i++) {
         const date =
           filteredWeekDates[
@@ -99,27 +101,29 @@ const WeekView = memo(
         const endTime = new Date(
           startTime.getTime() + duration * 60 * 60 * 1000,
         );
-        const id = `debug-${Date.now()}-${i}-${Math.random().toString(36).slice(2, 7)}`;
-        newEvents.push({
-          id,
-          title: `Debug ${i + 1}`,
-          location: i % 3 === 0 ? `Room ${100 + (i % 10)}` : "",
+
+        addCustomEvent({
+          title: `Additional ${i + 1}`,
+          location: i % 3 === 0 ? `Room ${100 + (i % 10)}` : undefined,
           startTime,
           endTime,
-          duration,
-          startHour,
-          color: "",
+          source: "additional",
         });
       }
-      setDebugEvents((prev) => [...prev, ...newEvents]);
     };
 
-    const clearDebugEvents = () => setDebugEvents([]);
+    const clearAdditionalEvents = () =>
+      clearCustomEvents({ source: "additional" });
 
     const getDisplayTitle = (title: string) =>
       config.showCourseIdInSchedule
         ? title
         : RealizationApiService.stripRealizationCode(title);
+
+    const getEventDisplayName = (event: ScheduleEvent) =>
+      metadataByEvent[event.id]?.name || event.title;
+    const getEventLocation = (event: ScheduleEvent) =>
+      metadataByEvent[event.id]?.location || event.location;
 
     // Realization dialog hook
     const {
@@ -148,6 +152,14 @@ const WeekView = memo(
     const weekStart = getWeekStart(currentDate);
     const weekDates = getWeekDates(currentDate);
     const weekEvents = getEventsForWeek(weekStart);
+    const visibleWeekEvents = config.allowCustomEvents
+      ? weekEvents
+      : Object.fromEntries(
+          Object.entries(weekEvents).map(([dateKey, dayEvents]) => [
+            dateKey,
+            dayEvents.filter((event) => !isCustomScheduleEventId(event.id)),
+          ]),
+        );
     const selectedEventForColor = colorEventId
       ? getEventById(colorEventId)
       : null;
@@ -166,7 +178,7 @@ const WeekView = memo(
       if (!isWeekend) return false;
 
       const dateString = date.toDateString();
-      const eventsForDay = weekEvents[dateString] || [];
+      const eventsForDay = visibleWeekEvents[dateString] || [];
       return eventsForDay.length > 0;
     });
 
@@ -180,9 +192,9 @@ const WeekView = memo(
         });
 
     const filteredWeekEvents = shouldShowWeekends
-      ? weekEvents
+      ? visibleWeekEvents
       : Object.fromEntries(
-          Object.entries(weekEvents).filter(([dateString]) => {
+          Object.entries(visibleWeekEvents).filter(([dateString]) => {
             const date = new Date(dateString);
             const dayOfWeek = date.getDay();
             return dayOfWeek !== 0 && dayOfWeek !== 6; // Exclude Sunday (0) and Saturday (6)
@@ -191,16 +203,6 @@ const WeekView = memo(
 
     const filteredDayNames =
       DateFormatUtils.getDayNamesShort(shouldShowWeekends);
-
-    // Merge in any temporary debug events so they are included in time slot calculations
-    const mergedWeekEvents: Record<string, ScheduleEvent[]> = {
-      ...filteredWeekEvents,
-    };
-    debugEvents.forEach((ev) => {
-      const dateKey = ev.startTime.toDateString();
-      if (!mergedWeekEvents[dateKey]) mergedWeekEvents[dateKey] = [];
-      mergedWeekEvents[dateKey].push(ev);
-    });
 
     // Precompute event column layout per day so overlapping events are shown side-by-side.
     // We group events into overlapping clusters (transitive overlap), then assign columns
@@ -211,7 +213,7 @@ const WeekView = memo(
     > = {};
     filteredWeekDates.forEach((date) => {
       const dateString = date.toDateString();
-      const events = (mergedWeekEvents[dateString] || []).slice(); // copy
+      const events = (filteredWeekEvents[dateString] || []).slice(); // copy
 
       // Sort by start time (earlier start first). If equal, longer duration first
       events.sort(
@@ -272,10 +274,10 @@ const WeekView = memo(
       eventLayoutByDate[dateString] = mapping;
     });
 
-    // Calculate the time range for the week (include debug events)
+    // Calculate the time range for the week
     const timeSlots =
-      ScheduleLayoutUtils.generateWeekTimeSlots(mergedWeekEvents);
-    const totalEventsThisWeek = Object.values(mergedWeekEvents).reduce(
+      ScheduleLayoutUtils.generateWeekTimeSlots(filteredWeekEvents);
+    const totalEventsThisWeek = Object.values(filteredWeekEvents).reduce(
       (sum, dayEvents) => sum + dayEvents.length,
       0,
     );
@@ -305,7 +307,7 @@ const WeekView = memo(
     };
 
     // Format week indicator with hours
-    const allWeekEvents = Object.values(mergedWeekEvents).flat();
+    const allWeekEvents = Object.values(filteredWeekEvents).flat();
     const eventById = new Map(allWeekEvents.map((event) => [event.id, event]));
     const isEventEffectivelyHidden = (eventId: string) => {
       const event = eventById.get(eventId);
@@ -319,7 +321,7 @@ const WeekView = memo(
       const attachedRealizationId =
         metadataByEvent[eventId]?.attachedRealizationId ?? null;
       const realizationCode = RealizationApiService.getEffectiveRealizationCode(
-        event.title,
+        getEventDisplayName(event),
         attachedRealizationId,
       );
       return Boolean(realizationCode && isRealizationHidden(realizationCode));
@@ -330,7 +332,7 @@ const WeekView = memo(
     };
 
     const hasTimeOverrideChange = (event: ScheduleEvent) => {
-      const override = metadataByEvent[event.id]?.overrides?.time;
+      const override = metadataByEvent[event.id]?.time;
       if (!override) {
         return false;
       }
@@ -391,22 +393,22 @@ const WeekView = memo(
               )}
               <CalendarViewBadge variant="full" />
             </div>
-            {/* Debug controls (temporary) */}
+            {/* Additional event controls */}
             {config.devToolsEnableEventGenerator && (
               <div className="hidden md:flex absolute right-4 top-4 gap-2">
                 <button
                   type="button"
                   className="px-2 py-1 text-xs border rounded"
-                  onClick={() => generateRandomEvents(30, weekDates)}
+                  onClick={() => generateAdditionalEvents(30, weekDates)}
                 >
-                  Add random events
+                  Add additional events
                 </button>
                 <button
                   type="button"
                   className="px-2 py-1 text-xs border rounded"
-                  onClick={clearDebugEvents}
+                  onClick={clearAdditionalEvents}
                 >
-                  Clear debug
+                  Clear additional
                 </button>
               </div>
             )}
@@ -547,8 +549,8 @@ const WeekView = memo(
                                 : "bg-transparent",
                             )}
                           >
-                            {/* Events for this time slot (includes debug events) */}
-                            {mergedWeekEvents[date.toDateString()]?.map(
+                            {/* Events for this time slot */}
+                            {filteredWeekEvents[date.toDateString()]?.map(
                               (event) => {
                                 const eventStartHour = event.startHour;
                                 const slotHour = parseInt(
@@ -624,13 +626,16 @@ const WeekView = memo(
                                           }}
                                         >
                                           <div className="font-semibold line-clamp-2 leading-tight">
-                                            {getDisplayTitle(event.title)}
+                                            {getDisplayTitle(
+                                              getEventDisplayName(event),
+                                            )}
                                           </div>
-                                          {event.location && height > 56 && (
-                                            <div className="text-xs opacity-90 leading-tight">
-                                              📍 {event.location}
-                                            </div>
-                                          )}
+                                          {getEventLocation(event) &&
+                                            height > 56 && (
+                                              <div className="text-xs opacity-90 leading-tight">
+                                                📍 {getEventLocation(event)}
+                                              </div>
+                                            )}
                                           <div className="text-xs opacity-75 line-clamp-2">
                                             {ScheduleUtils.formatTimeRange(
                                               event.startTime,
@@ -710,6 +715,11 @@ const WeekView = memo(
           open={eventDetailsDialogOpen}
           onOpenChange={closeEventDetailsDialog}
           event={selectedEvent}
+          hideNoRealizationIdWarning={Boolean(
+            selectedEvent && isCustomScheduleEventId(selectedEvent.id),
+          )}
+          allowNameEditing
+          allowLocationEditing
           onOpenRealizationDialog={openRealizationDialog}
           onOpenRealizationDialogByCode={openRealizationDialogByCode}
           onOpenColorCustomizer={openColorCustomizer}
@@ -726,18 +736,20 @@ const WeekView = memo(
               }
             }}
             eventId={selectedEventForColor.id}
-            eventTitle={getDisplayTitle(selectedEventForColor.title)}
-            eventTitleRaw={selectedEventForColor.title}
+            eventTitle={getDisplayTitle(
+              getEventDisplayName(selectedEventForColor),
+            )}
+            eventTitleRaw={getEventDisplayName(selectedEventForColor)}
             realizationCode={
               metadataByEvent[selectedEventForColor.id]
                 ?.attachedRealizationId ||
               RealizationApiService.extractRealizationCode(
-                selectedEventForColor.title,
+                getEventDisplayName(selectedEventForColor),
               ) ||
               ""
             }
             realizationTitle={RealizationApiService.stripRealizationCode(
-              selectedEventForColor.title,
+              getEventDisplayName(selectedEventForColor),
             )}
           />
         )}

@@ -42,6 +42,10 @@
         "label": "Always show weekends",
         "subtitle": "Weekends are already automatically shown if they contain events"
       },
+      "allowCustomEvents": {
+        "label": "Show custom events",
+        "subtitle": "Allow the creation and display of custom events you add yourself"
+      },
       "showCourseId": {
         "label": "Show course ID in schedule",
         "subtitle": "Display the realization ID at the end of each course name"

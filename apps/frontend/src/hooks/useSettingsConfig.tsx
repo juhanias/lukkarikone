@@ -17,6 +17,7 @@ import useConfigStore, {
   useCalendarStore,
   useEventMetadataStore,
   useRealizationMetadataStore,
+  useScheduleStore,
   useSeenCommitsStore,
 } from "../state/state-management";
 import { FONT_OPTIONS, type Font } from "../types/config";
@@ -32,7 +33,9 @@ export function useSettingsConfig(): SettingsConfig {
   const { metadataByRealization, clearAllRealizationMetadata } =
     useRealizationMetadataStore();
   const { metadataByEvent, clearAllEventMetadata } = useEventMetadataStore();
+  const { clearCustomEvents, getCustomEventTemplates } = useScheduleStore();
   const { clearSeenCommits, seenCommits } = useSeenCommitsStore();
+  const customEventTemplates = getCustomEventTemplates();
 
   const handleWipeApplication = useCallback(() => {
     resetConfig();
@@ -104,6 +107,16 @@ export function useSettingsConfig(): SettingsConfig {
               subtitle: t("sections.view.showWeekends.subtitle"),
               checked: config.showWeekends,
               onChange: (checked) => setConfig({ showWeekends: checked }),
+            },
+          },
+          {
+            componentType: "toggle",
+            id: "allow-custom-events",
+            data: {
+              label: t("sections.view.allowCustomEvents.label"),
+              subtitle: t("sections.view.allowCustomEvents.subtitle"),
+              checked: config.allowCustomEvents,
+              onChange: (checked) => setConfig({ allowCustomEvents: checked }),
             },
           },
           {
@@ -454,6 +467,63 @@ export function useSettingsConfig(): SettingsConfig {
                       </pre>
                     </div>
                   </div>
+
+                  {/* Custom Events */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4
+                        className="text-sm font-semibold"
+                        style={{ color: "var(--color-text)" }}
+                      >
+                        Custom Events ({customEventTemplates.length})
+                      </h4>
+                      {customEventTemplates.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => clearCustomEvents()}
+                          className="px-3 py-1 text-sm rounded transition-colors"
+                          style={{
+                            backgroundColor: "var(--color-danger-alpha-20)",
+                            color: "var(--color-danger)",
+                            border: "1px solid var(--color-danger-alpha-30)",
+                          }}
+                        >
+                          Clear All
+                        </button>
+                      )}
+                    </div>
+                    <div
+                      className="rounded-lg p-4"
+                      style={{
+                        backgroundColor: "var(--color-background-alpha-60)",
+                        border: "1px solid var(--color-border-alpha-30)",
+                      }}
+                    >
+                      {customEventTemplates.length === 0 ? (
+                        <pre
+                          className="text-sm font-mono overflow-auto"
+                          style={{ color: "var(--color-accent)" }}
+                        >
+                          []
+                        </pre>
+                      ) : (
+                        <ul className="space-y-1 max-h-48 overflow-y-auto">
+                          {customEventTemplates
+                            .map((template) => template.id)
+                            .sort((a, b) => a.localeCompare(b))
+                            .map((eventId) => (
+                              <li
+                                key={eventId}
+                                className="text-sm font-mono break-all"
+                                style={{ color: "var(--color-accent)" }}
+                              >
+                                {eventId}
+                              </li>
+                            ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ),
             },
@@ -546,6 +616,8 @@ export function useSettingsConfig(): SettingsConfig {
     clearAllRealizationMetadata,
     metadataByEvent,
     clearAllEventMetadata,
+    customEventTemplates,
+    clearCustomEvents,
     seenCommits,
     clearSeenCommits,
   ]);

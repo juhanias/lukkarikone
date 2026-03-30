@@ -26,6 +26,7 @@ interface EventTimeEditDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   event: ScheduleEvent | null;
+  allowNameEditing?: boolean;
 }
 
 const padTime = (value: number) => value.toString().padStart(2, "0");
@@ -44,14 +45,16 @@ const EventTimeEditDialog = ({
   open,
   onOpenChange,
   event,
+  allowNameEditing = false,
 }: EventTimeEditDialogProps) => {
   const { t } = useTranslation("dialogs");
-  const { getEventTimeOverride, setEventTimeOverride } =
+  const { getEventMetadata, getEventTimeOverride, setEventMetadata, setEventTimeOverride } =
     useEventMetadataStore();
   const { applyEventTimeOverride } = useScheduleStore();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [startTimeValue, setStartTimeValue] = useState("");
   const [endTimeValue, setEndTimeValue] = useState("");
+  const [nameValue, setNameValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const startDigitsRef = useRef(0);
   const endTimeRef = useRef<HTMLInputElement>(null);
@@ -73,12 +76,14 @@ const EventTimeEditDialog = ({
     const baseEnd = activeOverride
       ? new Date(activeOverride.endTimeIso)
       : event.endTime;
+    const metadataName = getEventMetadata(event.id)?.name;
     setSelectedDate(baseStart);
     setStartTimeValue(formatTimeValue(baseStart));
     setEndTimeValue(formatTimeValue(baseEnd));
+    setNameValue(metadataName || event.title);
     setError(null);
     startDigitsRef.current = 0;
-  }, [activeOverride, event, open]);
+  }, [activeOverride, event, getEventMetadata, open]);
 
   const durationLabel = useMemo(() => {
     if (!selectedDate || !startTimeValue || !endTimeValue) {
@@ -137,6 +142,14 @@ const EventTimeEditDialog = ({
       updatedAt: new Date().toISOString(),
     };
 
+    if (allowNameEditing) {
+      const trimmedName = nameValue.trim();
+      if (!trimmedName) {
+        setError(t("createEventDialog.errors.missingName"));
+        return;
+      }
+      setEventMetadata(event.id, { name: trimmedName });
+    }
     setEventTimeOverride(event.id, override);
     applyEventTimeOverride(event.id, override);
     onOpenChange(false);
@@ -146,13 +159,38 @@ const EventTimeEditDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{t("eventTimeEditDialog.title")}</DialogTitle>
+          <DialogTitle>
+            {allowNameEditing
+              ? t("eventTimeEditDialog.titleWithName")
+              : t("eventTimeEditDialog.title")}
+          </DialogTitle>
           <DialogDescription>
-            {t("eventTimeEditDialog.description")}
+            {allowNameEditing
+              ? t("eventTimeEditDialog.descriptionWithName")
+              : t("eventTimeEditDialog.description")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
+          {allowNameEditing && (
+            <div className="space-y-2">
+              <label
+                htmlFor="event-time-name"
+                className="text-sm font-medium"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                {t("createEventDialog.nameLabel")}
+              </label>
+              <Input
+                id="event-time-name"
+                value={nameValue}
+                onChange={(eventInput) => setNameValue(eventInput.target.value)}
+                placeholder={t("createEventDialog.namePlaceholder")}
+                className="bg-[var(--color-surface)] border-[var(--color-border-alpha-30)] text-[var(--color-text)] focus-visible:border-[var(--color-accent)] focus-visible:ring-[var(--color-accent)]/30"
+              />
+            </div>
+          )}
+
           <div className="space-y-2">
             <div
               className="text-sm font-medium"

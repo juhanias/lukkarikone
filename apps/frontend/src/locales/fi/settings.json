@@ -42,6 +42,10 @@
         "label": "Näytä viikonloput aina",
         "subtitle": "Viikonloput näytetään jo automaattisesti jos niissä on tapahtumia"
       },
+      "allowCustomEvents": {
+        "label": "Näytä omat tapahtumat",
+        "subtitle": "Sallii omien tapahtumien luomisen"
+      },
       "showCourseId": {
         "label": "Näytä toteutuksen tunnus lukujärjestyksessä",
         "subtitle": "Näytä toteutuksen ID kurssinimen lopussa (esim. TE00DH11-3001)"

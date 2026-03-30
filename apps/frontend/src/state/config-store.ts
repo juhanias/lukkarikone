@@ -311,6 +311,7 @@ interface Config {
   font: Font;
   theme: string;
   showWeekends: boolean;
+  allowCustomEvents: boolean;
   hiddenEventOpacity: number;
   showCourseIdInSchedule: boolean;
   showTotalHours: boolean;
@@ -338,6 +339,7 @@ const defaultConfig: Config = {
   font: "gabarito-open-sans",
   theme: "muted-coral",
   showWeekends: false,
+  allowCustomEvents: true,
   hiddenEventOpacity: 25,
   showCourseIdInSchedule: false,
   showTotalHours: true,

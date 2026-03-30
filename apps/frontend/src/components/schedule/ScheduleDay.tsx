@@ -11,6 +11,7 @@ import { useColorCustomizerDialogParam } from "../../hooks/useDialogParams";
 import { useEventDetailsDialog } from "../../hooks/useEventDetailsDialog";
 import { useRealizationDialog } from "../../hooks/useRealizationDialog";
 import { RealizationApiService } from "../../services/realizationApi";
+import { isCustomScheduleEventId } from "../../state/schedule-store";
 import {
   default as useConfigStore,
   useEventMetadataStore,
@@ -24,8 +25,8 @@ import {
 } from "../../utils/schedule-layout-utils";
 import { ScheduleUtils } from "../../utils/schedule-utils";
 import { CalendarViewBadge } from "../CalendarViewBadge";
-import { LastUpdatedBadge } from "../LastUpdatedBadge";
 import EventDetailsDialog from "../EventDetailsDialog";
+import { LastUpdatedBadge } from "../LastUpdatedBadge";
 import RealizationDialog from "../RealizationDialog";
 import {
   ContextMenu,
@@ -72,6 +73,11 @@ const ScheduleDay = memo(
       config.showCourseIdInSchedule
         ? title
         : RealizationApiService.stripRealizationCode(title);
+
+    const getEventDisplayName = (event: ScheduleEvent) =>
+      metadataByEvent[event.id]?.name || event.title;
+    const getEventLocation = (event: ScheduleEvent) =>
+      metadataByEvent[event.id]?.location || event.location;
 
     // Realization dialog hook
     const {
@@ -139,9 +145,10 @@ const ScheduleDay = memo(
         }
         const attachedRealizationId =
           metadataByEvent[eventId]?.attachedRealizationId ?? null;
+        const eventDisplayName = metadataByEvent[eventId]?.name || event.title;
         const realizationCode =
           RealizationApiService.getEffectiveRealizationCode(
-            event.title,
+            eventDisplayName,
             attachedRealizationId,
           );
         return Boolean(realizationCode && isRealizationHidden(realizationCode));
@@ -155,7 +162,7 @@ const ScheduleDay = memo(
     };
 
     const hasTimeOverrideChange = (event: ScheduleEvent) => {
-      const override = metadataByEvent[event.id]?.overrides?.time;
+      const override = metadataByEvent[event.id]?.time;
       if (!override) {
         return false;
       }
@@ -392,10 +399,10 @@ const ScheduleDay = memo(
                                     : "text-base line-clamp-3"
                                 }`}
                               >
-                                {getDisplayTitle(event.title)}
+                                {getDisplayTitle(getEventDisplayName(event))}
                               </h3>
 
-                              {event.location &&
+                              {getEventLocation(event) &&
                                 eventDurationInHours >= 1.5 && (
                                   <p
                                     className={`text-xs opacity-90 leading-tight ${
@@ -404,7 +411,7 @@ const ScheduleDay = memo(
                                         : "line-clamp-2"
                                     }`}
                                   >
-                                    {event.location}
+                                    {getEventLocation(event)}
                                   </p>
                                 )}
 
@@ -477,6 +484,11 @@ const ScheduleDay = memo(
           open={eventDetailsDialogOpen}
           onOpenChange={closeEventDetailsDialog}
           event={selectedEvent}
+          hideNoRealizationIdWarning={Boolean(
+            selectedEvent && isCustomScheduleEventId(selectedEvent.id),
+          )}
+          allowNameEditing
+          allowLocationEditing
           onOpenRealizationDialog={openRealizationDialog}
           onOpenRealizationDialogByCode={openRealizationDialogByCode}
           isRealizationLoading={realizationLoading}
@@ -492,18 +504,20 @@ const ScheduleDay = memo(
               }
             }}
             eventId={selectedEventForColor.id}
-            eventTitle={getDisplayTitle(selectedEventForColor.title)}
-            eventTitleRaw={selectedEventForColor.title}
+            eventTitle={getDisplayTitle(
+              getEventDisplayName(selectedEventForColor),
+            )}
+            eventTitleRaw={getEventDisplayName(selectedEventForColor)}
             realizationCode={
               metadataByEvent[selectedEventForColor.id]
                 ?.attachedRealizationId ||
               RealizationApiService.extractRealizationCode(
-                selectedEventForColor.title,
+                getEventDisplayName(selectedEventForColor),
               ) ||
               ""
             }
             realizationTitle={RealizationApiService.stripRealizationCode(
-              selectedEventForColor.title,
+              getEventDisplayName(selectedEventForColor),
             )}
           />
         )}

@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { PRESET_CALENDARS } from "@/lib/preset-calendars";
 import { useIsMobile } from "../hooks/useIsMobile";
-import { useCalendarStore } from "../state/state-management";
+import { useCalendarStore, useConfigStore } from "../state/state-management";
 import type { Calendar as CalendarType } from "../types/calendar";
 import { Button } from "./ui/button";
 import {
@@ -30,6 +30,7 @@ import {
   DrawerTitle,
 } from "./ui/drawer";
 import { Input } from "./ui/input";
+import { Switch } from "./ui/switch";
 
 interface CalendarManagementDialogProps {
   open: boolean;
@@ -41,8 +42,10 @@ export const CalendarManagementDialog = ({
   onOpenChange,
 }: CalendarManagementDialogProps) => {
   const { t } = useTranslation("common");
+  const { t: tSettings } = useTranslation("settings");
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { config, setConfig } = useConfigStore();
   const {
     calendars,
     activeCalendarId,
@@ -176,6 +179,36 @@ export const CalendarManagementDialog = ({
         <Plus className="h-4 w-4" />
         {t("calendars.createNew") || "New Calendar"}
       </Button>
+
+      <div
+        className="w-full flex items-center justify-between rounded-lg border p-4"
+        style={{
+          backgroundColor: "var(--color-surface-secondary-alpha-20)",
+          borderColor: "var(--color-border-alpha-30)",
+        }}
+      >
+        <div className="mr-4 min-w-0">
+          <p
+            className="text-sm font-medium"
+            style={{ color: "var(--color-text)" }}
+          >
+            {tSettings("sections.view.allowCustomEvents.label")}
+          </p>
+          <p
+            className="text-xs mt-0.5"
+            style={{ color: "var(--color-text-secondary)" }}
+          >
+            {tSettings("sections.view.allowCustomEvents.subtitle")}
+          </p>
+        </div>
+        <Switch
+          checked={config.allowCustomEvents}
+          onCheckedChange={(checked) =>
+            setConfig({ allowCustomEvents: checked })
+          }
+          aria-label={tSettings("sections.view.allowCustomEvents.label")}
+        />
+      </div>
 
       {/* Calendar List */}
       {calendars.map((calendar) => (

@@ -16,7 +16,8 @@
     "day": "Päivä",
     "week": "Viikko",
     "month": "Kuukausi",
-    "today": "Tänään"
+    "today": "Tänään",
+    "createEvent": "Luo tapahtuma"
   },
   "monthView": {
     "subtitle": "Kuukauden yleisnäkymä",

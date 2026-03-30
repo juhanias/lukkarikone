@@ -66,6 +66,8 @@
     "date": "Päivämäärä",
     "time": "Aika",
     "duration": "Kesto",
+    "editName": "Muokkaa nimeä",
+    "editLocation": "Muokkaa sijaintia",
     "teachers": "Opettajat",
     "studentGroups": "Opiskelijaryhmät",
     "showRealizationDetails": "Näytä toteutustiedot",
@@ -103,7 +105,9 @@
   },
   "eventTimeEditDialog": {
     "title": "Muokkaa tapahtuman aikaa",
+    "titleWithName": "Muokkaa tapahtumaa",
     "description": "Päivitä tämän tapahtuman päivä ja kellonaika.",
+    "descriptionWithName": "Päivitä tämän tapahtuman nimi, päivä ja kellonaika.",
     "openButton": "Muokkaa aikaa",
     "dateLabel": "Päivä",
     "pickDate": "Valitse päivä",
@@ -112,6 +116,34 @@
     "cancel": "Peruuta",
     "save": "Tallenna",
     "errors": {
+      "missingDate": "Valitse ensin päivä.",
+      "invalidRange": "Päättymisajan on oltava alkamisajan jälkeen."
+    }
+  },
+  "eventLocationEditDialog": {
+    "title": "Muokkaa tapahtuman sijaintia",
+    "description": "Päivitä tämän tapahtuman sijainti.",
+    "cancel": "Peruuta",
+    "save": "Tallenna"
+  },
+  "createEventDialog": {
+    "title": "Luo tapahtuma",
+    "description": "Lisää uusi tapahtuma lukujärjestykseesi.",
+    "nameLabel": "Nimi",
+    "namePlaceholder": "esim. Itsenäinen opiskelu (lock in)",
+    "dateLabel": "Päivä",
+    "pickDate": "Valitse päivä",
+    "startTimeLabel": "Alkaa",
+    "endTimeLabel": "Päättyy",
+    "moreOptions": "Lisäasetukset",
+    "locationLabel": "Sijainti (valinnainen)",
+    "locationPlaceholder": "esim. Taidon Portaat",
+    "colorLabel": "Väri (valinnainen)",
+    "colorDefault": "Käytä oletusta",
+    "cancel": "Peruuta",
+    "create": "Luo",
+    "errors": {
+      "missingName": "Anna tapahtumalle nimi.",
       "missingDate": "Valitse ensin päivä.",
       "invalidRange": "Päättymisajan on oltava alkamisajan jälkeen."
     }

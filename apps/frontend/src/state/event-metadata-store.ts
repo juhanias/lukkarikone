@@ -6,6 +6,18 @@ import type {
   EventTimeOverride,
 } from "../types/metadata";
 
+interface LegacyEventMetadata extends Omit<EventMetadata, "time"> {
+  time?: EventTimeOverride;
+  overrides?: {
+    time?: EventTimeOverride;
+  };
+  customEvent?: {
+    name?: string;
+    location?: string;
+    source?: "manual" | "additional";
+  };
+}
+
 const STORAGE_KEY = "event-metadata";
 const LEGACY_STORAGE_KEY = "hidden-events";
 
@@ -92,6 +104,13 @@ interface EventMetadataState {
   showEvent: (eventId: string) => void;
   toggleEventVisibility: (eventId: string) => void;
   clearAllEventMetadata: () => void;
+  clearCustomEventMetadata: (options?: {
+    source?: "manual" | "additional";
+  }) => void;
+  clearEventMetadataKeys: (
+    eventId: string,
+    keys: Array<keyof EventMetadata>,
+  ) => void;
   setHasSeenEditWarning: (value: boolean) => void;
 }
 
@@ -132,7 +151,7 @@ export const useEventMetadataStore = create<EventMetadataState>()(
 
       getEventTimeOverride: (eventId: string) => {
         const { metadataByEvent } = get();
-        return metadataByEvent[eventId]?.overrides?.time ?? null;
+        return metadataByEvent[eventId]?.time ?? null;
       },
 
       setEventTimeOverride: (eventId: string, override: EventTimeOverride) => {
@@ -141,10 +160,7 @@ export const useEventMetadataStore = create<EventMetadataState>()(
             ...state.metadataByEvent,
             [eventId]: {
               ...state.metadataByEvent[eventId],
-              overrides: {
-                ...state.metadataByEvent[eventId]?.overrides,
-                time: override,
-              },
+              time: override,
             },
           },
         }));
@@ -153,24 +169,18 @@ export const useEventMetadataStore = create<EventMetadataState>()(
       clearEventTimeOverride: (eventId: string) => {
         set((state) => {
           const existing = state.metadataByEvent[eventId];
-          if (!existing?.overrides?.time) {
+          if (!existing?.time) {
             return state;
           }
-          const { overrides: __, ...restEvent } = existing;
-          const { time: _, ...restOverrides } = existing.overrides ?? {};
-          const overrides =
-            Object.keys(restOverrides).length > 0 ? restOverrides : undefined;
-          if (Object.keys(restEvent).length === 0 && !overrides) {
+          const { time: _, ...restEvent } = existing;
+          if (Object.keys(restEvent).length === 0) {
             const { [eventId]: __, ...remaining } = state.metadataByEvent;
             return { metadataByEvent: remaining };
           }
           return {
             metadataByEvent: {
               ...state.metadataByEvent,
-              [eventId]: {
-                ...restEvent,
-                ...(overrides ? { overrides } : {}),
-              },
+              [eventId]: restEvent,
             },
           };
         });
@@ -320,13 +330,92 @@ export const useEventMetadataStore = create<EventMetadataState>()(
         set({ metadataByEvent: {} });
       },
 
+      clearCustomEventMetadata: (options) => {
+        const sourceFilter = options?.source;
+        set((state) => {
+          const nextMetadataByEvent = Object.fromEntries(
+            Object.entries(state.metadataByEvent).filter(([, metadata]) => {
+              const customSource = metadata.source;
+              if (!customSource) {
+                return true;
+              }
+              if (!sourceFilter) {
+                return false;
+              }
+              return customSource !== sourceFilter;
+            }),
+          );
+          return { metadataByEvent: nextMetadataByEvent };
+        });
+      },
+
+      clearEventMetadataKeys: (eventId, keys) => {
+        if (keys.length === 0) {
+          return;
+        }
+        set((state) => {
+          const existing = state.metadataByEvent[eventId];
+          if (!existing) {
+            return state;
+          }
+          const next = { ...existing };
+          keys.forEach((key) => {
+            delete next[key];
+          });
+          if (Object.keys(next).length === 0) {
+            const { [eventId]: __, ...remaining } = state.metadataByEvent;
+            return { metadataByEvent: remaining };
+          }
+          return {
+            metadataByEvent: {
+              ...state.metadataByEvent,
+              [eventId]: next,
+            },
+          };
+        });
+      },
+
       setHasSeenEditWarning: (value: boolean) => {
         set({ hasSeenEditWarning: value });
       },
     }),
     {
       name: STORAGE_KEY,
-      version: 1,
+      version: 2,
+      migrate: (persistedState, _version) => {
+        const persisted = persistedState as Partial<EventMetadataState>;
+        const metadataByEvent = persisted.metadataByEvent ?? {};
+        const migratedMetadataByEvent = Object.fromEntries(
+          Object.entries(metadataByEvent).map(([eventId, metadata]) => {
+            const legacyMetadata = metadata as LegacyEventMetadata;
+            const migrated: EventMetadata = {
+              hidden: legacyMetadata.hidden,
+              color: legacyMetadata.color,
+              attachedRealizationId: legacyMetadata.attachedRealizationId,
+              name:
+                legacyMetadata.name ?? legacyMetadata.customEvent?.name ?? undefined,
+              location:
+                legacyMetadata.location ??
+                legacyMetadata.customEvent?.location ??
+                undefined,
+              source:
+                legacyMetadata.source ??
+                legacyMetadata.customEvent?.source ??
+                undefined,
+              time:
+                legacyMetadata.time ??
+                legacyMetadata.overrides?.time ??
+                undefined,
+            };
+            return [eventId, migrated];
+          }),
+        ) as EventMetadataMap;
+
+        return {
+          metadataByEvent: migratedMetadataByEvent,
+          hasSeenEditWarning: Boolean(persisted.hasSeenEditWarning),
+        };
+      },
       partialize: (state) => ({
         metadataByEvent: state.metadataByEvent,
         hasSeenEditWarning: state.hasSeenEditWarning,

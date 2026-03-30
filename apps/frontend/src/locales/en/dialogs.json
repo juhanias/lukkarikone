@@ -66,6 +66,8 @@
     "date": "Date",
     "time": "Time",
     "duration": "Duration",
+    "editName": "Edit name",
+    "editLocation": "Edit location",
     "teachers": "Teachers",
     "studentGroups": "Student Groups",
     "showRealizationDetails": "Show Implementation Details",
@@ -103,7 +105,9 @@
   },
   "eventTimeEditDialog": {
     "title": "Edit event time",
+    "titleWithName": "Edit event",
     "description": "Update the date and time for this event.",
+    "descriptionWithName": "Update the name, date and time for this event.",
     "openButton": "Edit time",
     "dateLabel": "Date",
     "pickDate": "Pick a date",
@@ -112,6 +116,34 @@
     "cancel": "Cancel",
     "save": "Save",
     "errors": {
+      "missingDate": "Please pick a date first.",
+      "invalidRange": "End time must be after start time."
+    }
+  },
+  "eventLocationEditDialog": {
+    "title": "Edit event location",
+    "description": "Update the location for this event.",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "createEventDialog": {
+    "title": "Create event",
+    "description": "Add a new event to your schedule.",
+    "nameLabel": "Name",
+    "namePlaceholder": "e.g. lock in for physics",
+    "dateLabel": "Date",
+    "pickDate": "Pick a date",
+    "startTimeLabel": "Starts",
+    "endTimeLabel": "Ends",
+    "moreOptions": "More options",
+    "locationLabel": "Location (optional)",
+    "locationPlaceholder": "e.g. Taidon Portaat",
+    "colorLabel": "Color (optional)",
+    "colorDefault": "Use default",
+    "cancel": "Cancel",
+    "create": "Create",
+    "errors": {
+      "missingName": "Please enter a name.",
       "missingDate": "Please pick a date first.",
       "invalidRange": "End time must be after start time."
     }
