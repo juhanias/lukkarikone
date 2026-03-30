@@ -1,11 +1,7 @@
 import { AlertTriangle, Clock3, Info, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../hooks/useIsMobile";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerTrigger,
-} from "./ui/drawer";
+import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 import {
   Tooltip,
   TooltipContent,

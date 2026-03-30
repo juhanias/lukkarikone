@@ -1,13 +1,13 @@
 import { motion } from "framer-motion";
 import { ChevronDown, GitBranch } from "lucide-react";
 import { useRef, useState } from "react";
-import { SettingsComponentRenderer } from "./SettingsComponentRenderer";
-import { SettingsNavigation } from "./SettingsNavigation";
-import { SettingsSection } from "./ui";
 import { useActiveSection } from "../hooks/useActiveSection";
 import { useSettingsConfig } from "../hooks/useSettingsConfig";
 import useConfigStore from "../state/state-management";
 import type { SettingComponentGroup } from "../types/settings-config";
+import { SettingsComponentRenderer } from "./SettingsComponentRenderer";
+import { SettingsNavigation } from "./SettingsNavigation";
+import { SettingsSection } from "./ui";
 import "./ui/slider-theme.css";
 
 interface SettingsPanelProps {
@@ -144,7 +144,9 @@ export function SettingsPanel({ mode = "page" }: SettingsPanelProps) {
                 key={block.id}
                 id={block.id}
                 variants={itemVariants}
-                className={block.id === "styling-settings" ? "mb-64" : undefined}
+                className={
+                  block.id === "styling-settings" ? "mb-64" : undefined
+                }
               >
                 <SettingsSection
                   icon={block.icon}
@@ -195,7 +197,9 @@ export function SettingsPanel({ mode = "page" }: SettingsPanelProps) {
                 key={block.id}
                 id={block.id}
                 variants={itemVariants}
-                className={block.id === "styling-settings" ? "mb-64" : undefined}
+                className={
+                  block.id === "styling-settings" ? "mb-64" : undefined
+                }
               >
                 <SettingsSection
                   icon={block.icon}

@@ -18,12 +18,7 @@ import { useScheduleStore } from "../state/schedule-store";
 import { useEventMetadataStore } from "../state/state-management";
 import type { ScheduleEvent } from "../types/schedule";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from "./ui/drawer";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer";
 
 interface RealizationData {
   name: string;
@@ -262,39 +257,39 @@ const RealizationDialog = ({
 
   const metaBadges = displayRealization
     ? ([
-      displayRealization.scope_amount
-        ? {
-          icon: BookOpen,
-          label: t("realizationDialog.basicInfo.credits"),
-          value: `${displayRealization.scope_amount} op`,
-        }
-        : null,
-      displayRealization.office
-        ? {
-          icon: MapPin,
-          label: t("realizationDialog.basicInfo.campus"),
-          value: displayRealization.office,
-        }
-        : null,
-      displayRealization.teaching_language
-        ? {
-          icon: GraduationCap,
-          label: t("realizationDialog.basicInfo.teachingLanguage"),
-          value: displayRealization.teaching_language,
-        }
-        : null,
-      displayRealization.evaluation_scale
-        ? {
-          icon: Info,
-          label: t("realizationDialog.basicInfo.evaluationScale"),
-          value: displayRealization.evaluation_scale,
-        }
-        : null,
-    ].filter(Boolean) as Array<{
-      icon: React.ComponentType<{ className?: string }>;
-      label: string;
-      value: string;
-    }>)
+        displayRealization.scope_amount
+          ? {
+              icon: BookOpen,
+              label: t("realizationDialog.basicInfo.credits"),
+              value: `${displayRealization.scope_amount} op`,
+            }
+          : null,
+        displayRealization.office
+          ? {
+              icon: MapPin,
+              label: t("realizationDialog.basicInfo.campus"),
+              value: displayRealization.office,
+            }
+          : null,
+        displayRealization.teaching_language
+          ? {
+              icon: GraduationCap,
+              label: t("realizationDialog.basicInfo.teachingLanguage"),
+              value: displayRealization.teaching_language,
+            }
+          : null,
+        displayRealization.evaluation_scale
+          ? {
+              icon: Info,
+              label: t("realizationDialog.basicInfo.evaluationScale"),
+              value: displayRealization.evaluation_scale,
+            }
+          : null,
+      ].filter(Boolean) as Array<{
+        icon: React.ComponentType<{ className?: string }>;
+        label: string;
+        value: string;
+      }>)
     : [];
 
   const teachers =
@@ -469,8 +464,7 @@ const RealizationDialog = ({
                             style={{
                               backgroundColor: "var(--color-surface)",
                               color: "var(--color-text)",
-                              border:
-                                "1px solid var(--color-border-alpha-30)",
+                              border: "1px solid var(--color-border-alpha-30)",
                             }}
                           >
                             {teacher}
@@ -497,8 +491,7 @@ const RealizationDialog = ({
                             style={{
                               backgroundColor: "var(--color-surface)",
                               color: "var(--color-text)",
-                              border:
-                                "1px solid var(--color-border-alpha-30)",
+                              border: "1px solid var(--color-border-alpha-30)",
                             }}
                           >
                             {group}
@@ -514,59 +507,59 @@ const RealizationDialog = ({
             {/* Learning Materials & Further Information */}
             {(displayRealization.learning_material ||
               displayRealization.further_information) && (
-                <div
-                  className="rounded-lg border overflow-hidden"
-                  style={{
-                    backgroundColor: "var(--color-surface-alpha-40)",
-                    borderColor: "var(--color-border-alpha-30)",
-                  }}
-                >
-                  <div className="grid grid-cols-1">
-                    {displayRealization.learning_material && (
-                      <div
-                        className={`p-4 ${displayRealization.further_information ? "border-b" : ""}`}
-                        style={
-                          displayRealization.further_information
-                            ? { borderColor: "var(--color-border-alpha-30)" }
-                            : undefined
-                        }
+              <div
+                className="rounded-lg border overflow-hidden"
+                style={{
+                  backgroundColor: "var(--color-surface-alpha-40)",
+                  borderColor: "var(--color-border-alpha-30)",
+                }}
+              >
+                <div className="grid grid-cols-1">
+                  {displayRealization.learning_material && (
+                    <div
+                      className={`p-4 ${displayRealization.further_information ? "border-b" : ""}`}
+                      style={
+                        displayRealization.further_information
+                          ? { borderColor: "var(--color-border-alpha-30)" }
+                          : undefined
+                      }
+                    >
+                      <h4
+                        className="text-sm font-semibold mb-2 flex items-center gap-1.5"
+                        style={{ color: "var(--color-text-secondary)" }}
                       >
-                        <h4
-                          className="text-sm font-semibold mb-2 flex items-center gap-1.5"
-                          style={{ color: "var(--color-text-secondary)" }}
-                        >
-                          <BookOpen className="h-4 w-4" />
-                          {t("realizationDialog.learningMaterial.title")}
-                        </h4>
-                        <p
-                          className="text-sm whitespace-pre-wrap leading-relaxed"
-                          style={{ color: "var(--color-text)" }}
-                        >
-                          {displayRealization.learning_material}
-                        </p>
-                      </div>
-                    )}
+                        <BookOpen className="h-4 w-4" />
+                        {t("realizationDialog.learningMaterial.title")}
+                      </h4>
+                      <p
+                        className="text-sm whitespace-pre-wrap leading-relaxed"
+                        style={{ color: "var(--color-text)" }}
+                      >
+                        {displayRealization.learning_material}
+                      </p>
+                    </div>
+                  )}
 
-                    {displayRealization.further_information && (
-                      <div className="p-4">
-                        <h4
-                          className="text-sm font-semibold mb-2 flex items-center gap-1.5"
-                          style={{ color: "var(--color-text-secondary)" }}
-                        >
-                          <Info className="h-4 w-4" />
-                          {t("realizationDialog.furtherInformation.title")}
-                        </h4>
-                        <p
-                          className="text-sm whitespace-pre-wrap leading-relaxed"
-                          style={{ color: "var(--color-text)" }}
-                        >
-                          {displayRealization.further_information}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                  {displayRealization.further_information && (
+                    <div className="p-4">
+                      <h4
+                        className="text-sm font-semibold mb-2 flex items-center gap-1.5"
+                        style={{ color: "var(--color-text-secondary)" }}
+                      >
+                        <Info className="h-4 w-4" />
+                        {t("realizationDialog.furtherInformation.title")}
+                      </h4>
+                      <p
+                        className="text-sm whitespace-pre-wrap leading-relaxed"
+                        style={{ color: "var(--color-text)" }}
+                      >
+                        {displayRealization.further_information}
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+            )}
 
             {/* Events */}
             {analyzedEvents.length > 0 && (
@@ -605,8 +598,7 @@ const RealizationDialog = ({
                       }}
                     >
                       <Calendar className="h-3 w-3 shrink-0" />
-                      {t("realizationDialog.events.upcoming")}:{" "}
-                      {upcomingCount}
+                      {t("realizationDialog.events.upcoming")}: {upcomingCount}
                       <span className="opacity-75">
                         · {fmtHours(upcomingHours)}
                       </span>

@@ -168,7 +168,11 @@ export const CalendarManagementDialog = ({
 
   const calendarManagementBody = (
     <div className="space-y-4 mt-4">
-      <Button type="button" onClick={handleCreateCalendar} className="w-full sm:w-auto">
+      <Button
+        type="button"
+        onClick={handleCreateCalendar}
+        className="w-full sm:w-auto"
+      >
         <Plus className="h-4 w-4" />
         {t("calendars.createNew") || "New Calendar"}
       </Button>
@@ -219,8 +223,7 @@ export const CalendarManagementDialog = ({
                       }
                     }}
                     placeholder={
-                      t("calendars.calendarNamePlaceholder") ||
-                      "Calendar name"
+                      t("calendars.calendarNamePlaceholder") || "Calendar name"
                     }
                     autoFocus
                     style={{
@@ -332,8 +335,7 @@ export const CalendarManagementDialog = ({
                 key={url}
                 className="flex items-center gap-2 p-2 rounded"
                 style={{
-                  backgroundColor:
-                    "var(--color-surface-secondary-alpha-20)",
+                  backgroundColor: "var(--color-surface-secondary-alpha-20)",
                 }}
               >
                 {editingUrlState?.calendarId === calendar.id &&
@@ -431,8 +433,7 @@ export const CalendarManagementDialog = ({
               <div
                 className="space-y-3 p-3 rounded-lg border"
                 style={{
-                  backgroundColor:
-                    "var(--color-surface-secondary-alpha-20)",
+                  backgroundColor: "var(--color-surface-secondary-alpha-20)",
                   borderColor: "var(--color-border-alpha-30)",
                 }}
               >
@@ -505,9 +506,7 @@ export const CalendarManagementDialog = ({
                       if (e.key === "Enter") handleAddUrl(calendar.id);
                       if (e.key === "Escape") setNewUrlState(null);
                     }}
-                    placeholder={
-                      t("calendars.urlPlaceholder") || "https://..."
-                    }
+                    placeholder={t("calendars.urlPlaceholder") || "https://..."}
                     autoFocus
                     className="flex-1"
                     style={{

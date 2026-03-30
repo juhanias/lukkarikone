@@ -8,6 +8,10 @@
         "setup": "bun install",
         "dev:frontend": "cd apps/frontend && bun run dev",
         "dev:backend": "cd apps/backend && bun run dev",
-        "dev": "concurrently \"bun run dev:frontend\" \"bun run dev:backend\" --names \"frontend,backend\" --prefix-colors \"green,blue\""
+        "dev": "concurrently \"bun run dev:frontend\" \"bun run dev:backend\" --names \"frontend,backend\" --prefix-colors \"green,blue\"",
+        "lint": "bun run --cwd apps/frontend lint",
+        "fix:lint": "bun run --cwd apps/frontend fix:lint",
+        "fix:format": "bun run --cwd apps/frontend fix:format",
+        "fix:all": "bun run --cwd apps/frontend fix:all"
     }
 }

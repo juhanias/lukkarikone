@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
+import { useEventTimeEditDialogParam } from "../hooks/useDialogParams";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { RealizationApiService } from "../services/realizationApi";
 import {
@@ -22,7 +23,6 @@ import {
   useScheduleStore,
 } from "../state/state-management";
 import type { ScheduleEvent } from "../types/schedule";
-import { useEventTimeEditDialogParam } from "../hooks/useDialogParams";
 import AttachRealizationDialog from "./AttachRealizationDialog";
 import EventTimeEditDialog from "./EventTimeEditDialog";
 import { ActionButton } from "./ui/ActionButton";
@@ -35,12 +35,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from "./ui/drawer";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer";
 import {
   Sheet,
   SheetContent,
@@ -363,288 +358,277 @@ const LectureDetailsDialog = ({
           className="space-y-4"
           style={{ willChange: "transform, opacity" }}
         >
-                {/* Date & Schedule */}
-                <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-semibold flex items-center gap-1.5 text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        {t("lectureDetailsDialog.schedule")}
-                      </h4>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={handleOpenTimeEdit}
-                        aria-label={t("eventTimeEditDialog.openButton")}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
+          {/* Date & Schedule */}
+          <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-sm font-semibold flex items-center gap-1.5 text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  {t("lectureDetailsDialog.schedule")}
+                </h4>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleOpenTimeEdit}
+                  aria-label={t("eventTimeEditDialog.openButton")}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="space-y-1">
+                {hasTimeOverrideChange &&
+                originalStartTime &&
+                originalEndTime ? (
+                  <>
+                    {hasDateOverrideChange && (
+                      <p className="text-sm line-through text-muted-foreground">
+                        {formatDate(originalStartTime)}
+                      </p>
+                    )}
+                    <p className="text-sm text-foreground">
+                      {formatDate(event.startTime)}
+                    </p>
+                    <p className="text-sm line-through text-muted-foreground">
+                      {formatTime(originalStartTime)} –{" "}
+                      {formatTime(originalEndTime)}
+                      {typeof originalDuration === "number" && (
+                        <span className="ml-2 text-xs">
+                          ({getDurationString(originalDuration)})
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-sm text-foreground">
+                      {formatTime(event.startTime)} –{" "}
+                      {formatTime(event.endTime)}
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        ({getDurationString(event.duration)})
+                      </span>
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-foreground">
+                      {formatDate(event.startTime)}
+                    </p>
+                    <p className="text-sm text-foreground">
+                      {formatTime(event.startTime)} –{" "}
+                      {formatTime(event.endTime)}
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        ({getDurationString(event.duration)})
+                      </span>
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Location */}
+          {event.location && (
+            <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
+              <div className="p-4">
+                <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
+                  <MapPin className="h-4 w-4" />
+                  {t("lectureDetailsDialog.location")}
+                </h4>
+                <p className="text-sm text-foreground">{event.location}</p>
+              </div>
+            </div>
+          )}
+
+          {/* People & teachers */}
+          {(hasTeachers || hasGroups) && (
+            <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
+              <div className="flex flex-col">
+                {hasTeachers && (
+                  <div
+                    className={`p-4 ${hasGroups ? "border-b" : ""}`}
+                    style={
+                      hasGroups
+                        ? { borderColor: "var(--color-border-alpha-30)" }
+                        : undefined
+                    }
+                  >
+                    <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
+                      <GraduationCap className="h-4 w-4" />
+                      {t("lectureDetailsDialog.teachers")}
+                    </h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {teachers.map((teacher) => (
+                        <span
+                          key={`${event.id}-teacher-${teacher}`}
+                          className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-[var(--color-surface)] text-foreground border border-[var(--color-border-alpha-30)]"
+                        >
+                          {teacher}
+                        </span>
+                      ))}
                     </div>
-                    <div className="space-y-1">
-                      {hasTimeOverrideChange &&
-                      originalStartTime &&
-                      originalEndTime ? (
+                  </div>
+                )}
+
+                {hasGroups && (
+                  <div className="p-4">
+                    <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
+                      <Users className="h-4 w-4" />
+                      {t("lectureDetailsDialog.studentGroups")}
+                    </h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {groups.map((group) => (
+                        <span
+                          key={`${event.id}-group-${group}`}
+                          className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-[var(--color-surface)] text-foreground border border-[var(--color-border-alpha-30)]"
+                        >
+                          {group}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Action Button for Realization Dialog */}
+          {event && (
+            <div
+              className="pt-4 border-t"
+              style={{ borderColor: "var(--color-border-alpha-30)" }}
+            >
+              <div className="space-y-2">
+                {hasEffectiveRealizationCode &&
+                  (onOpenRealizationDialog ||
+                    onOpenRealizationDialogByCode) && (
+                    <ActionButton
+                      onClick={handleOpenRealizationDialog}
+                      variant="primary"
+                      disabled={isRealizationLoading}
+                      size="sm"
+                      className="w-full sm:w-auto"
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        {isRealizationLoading ? (
+                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                        ) : (
+                          <ExternalLink className="h-4 w-4" />
+                        )}
+                        {t("lectureDetailsDialog.showRealizationDetails")}
+                      </div>
+                    </ActionButton>
+                  )}
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-start">
+                  <ActionButton
+                    onClick={handleToggleVisibility}
+                    variant="subtle"
+                    className="w-full sm:w-auto"
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      {isHidden ? (
                         <>
-                          {hasDateOverrideChange && (
-                            <p className="text-sm line-through text-muted-foreground">
-                              {formatDate(originalStartTime)}
-                            </p>
-                          )}
-                          <p className="text-sm text-foreground">
-                            {formatDate(event.startTime)}
-                          </p>
-                          <p className="text-sm line-through text-muted-foreground">
-                            {formatTime(originalStartTime)} –{" "}
-                            {formatTime(originalEndTime)}
-                            {typeof originalDuration === "number" && (
-                              <span className="ml-2 text-xs">
-                                ({getDurationString(originalDuration)})
-                              </span>
-                            )}
-                          </p>
-                          <p className="text-sm text-foreground">
-                            {formatTime(event.startTime)} –{" "}
-                            {formatTime(event.endTime)}
-                            <span className="ml-2 text-xs text-muted-foreground">
-                              ({getDurationString(event.duration)})
-                            </span>
-                          </p>
+                          <Eye className="h-4 w-4" />
+                          {tColor("contextMenu.showEvent")}
                         </>
                       ) : (
                         <>
-                          <p className="text-sm text-foreground">
-                            {formatDate(event.startTime)}
-                          </p>
-                          <p className="text-sm text-foreground">
-                            {formatTime(event.startTime)} –{" "}
-                            {formatTime(event.endTime)}
-                            <span className="ml-2 text-xs text-muted-foreground">
-                              ({getDurationString(event.duration)})
-                            </span>
-                          </p>
+                          <EyeOff className="h-4 w-4" />
+                          {tColor("contextMenu.hideEvent")}
                         </>
                       )}
                     </div>
-                  </div>
-                </div>
-
-                {/* Location */}
-                {event.location && (
-                  <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
-                    <div className="p-4">
-                      <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
-                        <MapPin className="h-4 w-4" />
-                        {t("lectureDetailsDialog.location")}
-                      </h4>
-                      <p className="text-sm text-foreground">
-                        {event.location}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* People & teachers */}
-                {(hasTeachers || hasGroups) && (
-                  <div className="rounded-lg border overflow-hidden bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
-                    <div className="flex flex-col">
-                      {hasTeachers && (
-                        <div
-                          className={`p-4 ${hasGroups ? "border-b" : ""}`}
-                          style={
-                            hasGroups
-                              ? { borderColor: "var(--color-border-alpha-30)" }
-                              : undefined
-                          }
-                        >
-                          <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
-                            <GraduationCap className="h-4 w-4" />
-                            {t("lectureDetailsDialog.teachers")}
-                          </h4>
-                          <div className="flex flex-wrap gap-1.5">
-                            {teachers.map((teacher) => (
-                              <span
-                                key={`${event.id}-teacher-${teacher}`}
-                                className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-[var(--color-surface)] text-foreground border border-[var(--color-border-alpha-30)]"
-                              >
-                                {teacher}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {hasGroups && (
-                        <div className="p-4">
-                          <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
-                            <Users className="h-4 w-4" />
-                            {t("lectureDetailsDialog.studentGroups")}
-                          </h4>
-                          <div className="flex flex-wrap gap-1.5">
-                            {groups.map((group) => (
-                              <span
-                                key={`${event.id}-group-${group}`}
-                                className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-[var(--color-surface)] text-foreground border border-[var(--color-border-alpha-30)]"
-                              >
-                                {group}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Button for Realization Dialog */}
-                {event && (
-                  <div
-                    className="pt-4 border-t"
-                    style={{ borderColor: "var(--color-border-alpha-30)" }}
-                  >
-                    <div className="space-y-2">
-                      {hasEffectiveRealizationCode &&
-                        (onOpenRealizationDialog ||
-                          onOpenRealizationDialogByCode) && (
-                          <ActionButton
-                            onClick={handleOpenRealizationDialog}
-                            variant="primary"
-                            disabled={isRealizationLoading}
-                            size="sm"
-                            className="w-full sm:w-auto"
-                          >
-                            <div className="flex items-center justify-center gap-2">
-                              {isRealizationLoading ? (
-                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                              ) : (
-                                <ExternalLink className="h-4 w-4" />
-                              )}
-                              {t("lectureDetailsDialog.showRealizationDetails")}
-                            </div>
-                          </ActionButton>
-                        )}
-                      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-start">
-                        <ActionButton
-                          onClick={handleToggleVisibility}
-                          variant="subtle"
-                          className="w-full sm:w-auto"
-                        >
-                          <div className="flex items-center justify-center gap-2">
-                            {isHidden ? (
-                              <>
-                                <Eye className="h-4 w-4" />
-                                {tColor("contextMenu.showEvent")}
-                              </>
-                            ) : (
-                              <>
-                                <EyeOff className="h-4 w-4" />
-                                {tColor("contextMenu.hideEvent")}
-                              </>
-                            )}
-                          </div>
-                        </ActionButton>
-                        {onOpenColorCustomizer && (
-                          <ActionButton
-                            onClick={handleOpenColorCustomizer}
-                            variant="subtle"
-                            className="w-full sm:w-auto"
-                          >
-                            <div className="flex items-center justify-center gap-2">
-                              <Palette className="h-4 w-4" />
-                              {tColor("contextMenu.customizeColor")}
-                            </div>
-                          </ActionButton>
-                        )}
-                        {!hasRealizationCode && (
-                          <ActionButton
-                            onClick={() => setAttachDialogOpen(true)}
-                            variant="subtle"
-                            className="w-full sm:w-auto"
-                          >
-                            <div className="flex items-center justify-center gap-2">
-                              {attachedRealizationId
-                                ? t(
-                                    "lectureDetailsDialog.attachRealization.change",
-                                  )
-                                : t(
-                                    "lectureDetailsDialog.attachRealization.button",
-                                  )}
-                            </div>
-                          </ActionButton>
-                        )}
-                        {hasEffectiveRealizationCode && (
-                          <ActionButton
-                            onClick={() => {
-                              if (isCourseHidden) {
-                                handleShowCourse();
-                              } else {
-                                setHideCourseDialogOpen(true);
-                              }
-                            }}
-                            variant={isCourseHidden ? "subtle" : "danger"}
-                            className="w-full sm:w-auto"
-                          >
-                            <div className="flex items-center justify-center gap-2">
-                              {isCourseHidden
-                                ? t("lectureDetailsDialog.showCourse")
-                                : t("lectureDetailsDialog.hideCourse")}
-                            </div>
-                          </ActionButton>
-                        )}
+                  </ActionButton>
+                  {onOpenColorCustomizer && (
+                    <ActionButton
+                      onClick={handleOpenColorCustomizer}
+                      variant="subtle"
+                      className="w-full sm:w-auto"
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <Palette className="h-4 w-4" />
+                        {tColor("contextMenu.customizeColor")}
                       </div>
-                    </div>
-                  </div>
-                )}
+                    </ActionButton>
+                  )}
+                  {!hasRealizationCode && (
+                    <ActionButton
+                      onClick={() => setAttachDialogOpen(true)}
+                      variant="subtle"
+                      className="w-full sm:w-auto"
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        {attachedRealizationId
+                          ? t("lectureDetailsDialog.attachRealization.change")
+                          : t("lectureDetailsDialog.attachRealization.button")}
+                      </div>
+                    </ActionButton>
+                  )}
+                  {hasEffectiveRealizationCode && (
+                    <ActionButton
+                      onClick={() => {
+                        if (isCourseHidden) {
+                          handleShowCourse();
+                        } else {
+                          setHideCourseDialogOpen(true);
+                        }
+                      }}
+                      variant={isCourseHidden ? "subtle" : "danger"}
+                      className="w-full sm:w-auto"
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        {isCourseHidden
+                          ? t("lectureDetailsDialog.showCourse")
+                          : t("lectureDetailsDialog.hideCourse")}
+                      </div>
+                    </ActionButton>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
-                {/* Info about missing realization data */}
-                {event.title && !hasEffectiveRealizationCode && (
-                  <div className="rounded-lg p-4 border bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Info className="h-4 w-4 shrink-0" />
-                      <span className="text-sm">
-                        {t("lectureDetailsDialog.noRealizationData")}{" "}
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                type="button"
-                                className="hidden md:inline-flex underline underline-offset-2"
-                              >
-                                {noRealizationWhyNotLabel}
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent
-                              side="top"
-                              className="max-w-xs text-xs"
-                            >
-                              {noRealizationWhyNotExplanation}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        <Sheet>
-                          <SheetTrigger asChild>
-                            <button
-                              type="button"
-                              className="md:hidden underline underline-offset-2"
-                            >
-                              {noRealizationWhyNotLabel}
-                            </button>
-                          </SheetTrigger>
-                          <SheetContent side="bottom">
-                            <SheetHeader>
-                              <SheetTitle>
-                                {noRealizationWhyNotLabel}
-                              </SheetTitle>
-                              <SheetDescription>
-                                {noRealizationWhyNotExplanation}
-                              </SheetDescription>
-                            </SheetHeader>
-                          </SheetContent>
-                        </Sheet>
-                      </span>
-                    </div>
-                  </div>
-                )}
+          {/* Info about missing realization data */}
+          {event.title && !hasEffectiveRealizationCode && (
+            <div className="rounded-lg p-4 border bg-[var(--color-surface-alpha-40)] border-[var(--color-border-alpha-30)]">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Info className="h-4 w-4 shrink-0" />
+                <span className="text-sm">
+                  {t("lectureDetailsDialog.noRealizationData")}{" "}
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="hidden md:inline-flex underline underline-offset-2"
+                        >
+                          {noRealizationWhyNotLabel}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-xs text-xs">
+                        {noRealizationWhyNotExplanation}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <button
+                        type="button"
+                        className="md:hidden underline underline-offset-2"
+                      >
+                        {noRealizationWhyNotLabel}
+                      </button>
+                    </SheetTrigger>
+                    <SheetContent side="bottom">
+                      <SheetHeader>
+                        <SheetTitle>{noRealizationWhyNotLabel}</SheetTitle>
+                        <SheetDescription>
+                          {noRealizationWhyNotExplanation}
+                        </SheetDescription>
+                      </SheetHeader>
+                    </SheetContent>
+                  </Sheet>
+                </span>
+              </div>
+            </div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

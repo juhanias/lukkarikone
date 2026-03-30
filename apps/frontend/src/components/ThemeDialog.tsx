@@ -52,17 +52,18 @@ export function ThemeDialog() {
         open={isOpen}
         onOpenChange={(open) => setThemeParam(open ? "true" : null)}
       >
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="w-[calc(100%-1rem)] max-w-2xl max-h-[85vh] overflow-hidden p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>{t("sections.styling.themeDialog.title")}</DialogTitle>
             <DialogDescription>
               {t("sections.styling.themeDialog.description")}
             </DialogDescription>
           </DialogHeader>
-          <div className="mt-4">
+          <div className="mt-2 max-h-[60vh] overflow-y-auto overscroll-contain pr-1 sm:max-h-[65vh] sm:pr-2">
             <ThemeSelector
               themes={transformedThemes}
               selectedThemeId={config.theme}
+              showNames
               onThemeSelect={(themeId) => {
                 setConfig({ theme: themeId });
               }}

@@ -2,6 +2,8 @@ import { Code, RotateCcw, Settings, Sparkles, Trash2 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { CalendarDialog } from "../components/CalendarDialog";
+import { ThemeDialog } from "../components/ThemeDialog";
 import {
   Dialog,
   DialogContent,
@@ -10,8 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
-import { CalendarDialog } from "../components/CalendarDialog";
-import { ThemeDialog } from "../components/ThemeDialog";
 import { useSettingsDialogParam } from "../hooks/useDialogParams";
 import useConfigStore, {
   useCalendarStore,
@@ -182,7 +182,10 @@ export function useSettingsConfig(): SettingsConfig {
                     open={isWipeDialogOpen}
                     onOpenChange={setIsWipeDialogOpen}
                   >
-                    <DialogContent className="sm:max-w-md" showCloseButton={false}>
+                    <DialogContent
+                      className="sm:max-w-md"
+                      showCloseButton={false}
+                    >
                       <DialogHeader>
                         <DialogTitle>
                           {t("sections.actions.resetAllConfirmTitle")}
