@@ -8,7 +8,7 @@
   },
   "dayView": {
     "noEvents": "Ei tapahtumia",
-    "noEventsDescription": "Tällä päivällä ei ole merkittyjä tapahtumia / luentoja!",
+    "noEventsDescription": "Tälle päivälle ei ole merkitty tapahtumia!",
     "swipeToNavigate": "← Pyyhkäise vaihtaaksesi päivää →",
     "breakDuration": "hyppytunti"
   },

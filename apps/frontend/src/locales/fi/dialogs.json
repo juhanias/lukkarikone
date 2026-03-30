@@ -57,7 +57,7 @@
       "description": "Kurssin kuvaus"
     }
   },
-  "lectureDetailsDialog": {
+  "eventDetailsDialog": {
     "basicInfo": "Perustiedot",
     "schedule": "Aikataulu",
     "location": "Sijainti",

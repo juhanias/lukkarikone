@@ -8,8 +8,8 @@
       "fi": "Lukkarikone v1.1"
     },
     "body": {
-      "en": "Hide lectures, customize colors, lecture info, course info, keyboard shortcuts",
-      "fi": "Piilota luentoja, mukauta värejä, katso luennon tietoja & kurssin tietoja, uusia pikanäppäimiä"
+      "en": "Hide events, customize colors, event info, course info, keyboard shortcuts",
+      "fi": "Piilota tapahtumia, mukauta värejä, katso tapahtuman tietoja & kurssin tietoja, uusia pikanäppäimiä"
     },
     "dismissal": "manual",
     "availability": {

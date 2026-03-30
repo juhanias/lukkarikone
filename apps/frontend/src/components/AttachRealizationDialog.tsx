@@ -106,10 +106,10 @@ const AttachRealizationDialog = ({
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>
-            {t("lectureDetailsDialog.attachRealization.title")}
+            {t("eventDetailsDialog.attachRealization.title")}
           </DialogTitle>
           <DialogDescription>
-            {t("lectureDetailsDialog.attachRealization.description")}
+            {t("eventDetailsDialog.attachRealization.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -119,7 +119,7 @@ const AttachRealizationDialog = ({
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={t("lectureDetailsDialog.attachRealization.search")}
+              placeholder={t("eventDetailsDialog.attachRealization.search")}
               className="pl-9 border-[var(--color-border-alpha-30)] focus-visible:border-[var(--color-accent)]"
             />
           </div>
@@ -134,7 +134,7 @@ const AttachRealizationDialog = ({
             >
               <div className="text-sm">
                 <div style={{ color: "var(--color-text-secondary)" }}>
-                  {t("lectureDetailsDialog.attachRealization.current")}
+                  {t("eventDetailsDialog.attachRealization.current")}
                 </div>
                 <div style={{ color: "var(--color-text)" }}>
                   {attachedRealizationId.toUpperCase()}
@@ -147,7 +147,7 @@ const AttachRealizationDialog = ({
                 onClick={handleDetach}
               >
                 <Unlink className="h-4 w-4" />
-                {t("lectureDetailsDialog.attachRealization.detach")}
+                {t("eventDetailsDialog.attachRealization.detach")}
               </Button>
             </div>
           )}
@@ -162,7 +162,7 @@ const AttachRealizationDialog = ({
                   color: "var(--color-text-secondary)",
                 }}
               >
-                {t("lectureDetailsDialog.attachRealization.empty")}
+                {t("eventDetailsDialog.attachRealization.empty")}
               </div>
             )}
 
@@ -200,8 +200,8 @@ const AttachRealizationDialog = ({
                     onClick={() => handleAttach(option.code)}
                   >
                     {isAttached
-                      ? t("lectureDetailsDialog.attachRealization.attached")
-                      : t("lectureDetailsDialog.attachRealization.attach")}
+                      ? t("eventDetailsDialog.attachRealization.attached")
+                      : t("eventDetailsDialog.attachRealization.attach")}
                   </Button>
                 </div>
               );

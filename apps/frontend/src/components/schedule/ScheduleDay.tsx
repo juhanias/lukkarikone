@@ -8,7 +8,7 @@ import {
 } from "../../constants/schedule-layout-constants";
 import { useCurrentTime } from "../../hooks/useCurrentTime";
 import { useColorCustomizerDialogParam } from "../../hooks/useDialogParams";
-import { useLectureDetailsDialog } from "../../hooks/useLectureDetailsDialog";
+import { useEventDetailsDialog } from "../../hooks/useEventDetailsDialog";
 import { useRealizationDialog } from "../../hooks/useRealizationDialog";
 import { RealizationApiService } from "../../services/realizationApi";
 import {
@@ -25,7 +25,7 @@ import {
 import { ScheduleUtils } from "../../utils/schedule-utils";
 import { CalendarViewBadge } from "../CalendarViewBadge";
 import { LastUpdatedBadge } from "../LastUpdatedBadge";
-import LectureDetailsDialog from "../LectureDetailsDialog";
+import EventDetailsDialog from "../EventDetailsDialog";
 import RealizationDialog from "../RealizationDialog";
 import {
   ContextMenu,
@@ -84,13 +84,13 @@ const ScheduleDay = memo(
       closeDialog: closeRealizationDialog,
     } = useRealizationDialog();
 
-    // Lecture details dialog hook
+    // Event details dialog hook
     const {
-      isOpen: lectureDetailsDialogOpen,
+      isOpen: eventDetailsDialogOpen,
       selectedEvent,
-      openDialog: openLectureDetailsDialog,
-      closeDialog: closeLectureDetailsDialog,
-    } = useLectureDetailsDialog();
+      openDialog: openEventDetailsDialog,
+      closeDialog: closeEventDetailsDialog,
+    } = useEventDetailsDialog();
 
     // Helper function to open color customizer for an event
     const openColorCustomizer = (event: ScheduleEvent) => {
@@ -371,8 +371,8 @@ const ScheduleDay = memo(
                               }
                             }
                             onClick={() => {
-                              // Open lecture details dialog for this event
-                              openLectureDetailsDialog(event);
+                              // Open event details dialog for this event
+                              openEventDetailsDialog(event);
                             }}
                           >
                             {/* Event Time Badge */}
@@ -427,7 +427,7 @@ const ScheduleDay = memo(
                         </ContextMenuTrigger>
                         <ContextMenuContent>
                           <ContextMenuItem
-                            onClick={() => openLectureDetailsDialog(event)}
+                            onClick={() => openEventDetailsDialog(event)}
                           >
                             <Calendar className="mr-2 h-4 w-4" />
                             {tColor("contextMenu.eventDetails")}
@@ -472,10 +472,10 @@ const ScheduleDay = memo(
           error={realizationError}
         />
 
-        {/* Lecture Details Dialog */}
-        <LectureDetailsDialog
-          open={lectureDetailsDialogOpen}
-          onOpenChange={closeLectureDetailsDialog}
+        {/* Event Details Dialog */}
+        <EventDetailsDialog
+          open={eventDetailsDialogOpen}
+          onOpenChange={closeEventDetailsDialog}
           event={selectedEvent}
           onOpenRealizationDialog={openRealizationDialog}
           onOpenRealizationDialogByCode={openRealizationDialogByCode}

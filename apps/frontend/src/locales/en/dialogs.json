@@ -57,7 +57,7 @@
       "description": "Course description"
     }
   },
-  "lectureDetailsDialog": {
+  "eventDetailsDialog": {
     "basicInfo": "Basic Information",
     "schedule": "Schedule",
     "location": "Location",

@@ -56,7 +56,7 @@
       },
       "showTotalHours": {
         "label": "Näytä kokonaistunnit",
-        "subtitle": "Näytä piilottamattomien luentotuntien summa päivä- ja viikkonäkymän otsikoissa"
+        "subtitle": "Näytä piilottamattomien tapahtumatuntien summa päivä- ja viikkonäkymän otsikoissa"
       }
     },
     "styling": {

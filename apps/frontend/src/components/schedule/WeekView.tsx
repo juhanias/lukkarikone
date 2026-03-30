@@ -11,7 +11,7 @@ import {
 } from "../../constants/schedule-layout-constants";
 import { useCurrentTime } from "../../hooks/useCurrentTime";
 import { useColorCustomizerDialogParam } from "../../hooks/useDialogParams";
-import { useLectureDetailsDialog } from "../../hooks/useLectureDetailsDialog";
+import { useEventDetailsDialog } from "../../hooks/useEventDetailsDialog";
 import { useRealizationDialog } from "../../hooks/useRealizationDialog";
 import { RealizationApiService } from "../../services/realizationApi";
 import {
@@ -26,7 +26,7 @@ import { ScheduleLayoutUtils } from "../../utils/schedule-layout-utils";
 import { ScheduleUtils } from "../../utils/schedule-utils";
 import { CalendarViewBadge } from "../CalendarViewBadge";
 import { LastUpdatedBadge } from "../LastUpdatedBadge";
-import LectureDetailsDialog from "../LectureDetailsDialog";
+import EventDetailsDialog from "../EventDetailsDialog";
 import RealizationDialog from "../RealizationDialog";
 import {
   ContextMenu,
@@ -132,13 +132,13 @@ const WeekView = memo(
       closeDialog: closeRealizationDialog,
     } = useRealizationDialog();
 
-    // Lecture details dialog hook
+    // Event details dialog hook
     const {
-      isOpen: lectureDetailsDialogOpen,
+      isOpen: eventDetailsDialogOpen,
       selectedEvent,
-      openDialog: openLectureDetailsDialog,
-      closeDialog: closeLectureDetailsDialog,
-    } = useLectureDetailsDialog();
+      openDialog: openEventDetailsDialog,
+      closeDialog: closeEventDetailsDialog,
+    } = useEventDetailsDialog();
 
     // Helper functions for color customization
     const openColorCustomizer = (event: ScheduleEvent) => {
@@ -619,8 +619,8 @@ const WeekView = memo(
                                             e.preventDefault();
                                             e.stopPropagation();
 
-                                            // Open lecture details dialog for this event
-                                            openLectureDetailsDialog(event);
+                                            // Open event details dialog for this event
+                                            openEventDetailsDialog(event);
                                           }}
                                         >
                                           <div className="font-semibold line-clamp-2 leading-tight">
@@ -647,7 +647,7 @@ const WeekView = memo(
                                       <ContextMenuContent>
                                         <ContextMenuItem
                                           onClick={() =>
-                                            openLectureDetailsDialog(event)
+                                            openEventDetailsDialog(event)
                                           }
                                         >
                                           <Calendar className="mr-2 h-4 w-4" />
@@ -705,10 +705,10 @@ const WeekView = memo(
           error={realizationError}
         />
 
-        {/* Lecture Details Dialog */}
-        <LectureDetailsDialog
-          open={lectureDetailsDialogOpen}
-          onOpenChange={closeLectureDetailsDialog}
+        {/* Event Details Dialog */}
+        <EventDetailsDialog
+          open={eventDetailsDialogOpen}
+          onOpenChange={closeEventDetailsDialog}
           event={selectedEvent}
           onOpenRealizationDialog={openRealizationDialog}
           onOpenRealizationDialogByCode={openRealizationDialogByCode}

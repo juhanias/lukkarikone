@@ -56,7 +56,7 @@
       },
       "showTotalHours": {
         "label": "Show total hours",
-        "subtitle": "Display the sum of non-hidden lecture hours in day and week headers"
+        "subtitle": "Display the sum of non-hidden event hours in day and week headers"
       }
     },
     "styling": {

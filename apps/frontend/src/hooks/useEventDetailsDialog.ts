@@ -3,7 +3,7 @@ import { useScheduleStore } from "../state/state-management";
 import type { ScheduleEvent } from "../types/schedule";
 import { useEventDialogParam } from "./useDialogParams";
 
-export const useLectureDetailsDialog = () => {
+export const useEventDetailsDialog = () => {
   const [eventId, setEventId] = useEventDialogParam();
   const { getEventById } = useScheduleStore();
 
@@ -38,4 +38,4 @@ export const useLectureDetailsDialog = () => {
   };
 };
 
-export default useLectureDetailsDialog;
+export default useEventDetailsDialog;

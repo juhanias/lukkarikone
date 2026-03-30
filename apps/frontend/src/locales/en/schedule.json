@@ -8,7 +8,7 @@
   },
   "dayView": {
     "noEvents": "No events",
-    "noEventsDescription": "No events or lectures scheduled for this day!",
+    "noEventsDescription": "No events scheduled for this day!",
     "swipeToNavigate": "← Swipe to change day →",
     "breakDuration": "break"
   },

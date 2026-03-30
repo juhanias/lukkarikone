@@ -51,7 +51,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
-interface LectureDetailsDialogProps {
+interface EventDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   event: ScheduleEvent | null;
@@ -61,7 +61,7 @@ interface LectureDetailsDialogProps {
   isRealizationLoading?: boolean;
 }
 
-const LectureDetailsDialog = ({
+const EventDetailsDialog = ({
   open,
   onOpenChange,
   event,
@@ -69,7 +69,7 @@ const LectureDetailsDialog = ({
   onOpenRealizationDialogByCode,
   onOpenColorCustomizer,
   isRealizationLoading = false,
-}: LectureDetailsDialogProps) => {
+}: EventDetailsDialogProps) => {
   const { t } = useTranslation("dialogs");
   const { t: tColor } = useTranslation("colorCustomization");
   const isMobile = useIsMobile();
@@ -91,10 +91,10 @@ const LectureDetailsDialog = ({
   const [editWarningOpen, setEditWarningOpen] = useState(false);
   const [editTimeParam, setEditTimeParam] = useEventTimeEditDialogParam();
   const noRealizationWhyNotLabel = t(
-    "lectureDetailsDialog.noRealizationWhyNot",
+    "eventDetailsDialog.noRealizationWhyNot",
   );
   const noRealizationWhyNotExplanation = t(
-    "lectureDetailsDialog.noRealizationWhyNotExplanation",
+    "eventDetailsDialog.noRealizationWhyNotExplanation",
   );
 
   useEffect(() => {
@@ -350,7 +350,7 @@ const LectureDetailsDialog = ({
     <AnimatePresence mode="wait">
       {event && (
         <motion.div
-          key="lecture-details"
+          key="event-details"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
@@ -364,7 +364,7 @@ const LectureDetailsDialog = ({
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-sm font-semibold flex items-center gap-1.5 text-muted-foreground">
                   <Calendar className="h-4 w-4" />
-                  {t("lectureDetailsDialog.schedule")}
+                  {t("eventDetailsDialog.schedule")}
                 </h4>
                 <Button
                   type="button"
@@ -430,7 +430,7 @@ const LectureDetailsDialog = ({
               <div className="p-4">
                 <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
                   <MapPin className="h-4 w-4" />
-                  {t("lectureDetailsDialog.location")}
+                  {t("eventDetailsDialog.location")}
                 </h4>
                 <p className="text-sm text-foreground">{event.location}</p>
               </div>
@@ -452,7 +452,7 @@ const LectureDetailsDialog = ({
                   >
                     <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
                       <GraduationCap className="h-4 w-4" />
-                      {t("lectureDetailsDialog.teachers")}
+                      {t("eventDetailsDialog.teachers")}
                     </h4>
                     <div className="flex flex-wrap gap-1.5">
                       {teachers.map((teacher) => (
@@ -471,7 +471,7 @@ const LectureDetailsDialog = ({
                   <div className="p-4">
                     <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground">
                       <Users className="h-4 w-4" />
-                      {t("lectureDetailsDialog.studentGroups")}
+                      {t("eventDetailsDialog.studentGroups")}
                     </h4>
                     <div className="flex flex-wrap gap-1.5">
                       {groups.map((group) => (
@@ -512,7 +512,7 @@ const LectureDetailsDialog = ({
                         ) : (
                           <ExternalLink className="h-4 w-4" />
                         )}
-                        {t("lectureDetailsDialog.showRealizationDetails")}
+                        {t("eventDetailsDialog.showRealizationDetails")}
                       </div>
                     </ActionButton>
                   )}
@@ -556,8 +556,8 @@ const LectureDetailsDialog = ({
                     >
                       <div className="flex items-center justify-center gap-2">
                         {attachedRealizationId
-                          ? t("lectureDetailsDialog.attachRealization.change")
-                          : t("lectureDetailsDialog.attachRealization.button")}
+                          ? t("eventDetailsDialog.attachRealization.change")
+                          : t("eventDetailsDialog.attachRealization.button")}
                       </div>
                     </ActionButton>
                   )}
@@ -575,8 +575,8 @@ const LectureDetailsDialog = ({
                     >
                       <div className="flex items-center justify-center gap-2">
                         {isCourseHidden
-                          ? t("lectureDetailsDialog.showCourse")
-                          : t("lectureDetailsDialog.hideCourse")}
+                          ? t("eventDetailsDialog.showCourse")
+                          : t("eventDetailsDialog.hideCourse")}
                       </div>
                     </ActionButton>
                   )}
@@ -591,7 +591,7 @@ const LectureDetailsDialog = ({
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Info className="h-4 w-4 shrink-0" />
                 <span className="text-sm">
-                  {t("lectureDetailsDialog.noRealizationData")}{" "}
+                  {t("eventDetailsDialog.noRealizationData")}{" "}
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -690,14 +690,14 @@ const LectureDetailsDialog = ({
         <DialogContent className="sm:max-w-md" showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>
-              {t("lectureDetailsDialog.hideCourseDialog.title")}
+              {t("eventDetailsDialog.hideCourseDialog.title")}
             </DialogTitle>
           </DialogHeader>
           <DialogDescription asChild>
             <div className="space-y-3">
-              <p>{t("lectureDetailsDialog.hideCourseDialog.line1")}</p>
-              <p>{t("lectureDetailsDialog.hideCourseDialog.line2")}</p>
-              <p>{t("lectureDetailsDialog.hideCourseDialog.line3")}</p>
+              <p>{t("eventDetailsDialog.hideCourseDialog.line1")}</p>
+              <p>{t("eventDetailsDialog.hideCourseDialog.line2")}</p>
+              <p>{t("eventDetailsDialog.hideCourseDialog.line3")}</p>
             </div>
           </DialogDescription>
           <DialogFooter>
@@ -706,14 +706,14 @@ const LectureDetailsDialog = ({
               variant="subtle"
               className="w-full sm:w-auto"
             >
-              {t("lectureDetailsDialog.hideCourseDialog.cancel")}
+              {t("eventDetailsDialog.hideCourseDialog.cancel")}
             </ActionButton>
             <ActionButton
               onClick={handleConfirmHideCourse}
               variant="danger"
               className="w-full sm:w-auto"
             >
-              {t("lectureDetailsDialog.hideCourseDialog.confirm")}
+              {t("eventDetailsDialog.hideCourseDialog.confirm")}
             </ActionButton>
           </DialogFooter>
         </DialogContent>
@@ -765,4 +765,4 @@ const LectureDetailsDialog = ({
   );
 };
 
-export default LectureDetailsDialog;
+export default EventDetailsDialog;
