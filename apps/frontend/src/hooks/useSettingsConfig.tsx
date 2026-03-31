@@ -329,6 +329,16 @@ export function useSettingsConfig(): SettingsConfig {
             },
           },
           {
+            componentType: "toggle",
+            id: "cat-companion",
+            data: {
+              label: t("sections.styling.cat.label"),
+              subtitle: t("sections.styling.cat.subtitle"),
+              checked: config.catCompanion || false,
+              onChange: (checked) => setConfig({ catCompanion: checked }),
+            },
+          },
+          {
             componentType: "button",
             id: "reset-config",
             data: {

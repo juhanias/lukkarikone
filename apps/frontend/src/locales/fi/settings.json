@@ -82,6 +82,10 @@
       "enhancedDialogs": {
         "label": "'Frosted Glass'-dialogit",
         "subtitle": "Tekee dialogien taustoista sumeampia ja kiinnostavampia. Mikäli tämä vaikuttaa negatiivisesti suorituskykyyn, voit poistaa sen käytöstä."
+      },
+      "cat": {
+        "label": "🐱",
+        "subtitle": "Lisää kumppanin, joka seuraa sinua ympäriinsä"
       }
     },
     "language": {

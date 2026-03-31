@@ -82,6 +82,10 @@
       "enhancedDialogs": {
         "label": "Use frosted glass dialogs",
         "subtitle": "Enable gradient backgrounds and blur for dialogs to make them more visually appealing. If this negatively impacts performance, you can disable it."
+      },
+      "cat": {
+        "label": "🐱",
+        "subtitle": "Adds a companion that follows you around"
       }
     },
     "language": {

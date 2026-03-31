@@ -11,6 +11,7 @@ import {
 import { useSettingsDialogParam } from "../hooks/useDialogParams";
 import { cn } from "../lib/utils";
 import useConfigStore, { useCalendarStore } from "../state/state-management";
+import { CatCompanionController } from "./CatCompanionController";
 import { SettingsPanel } from "./SettingsPanel";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
@@ -77,6 +78,7 @@ export default function Layout() {
 
   return (
     <div className="bg-background text-foreground w-full h-full flex flex-col min-w-[320px]">
+      <CatCompanionController />
       {/* Header */}
       <header
         className={cn(

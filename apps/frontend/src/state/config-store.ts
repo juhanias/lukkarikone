@@ -320,6 +320,7 @@ interface Config {
   enableCommitNotifications?: boolean;
   devToolsVisible?: boolean;
   devToolsEnableEventGenerator?: boolean;
+  catCompanion?: boolean;
 }
 
 export interface ConfigState {
@@ -348,6 +349,7 @@ const defaultConfig: Config = {
   enableCommitNotifications: false,
   devToolsVisible: false,
   devToolsEnableEventGenerator: false,
+  catCompanion: false,
 };
 
 export const LEGACY_PTIVIS25B_URL =
