@@ -393,7 +393,9 @@ export const useEventMetadataStore = create<EventMetadataState>()(
               color: legacyMetadata.color,
               attachedRealizationId: legacyMetadata.attachedRealizationId,
               name:
-                legacyMetadata.name ?? legacyMetadata.customEvent?.name ?? undefined,
+                legacyMetadata.name ??
+                legacyMetadata.customEvent?.name ??
+                undefined,
               location:
                 legacyMetadata.location ??
                 legacyMetadata.customEvent?.location ??

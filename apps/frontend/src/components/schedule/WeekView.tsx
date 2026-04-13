@@ -35,6 +35,12 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "../ui/context-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 interface WeekViewProps {
   currentDate: Date;
@@ -353,407 +359,513 @@ const WeekView = memo(
     };
 
     return (
-      <div className="w-full h-full flex flex-col">
-        {/* Week Header */}
-        <div className="w-full flex-shrink-0 bg-[linear-gradient(to_bottom,var(--color-surface-alpha-40),transparent)]">
-          <div className="max-w-7xl mx-auto px-4 py-6 relative">
-            {/* Mobile Icon Buttons - Top corners */}
-            <div className="absolute left-4 top-4 md:hidden">
-              <CalendarViewBadge variant="icon-only" />
-            </div>
-            {lastUpdatedLabel && (
-              <div className="absolute right-4 top-4 md:hidden">
-                <LastUpdatedBadge
-                  lastUpdatedLabel={lastUpdatedLabel}
-                  variant="icon-only"
-                  isCheckingHash={isCheckingHash}
-                  isFetchingCalendar={isFetchingCalendar}
-                  hasError={hasError}
-                />
+      <TooltipProvider delayDuration={350} disableHoverableContent>
+        <div className="w-full h-full flex flex-col">
+          {/* Week Header */}
+          <div className="w-full flex-shrink-0 bg-[linear-gradient(to_bottom,var(--color-surface-alpha-40),transparent)]">
+            <div className="max-w-7xl mx-auto px-4 py-6 relative">
+              <div className="absolute left-4 top-4 md:hidden">
+                <CalendarViewBadge variant="icon-only" />
               </div>
-            )}
-            <div className="text-center">
-              <div className="text-sm mb-1 text-muted-foreground">
-                {t("weekView.week")} {formatWeekIndicator()}
-              </div>
-              <h2 className="text-2xl font-medium text-foreground">
-                {formatWeekHeader()}
-              </h2>
-            </div>
-            {/* Desktop badges - Stacked vertically on the right */}
-            <div className="hidden md:flex flex-col items-end gap-2 absolute right-4 bottom-4">
               {lastUpdatedLabel && (
-                <LastUpdatedBadge
-                  lastUpdatedLabel={lastUpdatedLabel}
-                  variant="full"
-                  isCheckingHash={isCheckingHash}
-                  isFetchingCalendar={isFetchingCalendar}
-                  hasError={hasError}
-                />
+                <div className="absolute right-4 top-4 md:hidden">
+                  <LastUpdatedBadge
+                    lastUpdatedLabel={lastUpdatedLabel}
+                    variant="icon-only"
+                    isCheckingHash={isCheckingHash}
+                    isFetchingCalendar={isFetchingCalendar}
+                    hasError={hasError}
+                  />
+                </div>
               )}
-              <CalendarViewBadge variant="full" />
+              <div className="text-center">
+                <div className="text-sm mb-1 text-muted-foreground">
+                  {t("weekView.week")} {formatWeekIndicator()}
+                </div>
+                <h2 className="text-2xl font-medium text-foreground">
+                  {formatWeekHeader()}
+                </h2>
+              </div>
+              {/* Desktop badges - Stacked vertically on the right */}
+              <div className="hidden md:flex flex-col items-end gap-2 absolute right-4 bottom-4">
+                {lastUpdatedLabel && (
+                  <LastUpdatedBadge
+                    lastUpdatedLabel={lastUpdatedLabel}
+                    variant="full"
+                    isCheckingHash={isCheckingHash}
+                    isFetchingCalendar={isFetchingCalendar}
+                    hasError={hasError}
+                  />
+                )}
+                <CalendarViewBadge variant="full" />
+              </div>
+              {/* Additional event controls */}
+              {config.devToolsEnableEventGenerator && (
+                <div className="hidden md:flex absolute right-4 top-4 gap-2">
+                  <button
+                    type="button"
+                    className="px-2 py-1 text-xs border rounded"
+                    onClick={() => generateAdditionalEvents(30, weekDates)}
+                  >
+                    Add additional events
+                  </button>
+                  <button
+                    type="button"
+                    className="px-2 py-1 text-xs border rounded"
+                    onClick={clearAdditionalEvents}
+                  >
+                    Clear additional
+                  </button>
+                </div>
+              )}
             </div>
-            {/* Additional event controls */}
-            {config.devToolsEnableEventGenerator && (
-              <div className="hidden md:flex absolute right-4 top-4 gap-2">
-                <button
-                  type="button"
-                  className="px-2 py-1 text-xs border rounded"
-                  onClick={() => generateAdditionalEvents(30, weekDates)}
-                >
-                  Add additional events
-                </button>
-                <button
-                  type="button"
-                  className="px-2 py-1 text-xs border rounded"
-                  onClick={clearAdditionalEvents}
-                >
-                  Clear additional
-                </button>
-              </div>
-            )}
           </div>
-        </div>
 
-        {/* Week Container */}
-        <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full">
-          <div className="flex-1 flex flex-col px-4">
-            {totalEventsThisWeek === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center min-h-96 text-muted-foreground">
-                <Calendar size={48} className="mb-4 opacity-50" />
-                <p className="text-lg font-medium">{t("weekView.noEvents")}</p>
-                <p className="text-sm opacity-75 mt-1 text-center">
-                  {t("weekView.noEventsDescription")}
-                </p>
-              </div>
-            ) : (
-              <div className="flex-1 relative overflow-x-auto">
-                {/* Week Grid */}
-                <div
-                  style={{
-                    minWidth: config.squeezeWeekOnMobile
-                      ? "auto"
-                      : `${Math.max(320, filteredWeekDates.length * 100 + 48)}px`,
-                  }}
-                >
-                  {/* Day Headers */}
-                  <div className="sticky top-0 z-50 bg-[var(--color-surface)]">
-                    <div className="flex">
-                      <div className="w-12 flex-shrink-0 border-r border-[var(--color-border-alpha-30)]"></div>
-                      {filteredWeekDates.map((date, index) => {
-                        const isToday =
-                          date.toDateString() === new Date().toDateString();
-                        const isLight = isCurrentThemeLight();
-                        return (
-                          <div
-                            key={date.toDateString()}
-                            className={cn(
-                              "flex-1 p-2 text-center border-r border-[var(--color-border-alpha-30)] last:border-r-0",
-                              config.squeezeWeekOnMobile ? "" : "min-w-24",
-                              isToday
-                                ? "bg-[var(--color-header-accent)]"
-                                : isLight
-                                  ? "bg-[var(--color-accent-alpha-20)]"
-                                  : "bg-transparent",
-                            )}
-                          >
+          {/* Week Container */}
+          <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full">
+            <div className="flex-1 flex flex-col px-4">
+              {totalEventsThisWeek === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center min-h-96 text-muted-foreground">
+                  <Calendar size={48} className="mb-4 opacity-50" />
+                  <p className="text-lg font-medium">
+                    {t("weekView.noEvents")}
+                  </p>
+                  <p className="text-sm opacity-75 mt-1 text-center">
+                    {t("weekView.noEventsDescription")}
+                  </p>
+                </div>
+              ) : (
+                <div className="flex-1 relative overflow-x-auto">
+                  {/* Week Grid */}
+                  <div
+                    style={{
+                      minWidth: config.squeezeWeekOnMobile
+                        ? "auto"
+                        : `${Math.max(320, filteredWeekDates.length * 100 + 48)}px`,
+                    }}
+                  >
+                    {/* Day Headers */}
+                    <div className="sticky top-0 z-50 bg-[var(--color-surface)]">
+                      <div className="flex">
+                        <div className="w-12 flex-shrink-0 border-r border-[var(--color-border-alpha-30)]"></div>
+                        {filteredWeekDates.map((date, index) => {
+                          const isToday =
+                            date.toDateString() === new Date().toDateString();
+                          const isLight = isCurrentThemeLight();
+                          return (
                             <div
+                              key={date.toDateString()}
                               className={cn(
-                                "text-xs font-medium",
+                                "flex-1 p-2 text-center border-r border-[var(--color-border-alpha-30)] last:border-r-0",
+                                config.squeezeWeekOnMobile ? "" : "min-w-24",
                                 isToday
-                                  ? "text-white"
-                                  : "text-muted-foreground",
+                                  ? "bg-[var(--color-header-accent)]"
+                                  : isLight
+                                    ? "bg-[var(--color-accent-alpha-20)]"
+                                    : "bg-transparent",
                               )}
                             >
-                              {filteredDayNames[index]}
+                              <div
+                                className={cn(
+                                  "text-xs font-medium",
+                                  isToday
+                                    ? "text-white"
+                                    : "text-muted-foreground",
+                                )}
+                              >
+                                {filteredDayNames[index]}
+                              </div>
+                              <div
+                                className={cn(
+                                  "text-sm font-bold mt-1",
+                                  isToday ? "text-white" : "text-foreground",
+                                )}
+                              >
+                                {date.getDate()}
+                              </div>
                             </div>
-                            <div
-                              className={cn(
-                                "text-sm font-bold mt-1",
-                                isToday ? "text-white" : "text-foreground",
-                              )}
-                            >
-                              {date.getDate()}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Time Grid */}
-                  <div className="relative">
-                    {/* Current Time Indicator */}
-                    {showCurrentTimeIndicator && (
-                      <div
-                        className="absolute w-full z-40"
-                        style={{
-                          top: `${currentTimeIndicatorPosition}px`,
-                          left: "0",
-                          right: "0",
-                        }}
-                      >
-                        {/* Time label */}
-                        <div className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1 z-40 [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
-                          <Clock size={10} />
-                          {currentTimeString}
-                        </div>
-                        {/* Line spanning all days */}
-                        <div className="absolute left-12 top-0 right-0 h-0.5 bg-red-500 shadow-sm z-30"></div>
+                          );
+                        })}
                       </div>
-                    )}
+                    </div>
 
-                    {timeSlots.map((time, timeIndex) => (
-                      <div
-                        key={time}
-                        className="flex relative"
-                        style={{
-                          borderColor: isCurrentThemeLight()
-                            ? "var(--color-border-alpha-50)"
-                            : "var(--color-border-alpha-30)",
-                          borderBottomWidth: isCurrentThemeLight()
-                            ? "1.5px"
-                            : "1px",
-                          borderBottomStyle: "solid",
-                          minHeight: `${WEEK_HOUR_HEIGHT}px`,
-                        }}
-                      >
-                        {/* Half-hour dashed line */}
+                    {/* Time Grid */}
+                    <div className="relative">
+                      {/* Current Time Indicator */}
+                      {showCurrentTimeIndicator && (
                         <div
-                          className={
-                            isCurrentThemeLight()
-                              ? "absolute left-0 right-0 opacity-100"
-                              : "absolute left-0 right-0 opacity-75"
-                          }
+                          className="absolute w-full z-40"
                           style={{
-                            borderColor: "var(--color-border-alpha-30)",
-                            borderTopWidth: "1px",
-                            borderTopStyle: "dashed",
-                            top: `${WEEK_HOUR_HEIGHT / 2}px`,
-                            zIndex: 5,
+                            top: `${currentTimeIndicatorPosition}px`,
+                            left: "0",
+                            right: "0",
                           }}
-                        />
-
-                        <div className="w-12 flex-shrink-0 p-2 text-xs font-medium border-r border-[var(--color-border-alpha-30)] text-muted-foreground">
-                          {time}
+                        >
+                          {/* Time label */}
+                          <div className="absolute left-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium shadow-sm flex items-center gap-1 z-40 [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
+                            <Clock size={10} />
+                            {currentTimeString}
+                          </div>
+                          {/* Line spanning all days */}
+                          <div className="absolute left-12 top-0 right-0 h-0.5 bg-red-500 shadow-sm z-30"></div>
                         </div>
+                      )}
 
-                        {filteredWeekDates.map((date) => (
+                      {timeSlots.map((time, timeIndex) => (
+                        <div
+                          key={time}
+                          className="flex relative"
+                          style={{
+                            borderColor: isCurrentThemeLight()
+                              ? "var(--color-border-alpha-50)"
+                              : "var(--color-border-alpha-30)",
+                            borderBottomWidth: isCurrentThemeLight()
+                              ? "1.5px"
+                              : "1px",
+                            borderBottomStyle: "solid",
+                            minHeight: `${WEEK_HOUR_HEIGHT}px`,
+                          }}
+                        >
+                          {/* Half-hour dashed line */}
                           <div
-                            key={date.toDateString()}
-                            className={cn(
-                              "flex-1 relative border-r border-[var(--color-border-alpha-30)] last:border-r-0",
-                              config.squeezeWeekOnMobile ? "" : "min-w-24",
-                              DateFormatUtils.isToday(date)
-                                ? "bg-[var(--color-accent-alpha-5)]"
-                                : "bg-transparent",
-                            )}
-                          >
-                            {/* Events for this time slot */}
-                            {filteredWeekEvents[date.toDateString()]?.map(
-                              (event) => {
-                                const eventStartHour = event.startHour;
-                                const slotHour = parseInt(
-                                  time.split(":")[0],
-                                  10,
-                                );
-                                const nextSlotHour =
-                                  timeIndex < timeSlots.length - 1
-                                    ? parseInt(
-                                        timeSlots[timeIndex + 1].split(":")[0],
-                                        10,
-                                      )
-                                    : slotHour + 1;
+                            className={
+                              isCurrentThemeLight()
+                                ? "absolute left-0 right-0 opacity-100"
+                                : "absolute left-0 right-0 opacity-75"
+                            }
+                            style={{
+                              borderColor: "var(--color-border-alpha-30)",
+                              borderTopWidth: "1px",
+                              borderTopStyle: "dashed",
+                              top: `${WEEK_HOUR_HEIGHT / 2}px`,
+                              zIndex: 5,
+                            }}
+                          />
 
-                                // Check if event starts in this time slot
-                                if (
-                                  eventStartHour >= slotHour &&
-                                  eventStartHour < nextSlotHour
-                                ) {
-                                  const topOffset =
-                                    (eventStartHour - slotHour) *
-                                    WEEK_HOUR_HEIGHT; // WEEK_HOUR_HEIGHT px per hour
-                                  const height =
-                                    event.duration * WEEK_HOUR_HEIGHT; // WEEK_HOUR_HEIGHT px per hour
-                                  const colorPair = ScheduleUtils.getColorPair(
-                                    event.title,
-                                    event.id,
-                                    metadataByEvent,
-                                    metadataByRealization,
-                                  );
-                                  const isHidden = isEventEffectivelyHidden(
-                                    event.id,
-                                  );
-                                  // Layout for overlapping events (column index & total cols)
-                                  const layout = eventLayoutByDate[
-                                    date.toDateString()
-                                  ]?.[event.id] || { col: 0, cols: 1 };
-                                  const leftPercent =
-                                    (layout.col / layout.cols) * 100;
-                                  const widthPercent = 100 / layout.cols;
+                          <div className="w-12 flex-shrink-0 p-2 text-xs font-medium border-r border-[var(--color-border-alpha-30)] text-muted-foreground">
+                            {time}
+                          </div>
 
-                                  return (
-                                    <ContextMenu key={event.id}>
-                                      <ContextMenuTrigger asChild>
-                                        <button
-                                          type="button"
-                                          className={`absolute rounded text-white text-xs p-1 cursor-pointer overflow-hidden schedule-event-gradient schedule-event-gradient-week border-none text-left appearance-none flex flex-col items-start justify-start`}
+                          {filteredWeekDates.map((date) => (
+                            <div
+                              key={date.toDateString()}
+                              className={cn(
+                                "flex-1 relative border-r border-[var(--color-border-alpha-30)] last:border-r-0",
+                                config.squeezeWeekOnMobile ? "" : "min-w-24",
+                                DateFormatUtils.isToday(date)
+                                  ? "bg-[var(--color-accent-alpha-5)]"
+                                  : "bg-transparent",
+                              )}
+                            >
+                              {/* Events for this time slot */}
+                              {filteredWeekEvents[date.toDateString()]?.map(
+                                (event) => {
+                                  const dayEvents =
+                                    filteredWeekEvents[date.toDateString()] ||
+                                    [];
+                                  const eventStartHour = event.startHour;
+                                  const eventEndHour =
+                                    event.startHour + event.duration;
+                                  const slotHour = parseInt(
+                                    time.split(":")[0],
+                                    10,
+                                  );
+                                  const nextSlotHour =
+                                    timeIndex < timeSlots.length - 1
+                                      ? parseInt(
+                                          timeSlots[timeIndex + 1].split(
+                                            ":",
+                                          )[0],
+                                          10,
+                                        )
+                                      : slotHour + 1;
+
+                                  // Check if event starts in this time slot
+                                  if (
+                                    eventStartHour >= slotHour &&
+                                    eventStartHour < nextSlotHour
+                                  ) {
+                                    const topOffset =
+                                      (eventStartHour - slotHour) *
+                                      WEEK_HOUR_HEIGHT; // WEEK_HOUR_HEIGHT px per hour
+                                    const height =
+                                      event.duration * WEEK_HOUR_HEIGHT; // WEEK_HOUR_HEIGHT px per hour
+                                    const colorPair =
+                                      ScheduleUtils.getColorPair(
+                                        event.title,
+                                        event.id,
+                                        metadataByEvent,
+                                        metadataByRealization,
+                                      );
+                                    const isHidden = isEventEffectivelyHidden(
+                                      event.id,
+                                    );
+                                    const overlapsWithVisibleEvent =
+                                      dayEvents.some((otherEvent) => {
+                                        if (otherEvent.id === event.id) {
+                                          return false;
+                                        }
+                                        const otherEndHour =
+                                          otherEvent.startHour +
+                                          otherEvent.duration;
+                                        const overlaps =
+                                          eventStartHour < otherEndHour &&
+                                          otherEvent.startHour < eventEndHour;
+                                        return (
+                                          overlaps &&
+                                          !isEventEffectivelyHidden(
+                                            otherEvent.id,
+                                          )
+                                        );
+                                      });
+                                    const overlapsWithHiddenEvent =
+                                      dayEvents.some((otherEvent) => {
+                                        if (otherEvent.id === event.id) {
+                                          return false;
+                                        }
+                                        const otherEndHour =
+                                          otherEvent.startHour +
+                                          otherEvent.duration;
+                                        const overlaps =
+                                          eventStartHour < otherEndHour &&
+                                          otherEvent.startHour < eventEndHour;
+                                        return (
+                                          overlaps &&
+                                          isEventEffectivelyHidden(
+                                            otherEvent.id,
+                                          )
+                                        );
+                                      });
+                                    // Layout for overlapping events (column index & total cols)
+                                    const layout = eventLayoutByDate[
+                                      date.toDateString()
+                                    ]?.[event.id] || { col: 0, cols: 1 };
+                                    let leftPercent =
+                                      (layout.col / layout.cols) * 100;
+                                    let widthPercent = 100 / layout.cols;
+
+                                    if (isHidden && overlapsWithVisibleEvent) {
+                                      widthPercent = Math.min(widthPercent, 25);
+                                      leftPercent = Math.max(
+                                        leftPercent,
+                                        100 - widthPercent,
+                                      );
+                                    } else if (
+                                      !isHidden &&
+                                      overlapsWithHiddenEvent &&
+                                      layout.cols === 2
+                                    ) {
+                                      widthPercent = 75;
+                                      leftPercent = 0;
+                                    }
+
+                                    return (
+                                      <ContextMenu key={event.id}>
+                                        <ContextMenuTrigger
+                                          className="absolute"
                                           style={
                                             {
                                               top: `${topOffset}px`,
                                               left: `${leftPercent}%`,
                                               width: `calc(${widthPercent}% - 8px)`,
-                                              height: `${Math.max(height, SCHEDULE_LAYOUT.EVENT.MIN_HEIGHT)}px`, // Minimum height
-                                              zIndex: 10,
-                                              background: colorPair.normal,
-                                              opacity: isHidden
-                                                ? config.hiddenEventOpacity /
-                                                  100
-                                                : 1,
-                                              "--normal-gradient":
-                                                colorPair.normal,
-                                            } as React.CSSProperties & {
-                                              "--normal-gradient": string;
+                                              height: `${Math.max(height, SCHEDULE_LAYOUT.EVENT.MIN_HEIGHT)}px`,
+                                              zIndex: isHidden ? 10 : 12,
+                                            } as React.CSSProperties
+                                          }
+                                        >
+                                          <Tooltip>
+                                            <TooltipTrigger asChild>
+                                              <button
+                                                type="button"
+                                                className={`w-full h-full rounded text-white text-xs p-1 cursor-pointer overflow-hidden schedule-event-gradient schedule-event-gradient-week border-none text-left appearance-none flex flex-col items-start justify-start`}
+                                                style={
+                                                  {
+                                                    background:
+                                                      colorPair.normal,
+                                                    opacity: isHidden
+                                                      ? config.hiddenEventOpacity /
+                                                        100
+                                                      : 1,
+                                                    "--normal-gradient":
+                                                      colorPair.normal,
+                                                  } as React.CSSProperties & {
+                                                    "--normal-gradient": string;
+                                                  }
+                                                }
+                                                onClick={(e) => {
+                                                  e.preventDefault();
+                                                  e.stopPropagation();
+                                                  openEventDetailsDialog(event);
+                                                }}
+                                              >
+                                                <div className="font-semibold line-clamp-2 leading-tight">
+                                                  {getDisplayTitle(
+                                                    getEventDisplayName(event),
+                                                  )}
+                                                </div>
+                                                {getEventLocation(event) &&
+                                                  height > 56 && (
+                                                    <div className="text-xs opacity-90 leading-tight">
+                                                      📍{" "}
+                                                      {getEventLocation(event)}
+                                                    </div>
+                                                  )}
+                                                <div className="text-xs opacity-75 line-clamp-2">
+                                                  {ScheduleUtils.formatTimeRange(
+                                                    event.startTime,
+                                                    event.endTime,
+                                                  )}
+                                                </div>
+                                                {hasTimeOverrideChange(
+                                                  event,
+                                                ) && (
+                                                  <div className="absolute bottom-1 right-1 flex items-center gap-1 text-white/80 pointer-events-none">
+                                                    <Pencil className="h-3 w-3" />
+                                                  </div>
+                                                )}
+                                              </button>
+                                            </TooltipTrigger>
+                                            <TooltipContent
+                                              side="top"
+                                              className="w-80 space-y-1"
+                                            >
+                                              <p className="text-sm font-semibold leading-tight">
+                                                {getDisplayTitle(
+                                                  getEventDisplayName(event),
+                                                )}
+                                              </p>
+                                              <p className="text-xs text-background/80">
+                                                {ScheduleUtils.formatTimeRange(
+                                                  event.startTime,
+                                                  event.endTime,
+                                                )}
+                                                {` · ${event.duration.toFixed(1)}h`}
+                                              </p>
+                                              {getEventLocation(event) && (
+                                                <p className="text-xs text-background/80">
+                                                  📍 {getEventLocation(event)}
+                                                </p>
+                                              )}
+                                              {event.teachers?.length ? (
+                                                <p className="text-xs text-background/80 line-clamp-2">
+                                                  {event.teachers.join(", ")}
+                                                </p>
+                                              ) : null}
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        </ContextMenuTrigger>
+                                        <ContextMenuContent>
+                                          <ContextMenuItem
+                                            onClick={() =>
+                                              openEventDetailsDialog(event)
                                             }
-                                          }
-                                          onClick={(e) => {
-                                            // Prevent the click from causing scroll reset
-                                            e.preventDefault();
-                                            e.stopPropagation();
-
-                                            // Open event details dialog for this event
-                                            openEventDetailsDialog(event);
-                                          }}
-                                        >
-                                          <div className="font-semibold line-clamp-2 leading-tight">
-                                            {getDisplayTitle(
-                                              getEventDisplayName(event),
+                                          >
+                                            <Calendar className="mr-2 h-4 w-4" />
+                                            {tColor("contextMenu.eventDetails")}
+                                          </ContextMenuItem>
+                                          <ContextMenuItem
+                                            onClick={() =>
+                                              toggleEventVisibility(event)
+                                            }
+                                          >
+                                            {isHidden ? (
+                                              <>
+                                                <Eye className="mr-2 h-4 w-4" />
+                                                {tColor(
+                                                  "contextMenu.showEvent",
+                                                )}
+                                              </>
+                                            ) : (
+                                              <>
+                                                <EyeOff className="mr-2 h-4 w-4" />
+                                                {tColor(
+                                                  "contextMenu.hideEvent",
+                                                )}
+                                              </>
                                             )}
-                                          </div>
-                                          {getEventLocation(event) &&
-                                            height > 56 && (
-                                              <div className="text-xs opacity-90 leading-tight">
-                                                📍 {getEventLocation(event)}
-                                              </div>
+                                          </ContextMenuItem>
+                                          <ContextMenuItem
+                                            onClick={() =>
+                                              openColorCustomizer(event)
+                                            }
+                                          >
+                                            <Palette className="mr-2 h-4 w-4" />
+                                            {tColor(
+                                              "contextMenu.customizeColor",
                                             )}
-                                          <div className="text-xs opacity-75 line-clamp-2">
-                                            {ScheduleUtils.formatTimeRange(
-                                              event.startTime,
-                                              event.endTime,
-                                            )}
-                                          </div>
-                                          {hasTimeOverrideChange(event) && (
-                                            <div className="absolute bottom-1 right-1 flex items-center gap-1 text-white/80 pointer-events-none">
-                                              <Pencil className="h-3 w-3" />
-                                            </div>
-                                          )}
-                                        </button>
-                                      </ContextMenuTrigger>
-                                      <ContextMenuContent>
-                                        <ContextMenuItem
-                                          onClick={() =>
-                                            openEventDetailsDialog(event)
-                                          }
-                                        >
-                                          <Calendar className="mr-2 h-4 w-4" />
-                                          {tColor("contextMenu.eventDetails")}
-                                        </ContextMenuItem>
-                                        <ContextMenuItem
-                                          onClick={() =>
-                                            toggleEventVisibility(event)
-                                          }
-                                        >
-                                          {isHidden ? (
-                                            <>
-                                              <Eye className="mr-2 h-4 w-4" />
-                                              {tColor("contextMenu.showEvent")}
-                                            </>
-                                          ) : (
-                                            <>
-                                              <EyeOff className="mr-2 h-4 w-4" />
-                                              {tColor("contextMenu.hideEvent")}
-                                            </>
-                                          )}
-                                        </ContextMenuItem>
-                                        <ContextMenuItem
-                                          onClick={() =>
-                                            openColorCustomizer(event)
-                                          }
-                                        >
-                                          <Palette className="mr-2 h-4 w-4" />
-                                          {tColor("contextMenu.customizeColor")}
-                                        </ContextMenuItem>
-                                      </ContextMenuContent>
-                                    </ContextMenu>
-                                  );
-                                }
-                                return null;
-                              },
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    ))}
+                                          </ContextMenuItem>
+                                        </ContextMenuContent>
+                                      </ContextMenu>
+                                    );
+                                  }
+                                  return null;
+                                },
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Realization Dialog */}
-        <RealizationDialog
-          open={realizationDialogOpen}
-          onOpenChange={closeRealizationDialog}
-          realizationData={realizationData}
-          isLoading={realizationLoading}
-          error={realizationError}
-        />
-
-        {/* Event Details Dialog */}
-        <EventDetailsDialog
-          open={eventDetailsDialogOpen}
-          onOpenChange={closeEventDetailsDialog}
-          event={selectedEvent}
-          hideNoRealizationIdWarning={Boolean(
-            selectedEvent && isCustomScheduleEventId(selectedEvent.id),
-          )}
-          allowNameEditing
-          allowLocationEditing
-          onOpenRealizationDialog={openRealizationDialog}
-          onOpenRealizationDialogByCode={openRealizationDialogByCode}
-          onOpenColorCustomizer={openColorCustomizer}
-          isRealizationLoading={realizationLoading}
-        />
-
-        {/* Color Customizer Dialog */}
-        {selectedEventForColor && (
-          <RealizationColorCustomizer
-            open={Boolean(colorEventId)}
-            onOpenChange={(isOpen: boolean) => {
-              if (!isOpen) {
-                setColorEventId(null);
-              }
-            }}
-            eventId={selectedEventForColor.id}
-            eventTitle={getDisplayTitle(
-              getEventDisplayName(selectedEventForColor),
-            )}
-            eventTitleRaw={getEventDisplayName(selectedEventForColor)}
-            realizationCode={
-              metadataByEvent[selectedEventForColor.id]
-                ?.attachedRealizationId ||
-              RealizationApiService.extractRealizationCode(
-                getEventDisplayName(selectedEventForColor),
-              ) ||
-              ""
-            }
-            realizationTitle={RealizationApiService.stripRealizationCode(
-              getEventDisplayName(selectedEventForColor),
-            )}
+          {/* Realization Dialog */}
+          <RealizationDialog
+            open={realizationDialogOpen}
+            onOpenChange={closeRealizationDialog}
+            realizationData={realizationData}
+            isLoading={realizationLoading}
+            error={realizationError}
           />
-        )}
-      </div>
+
+          {/* Event Details Dialog */}
+          <EventDetailsDialog
+            open={eventDetailsDialogOpen}
+            onOpenChange={closeEventDetailsDialog}
+            event={selectedEvent}
+            hideNoRealizationIdWarning={Boolean(
+              selectedEvent && isCustomScheduleEventId(selectedEvent.id),
+            )}
+            allowNameEditing
+            allowLocationEditing
+            onOpenRealizationDialog={openRealizationDialog}
+            onOpenRealizationDialogByCode={openRealizationDialogByCode}
+            onOpenColorCustomizer={openColorCustomizer}
+            isRealizationLoading={realizationLoading}
+          />
+
+          {/* Color Customizer Dialog */}
+          {selectedEventForColor && (
+            <RealizationColorCustomizer
+              open={Boolean(colorEventId)}
+              onOpenChange={(isOpen: boolean) => {
+                if (!isOpen) {
+                  setColorEventId(null);
+                }
+              }}
+              eventId={selectedEventForColor.id}
+              eventTitle={getDisplayTitle(
+                getEventDisplayName(selectedEventForColor),
+              )}
+              eventTitleRaw={getEventDisplayName(selectedEventForColor)}
+              realizationCode={
+                metadataByEvent[selectedEventForColor.id]
+                  ?.attachedRealizationId ||
+                RealizationApiService.extractRealizationCode(
+                  getEventDisplayName(selectedEventForColor),
+                ) ||
+                ""
+              }
+              realizationTitle={RealizationApiService.stripRealizationCode(
+                getEventDisplayName(selectedEventForColor),
+              )}
+            />
+          )}
+        </div>
+      </TooltipProvider>
     );
   },
 );

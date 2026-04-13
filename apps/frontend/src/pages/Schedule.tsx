@@ -19,7 +19,7 @@ import {
   ChevronRight,
   Plus,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -60,16 +60,19 @@ export default function Schedule() {
   const {
     getEventsForDate,
     fetchSchedule,
+    refreshSchedule,
     isLoading,
     isCheckingHash,
     isFetchingCalendar,
     error,
     clearError,
+    lastFetched,
     lastUpdated,
   } = useScheduleStore();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
   const { config } = useConfigStore();
+  const isAutoRefreshingRef = useRef(false);
 
   // Validate and set active calendar from URL
   useEffect(() => {
@@ -156,6 +159,59 @@ export default function Schedule() {
   useEffect(() => {
     fetchSchedule();
   }, [fetchSchedule]);
+
+  // Auto-refreshes the calendar every 30 mins
+  // some people apparently just never refresh the page?
+  useEffect(() => {
+    const REFRESH_INTERVAL_MS = 30 * 60 * 1000;
+
+    const shouldRefresh = () => {
+      if (!lastFetched || isLoading || isFetchingCalendar || isCheckingHash) {
+        return false;
+      }
+
+      const lastRefreshTime =
+        lastFetched instanceof Date ? lastFetched : new Date(lastFetched);
+      if (Number.isNaN(lastRefreshTime.getTime())) {
+        return true;
+      }
+
+      const elapsed = Date.now() - lastRefreshTime.getTime();
+      return elapsed >= REFRESH_INTERVAL_MS;
+    };
+
+    const runRefreshCheck = () => {
+      if (isAutoRefreshingRef.current || !shouldRefresh()) {
+        return;
+      }
+
+      isAutoRefreshingRef.current = true;
+      refreshSchedule().finally(() => {
+        isAutoRefreshingRef.current = false;
+      });
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        runRefreshCheck();
+      }
+    };
+
+    const intervalId = window.setInterval(runRefreshCheck, 60 * 1000);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    runRefreshCheck();
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [
+    isCheckingHash,
+    isFetchingCalendar,
+    isLoading,
+    lastFetched,
+    refreshSchedule,
+  ]);
 
   useDocumentTitle(`${t("title")} — Avoin Lukkari`);
 

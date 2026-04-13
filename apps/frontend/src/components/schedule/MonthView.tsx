@@ -261,16 +261,18 @@ const MonthView = memo(
                         }}
                       />
                     </TooltipTrigger>
-                    <TooltipContent side="top" sideOffset={4}>
-                      <p className="font-semibold">{title}</p>
-                      <p className="opacity-85">
+                    <TooltipContent side="top" className="w-72 space-y-1">
+                      <p className="text-sm font-semibold leading-tight">
+                        {title}
+                      </p>
+                      <p className="text-xs text-background/80">
                         {ScheduleUtils.formatTimeRange(
                           event.startTime,
                           event.endTime,
                         )}
                         {` · ${formatHours(event.duration)}h`}
                       </p>
-                      <p className="opacity-70">
+                      <p className="text-xs text-background/80">
                         {dayLabelFormatter.format(day.date)}
                       </p>
                     </TooltipContent>
@@ -290,7 +292,7 @@ const MonthView = memo(
     };
 
     return (
-      <TooltipProvider delayDuration={80}>
+      <TooltipProvider delayDuration={350} disableHoverableContent>
         <div className="w-full h-full flex flex-col">
           <div className="w-full flex-shrink-0 bg-[linear-gradient(to_bottom,var(--color-surface-alpha-40),transparent)]">
             <div className="max-w-7xl mx-auto px-4 py-6 relative">

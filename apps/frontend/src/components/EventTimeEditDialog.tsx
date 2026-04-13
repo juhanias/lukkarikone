@@ -48,8 +48,12 @@ const EventTimeEditDialog = ({
   allowNameEditing = false,
 }: EventTimeEditDialogProps) => {
   const { t } = useTranslation("dialogs");
-  const { getEventMetadata, getEventTimeOverride, setEventMetadata, setEventTimeOverride } =
-    useEventMetadataStore();
+  const {
+    getEventMetadata,
+    getEventTimeOverride,
+    setEventMetadata,
+    setEventTimeOverride,
+  } = useEventMetadataStore();
   const { applyEventTimeOverride } = useScheduleStore();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [startTimeValue, setStartTimeValue] = useState("");

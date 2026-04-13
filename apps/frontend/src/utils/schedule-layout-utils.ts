@@ -5,6 +5,8 @@ export interface PositionedEvent extends ScheduleEvent {
   width: number;
   left: number;
   zIndex: number;
+  col: number;
+  cols: number;
 }
 
 export class ScheduleLayoutUtils {
@@ -47,61 +49,96 @@ export class ScheduleLayoutUtils {
   }
 
   /**
-   * Calculates positions for overlapping events in the day view
+   * Calculates horizontal placement for day/week event blocks
+   *
+   * - Provide a base layout that views can tweak (for hidden/visible rules)
+   * - Group overlapping events
+   * - Convert columns to `left` and `width` percentages
+   *
+   * Returned `col`/`cols` are intentionally exposed so views can apply
+   * additional policies on top of this baseline layout (for example hidden
+   * events occupying less width when overlapping visible events)
    */
   static calculateEventPositions(events: ScheduleEvent[]): PositionedEvent[] {
-    // Sort events by start time
     const sortedEvents = [...events].sort((a, b) => a.startHour - b.startHour);
+    const clusters: ScheduleEvent[][] = [];
+    let currentCluster: ScheduleEvent[] = [];
+    let clusterEnd = -Infinity;
 
-    // Group overlapping events using a more comprehensive approach
-    const groups: ScheduleEvent[][] = [];
-
+    // Separate overlap groups so independent time blocks do not affect each other
     sortedEvents.forEach((event) => {
-      // Find the first group this event overlaps with
-      const overlappingGroupIndex = groups.findIndex((group) =>
-        group.some((groupEvent) =>
-          ScheduleLayoutUtils.eventsOverlap(event, groupEvent),
-        ),
-      );
-
-      if (overlappingGroupIndex !== -1) {
-        // Add to existing group
-        groups[overlappingGroupIndex].push(event);
+      const eventEnd = event.startHour + event.duration;
+      if (currentCluster.length === 0) {
+        currentCluster.push(event);
+        clusterEnd = eventEnd;
+      } else if (event.startHour < clusterEnd) {
+        currentCluster.push(event);
+        clusterEnd = Math.max(clusterEnd, eventEnd);
       } else {
-        // Create new group
-        groups.push([event]);
+        clusters.push(currentCluster);
+        currentCluster = [event];
+        clusterEnd = eventEnd;
       }
     });
 
-    // Calculate positions for each group
+    if (currentCluster.length > 0) {
+      clusters.push(currentCluster);
+    }
+
     const positionedEvents: PositionedEvent[] = [];
 
-    groups.forEach((group) => {
-      if (group.length === 1) {
-        // No overlapping, full width
-        positionedEvents.push({
-          ...group[0],
-          width: 100,
-          left: 0,
-          zIndex: 1,
-        });
-      } else {
-        // Overlapping events - each takes 50% width and stacks
-        // Sort group by start time for consistent positioning
-        const sortedGroup = group.sort((a, b) => a.startHour - b.startHour);
+    clusters.forEach((cluster) => {
+      // Track when each column becomes free.
+      const columnEnds: number[] = [];
+      const assigned = new Map<
+        string,
+        { event: ScheduleEvent; col: number; cols: number }
+      >();
 
-        sortedGroup.forEach((event, index) => {
-          positionedEvents.push({
-            ...event,
-            width: 50,
-            left: Math.min(index * 30, 50), // Offset each event, max 50% to stay within bounds
-            zIndex: index + 2, // Higher z-index for events on top, starting from 2
-          });
+      cluster.forEach((event) => {
+        const eventEnd = event.startHour + event.duration;
+        let assignedCol = -1;
+
+        // Reuse a free column first; create a new one only if needed
+        for (let i = 0; i < columnEnds.length; i++) {
+          if (event.startHour >= columnEnds[i]) {
+            assignedCol = i;
+            columnEnds[i] = eventEnd;
+            break;
+          }
+        }
+
+        if (assignedCol === -1) {
+          assignedCol = columnEnds.length;
+          columnEnds.push(eventEnd);
+        }
+
+        assigned.set(event.id, { event, col: assignedCol, cols: 0 });
+      });
+
+      // All events in the cluster share the same base column count
+      const totalCols = Math.max(1, columnEnds.length);
+      for (const value of assigned.values()) {
+        value.cols = totalCols;
+      }
+
+      for (const value of assigned.values()) {
+        const width = 100 / value.cols;
+        const left = (value.col / value.cols) * 100;
+        const zIndex = value.col + 1;
+
+        positionedEvents.push({
+          ...value.event,
+          width,
+          left,
+          zIndex,
+          col: value.col,
+          cols: value.cols,
         });
       }
     });
 
-    return positionedEvents;
+    return positionedEvents.sort((a, b) => a.startHour - b.startHour);
   }
 
   /**

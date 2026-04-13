@@ -436,15 +436,13 @@ const useConfigStore = create<ConfigState>()(
     }),
     {
       name: "app-config",
-      version: 3,
+      version: 4,
       migrate: (persistedState: unknown, version: number) => {
         const state = persistedState as
           | { config?: Record<string, unknown> }
           | undefined;
 
         if (version < 2 && state?.config?.calendarUrl) {
-          console.log("Removing legacy calendarUrl from config");
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { calendarUrl: _calendarUrl, ...configWithoutUrl } =
             state.config;
           return {
@@ -460,6 +458,16 @@ const useConfigStore = create<ConfigState>()(
             config: {
               ...state.config,
               font: "gabarito-open-sans",
+            },
+          };
+        }
+
+        if (version < 4 && state?.config) {
+          return {
+            ...state,
+            config: {
+              ...state.config,
+              catCompanion: false,
             },
           };
         }
