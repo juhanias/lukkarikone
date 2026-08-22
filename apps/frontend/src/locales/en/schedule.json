@@ -29,6 +29,10 @@
     "noEvents": "No events this month"
   },
   "title": "Schedule",
+  "ptivis25Notice": {
+    "title": "Please note that this calendar does not show your study path schedule!",
+    "description": "You are currently using the general group calendar. When you move to your study path schedule, you will need to set this calendar tool to follow your personal schedule if you want to keep using the service."
+  },
   "calendar": {
     "urlMissing": "Connect your calendar",
     "urlMissingDescription": "Add an iCal source from Turku AMK to start using your schedule.",

@@ -28,6 +28,7 @@ import { ScheduleUtils } from "../../utils/schedule-utils";
 import { CalendarViewBadge } from "../CalendarViewBadge";
 import EventDetailsDialog from "../EventDetailsDialog";
 import { LastUpdatedBadge } from "../LastUpdatedBadge";
+import { Ptivis25Notice } from "../Ptivis25Notice";
 import RealizationDialog from "../RealizationDialog";
 import {
   ContextMenu,
@@ -363,6 +364,7 @@ const WeekView = memo(
         <div className="w-full h-full flex flex-col">
           {/* Week Header */}
           <div className="w-full flex-shrink-0 bg-[linear-gradient(to_bottom,var(--color-surface-alpha-40),transparent)]">
+            <Ptivis25Notice />
             <div className="max-w-7xl mx-auto px-4 py-6 relative">
               <div className="absolute left-4 top-4 md:hidden">
                 <CalendarViewBadge variant="icon-only" />

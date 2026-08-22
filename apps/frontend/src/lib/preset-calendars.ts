@@ -89,3 +89,16 @@ export const PRESET_CALENDAR_GROUPS = PRESET_CALENDARS.reduce<
   groups[preset.cohort].push(preset);
   return groups;
 }, {});
+
+const normalizePresetUrl = (url: string) =>
+  url.trim().replace(/^https:/i, "http:");
+
+export const isPresetCalendarUrl = (url: string, cohort: string) => {
+  const normalizedUrl = normalizePresetUrl(url);
+
+  return PRESET_CALENDARS.some(
+    (preset) =>
+      preset.cohort === cohort &&
+      normalizePresetUrl(preset.url) === normalizedUrl,
+  );
+};

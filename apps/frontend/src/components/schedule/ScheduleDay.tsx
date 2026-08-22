@@ -27,6 +27,7 @@ import { ScheduleUtils } from "../../utils/schedule-utils";
 import { CalendarViewBadge } from "../CalendarViewBadge";
 import EventDetailsDialog from "../EventDetailsDialog";
 import { LastUpdatedBadge } from "../LastUpdatedBadge";
+import { Ptivis25Notice } from "../Ptivis25Notice";
 import RealizationDialog from "../RealizationDialog";
 import {
   ContextMenu,
@@ -217,6 +218,7 @@ const ScheduleDay = memo(
         <div className="w-full h-full flex flex-col">
           {/* Date Header - Full Width Gradient */}
           <div className="w-full flex-shrink-0 bg-[linear-gradient(to_bottom,var(--color-surface-alpha-40),transparent)]">
+            <Ptivis25Notice />
             <div className="max-w-7xl mx-auto px-4 py-6 text-center relative">
               <div className="absolute left-4 top-4 md:hidden flex gap-2">
                 <CalendarViewBadge variant="icon-only" />

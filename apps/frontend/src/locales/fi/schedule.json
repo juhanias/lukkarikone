@@ -29,6 +29,10 @@
     "noEvents": "Ei tapahtumia tässä kuussa"
   },
   "title": "Lukujärjestys",
+  "ptivis25Notice": {
+    "title": "Huomaathan, että tässä ei näytetä polun aikataulua!",
+    "description": "Käytät tällä hetkellä yleistä ryhmäkalenteria. Kun siirryt suuntautumispolun aikatauluun, joudut asettamaan tämän lukkarikoneen seuraamaan henkilökohtaista aikatauluasi, jos haluat jatkaa palvelun käyttöä."
+  },
   "calendar": {
     "urlMissing": "Yhdistä kalenteri",
     "urlMissingDescription": "Lisää Turku AMK:n iCal-lähde, jotta lukujärjestys voidaan näyttää.",
