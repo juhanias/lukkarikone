@@ -6,7 +6,7 @@
         <h1>Avoin Lukkari Monorepository</h1>
     </p>
     <p width="120">
-        An open-source alternative to the widely used Lukkarikone 4
+        An open-source alternative to lukkari.turkuamk.fi
         <br>
         Customizable, fast & lightweight
     </p>
@@ -17,8 +17,8 @@
 </div>
 <br/>
 
-> [!IMPORTANT]
-> Currently only supports the Lukkarikone instance of Turku UAS.
+> [!NOTE]
+> Large parts of this codebase were built just to have the application out there. Code quality varies between outright (LLM) sloppy & better designed systems. The project is generally open to contributions using tools of all kind, but be mindful of what you're doing, and try to clean up as you go. Thanks for checking the project out. Yes, we could use a web designer.
 
 ## Development & Components
 `juhanias/lukkarikone` is structured as a monorepo. It contains the relevant service components for Avoin Lukkari.
